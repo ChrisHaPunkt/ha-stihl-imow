@@ -13,5 +13,6 @@
   "codeowners": [
     "@ChrisHaPunkt"
   ],
-  "iot_class": "cloud_polling"
+  "iot_class": "cloud_polling",
+  "version": "0.0.1a"
 }
