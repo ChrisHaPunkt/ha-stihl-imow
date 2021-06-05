@@ -1,0 +1,17 @@
+{
+  "domain": "stihl_imow",
+  "name": "STIHL iMow",
+  "config_flow": true,
+  "documentation": "https://www.home-assistant.io/integrations/stihl_imow",
+  "requirements": [
+    "imow-webapi==0.4.5"
+  ],
+  "ssdp": [],
+  "zeroconf": [],
+  "homekit": {},
+  "dependencies": [],
+  "codeowners": [
+    "@ChrisHaPunkt"
+  ],
+  "iot_class": "cloud_polling"
+}
