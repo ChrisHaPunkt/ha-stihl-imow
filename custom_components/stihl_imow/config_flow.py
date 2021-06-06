@@ -33,10 +33,14 @@ _LOGGER = logging.getLogger(__name__)
 STEP_USER_DATA_SCHEMA = vol.Schema({"username": str, "password": str})
 
 
-async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str, Any]:
+async def validate_input(
+        hass: HomeAssistant,
+        data: dict[str, Any]
+) -> dict[str, Any]:
     """Validate the user input allows us to connect.
 
-    Data has the keys from STEP_USER_DATA_SCHEMA with values provided by the user.
+    Data has the keys from STEP_USER_DATA_SCHEMA
+    with values provided by the user.
     """
     # TODO validate the data can be used to set up a connection.
 
@@ -58,7 +62,6 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     # Return info that you want to store in the config entry.
     mowers = []
     for mower in await imow.receive_mowers():
-
         mowers_state = dict(mower.__dict__)
         del mowers_state["api"]
         mowers.append(
@@ -117,7 +120,9 @@ class StihlImowConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors["base"] = "unknown"
         else:
 
-            return self.async_create_entry(title=CONF_ENTRY_TITLE, data=self.data)
+            return self.async_create_entry(
+                title=CONF_ENTRY_TITLE, data=self.data
+            )
 
         return self.async_show_form(
             step_id="user", data_schema=STEP_USER_DATA_SCHEMA, errors=errors

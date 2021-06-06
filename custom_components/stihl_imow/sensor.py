@@ -1,13 +1,14 @@
 """Platform for sensor integration."""
 from typing import Any, Dict, List
 
+from homeassistant import config_entries, core
+from homeassistant.const import TIME_SECONDS, PERCENTAGE
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.entity import Entity
 from imow.api import IMowApi
 from imow.common.mowerstate import MowerState
 from imow.common.mowertask import MowerTask
 
-from homeassistant import config_entries, core
-from homeassistant.const import TIME_MINUTES, TIME_SECONDS, PERCENTAGE
-from homeassistant.helpers.entity import Entity
 from .const import (
     CONF_API_TOKEN,
     CONF_MOWER,
@@ -18,17 +19,14 @@ from .const import (
     DOMAIN,
     NAME_PREFIX,
 )
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-INFO_ATTR = {
-
-}
+INFO_ATTR = {}
 
 
 async def async_setup_entry(
-        hass: core.HomeAssistant,
-        config_entry: config_entries.ConfigEntry,
-        async_add_entities,
+    hass: core.HomeAssistant,
+    config_entry: config_entries.ConfigEntry,
+    async_add_entities,
 ):
     """Add sensors for passed config_entry in HA."""
     config = hass.data[DOMAIN][config_entry.entry_id]
@@ -63,8 +61,9 @@ class ImowBaseEntity(Entity):
         """Provide info for device registration."""
         return {
             "identifiers": {
-                # Serial numbers are unique identifiers within a specific domain
-                (DOMAIN, self.mower_configflow[CONF_MOWER_STATE]['id']),
+                # Serial numbers are unique identifiers
+                # within a specific domain
+                (DOMAIN, self.mower_configflow[CONF_MOWER_STATE]["id"]),
             },
             "name": self.mower_configflow[CONF_MOWER_NAME],
             "manufacturer": "STIHL",
@@ -139,16 +138,18 @@ class ImowInfoChildEntity(ImowBaseEntity):
         """Initialize the sensor."""
         super().__init__(parent.imow, parent.mower_configflow)
 
-        self._name = f'{NAME_PREFIX}_info_{desc}'
+        self._name = f"{NAME_PREFIX}_info_{desc}"
         self.parent = parent
         self.desc = desc
 
     @property
     def should_poll(self) -> bool:
+        """Indicate that this is a silent entity."""
         return False
 
     @property
     def state(self):
+        """Return the state of the sensor."""
         if self.desc in self.parent.attrs:
             return self.parent.attrs[self.desc]
 
@@ -201,7 +202,8 @@ class ImowStatisticsEntity(ImowBaseEntity):
     @property
     def name(self):
         """Return the name of the sensor."""
-        return f"iMow {self.mower_configflow['name']} Total Blade Operating Time"
+        return f"iMow {self.mower_configflow['name']} " \
+               f"Total Blade Operating Time"
 
     @property
     def unique_id(self) -> str:
