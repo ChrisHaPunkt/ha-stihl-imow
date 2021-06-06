@@ -228,5 +228,5 @@ class ImowStatisticsEntity(ImowBaseEntity):
         statistics: dict = await self.imow.receive_mower_statistics(
             self.mower_configflow[CONF_MOWER_IDENTIFIER]
         )
-        self._state = statistics["TotalBladeOperatingTime"]
+        self._state = statistics["totalBladeOperatingTime"]
         self.attrs.update(statistics)
