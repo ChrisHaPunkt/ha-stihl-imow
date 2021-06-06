@@ -14,5 +14,6 @@
     "@ChrisHaPunkt"
   ],
   "iot_class": "cloud_polling",
-  "version": "0.0.1"
+  "version": "0.0.1",
+  "issue_tracker":  "https://github.com/ChrisHaPunkt/ha-stihl-imow/issues"
 }
