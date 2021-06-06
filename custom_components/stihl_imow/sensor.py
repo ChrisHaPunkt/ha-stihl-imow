@@ -201,7 +201,7 @@ class ImowStatisticsEntity(ImowBaseEntity):
     @property
     def name(self):
         """Return the name of the sensor."""
-        return f"iMow {self.mower_configflow['name']} Total Operating Time"
+        return f"iMow {self.mower_configflow['name']} Total Blade Operating Time"
 
     @property
     def unique_id(self) -> str:
@@ -226,5 +226,5 @@ class ImowStatisticsEntity(ImowBaseEntity):
         statistics: dict = await self.imow.receive_mower_statistics(
             self.mower_configflow[CONF_MOWER_IDENTIFIER]
         )
-        self._state = statistics["totalOperatingTime"]
+        self._state = statistics["TotalBladeOperatingTime"]
         self.attrs.update(statistics)
