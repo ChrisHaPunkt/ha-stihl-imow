@@ -4,13 +4,18 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
-
 ## HomeAssistant custom component for STIHL iMow lawn mower
 A platform which allows you to interact with the STIHL iMow lawn mower.
 
 ### Warning
 This is an early development version. Things are going to change in upcoming releases like entity names and the information currently available in the entity attributes will become own entities. 
+
+## Installation
+
+Add the URL to this repo as a custom repo in your HACS UI inside Home Assistant:
+``
+https://github.com/ChrisHaPunkt/ha-stihl-imow.git
+``
 
 ## Features
 * Display current state as human readable string if the action is already known by the python-api package. If not, the corresponding number is displayed. Information like `RainStaus` or `BladeService` are available on the attributes on the `sensor.imow_<mower>_state`) 
