@@ -18,7 +18,7 @@ from .const import (
     DOMAIN,
     NAME_PREFIX,
 )
-from ...helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 INFO_ATTR = {
 
