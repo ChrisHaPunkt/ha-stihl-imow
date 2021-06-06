@@ -12,3 +12,11 @@ jobs:
     steps:
       - uses: "actions/checkout@v2"
       - uses: home-assistant/actions/hassfest@master
+
+      - name: HACS validation
+        uses: "hacs/integration/action@master"
+        env:
+          SKIP_BRANDS_CHECK: "True"
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CATEGORY: "integration"
