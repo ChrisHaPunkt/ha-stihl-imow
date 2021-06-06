@@ -1,7 +1,6 @@
 
 # Home Assistant STIHL iMow
 [![CI](https://github.com/ChrisHaPunkt/ha-stihl-imow/actions/workflows/validate_via_cron.yaml/badge.svg?branch=main)](https://github.com/ChrisHaPunkt/ha-stihl-imow/actions/workflows/validate_via_cron.yaml)
-![Validate with HACS](https://github.com/custom-components/ha-stihl-imow/workflows/Validate%20with%20HACS/badge.svg)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
 
