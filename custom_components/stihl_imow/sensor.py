@@ -7,7 +7,6 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.entity import Entity
 from imow.api import IMowApi
 from imow.common.mowerstate import MowerState
-from imow.common.mowertask import MowerTask
 
 from .const import (
     CONF_API_TOKEN,
@@ -125,7 +124,8 @@ class ImowInfoEntity(ImowBaseEntity):
         mower_state_values = dict(mower_state.__dict__)
         self._state = mower_state_values["status"]["chargeLevel"]
 
-        del mower_state_values["api"]
+        del mower_state_values["state_message"]
+        del mower_state_values["imow"]
         del mower_state_values["smartLogic"]
         del mower_state_values["status"]
         self.attrs.update(mower_state_values)
@@ -187,8 +187,11 @@ class ImowStateEntity(ImowBaseEntity):
         mower_state: MowerState = await self.imow.receive_mower_by_id(
             self.mower_configflow[CONF_MOWER_IDENTIFIER]
         )
-        self._state = MowerTask(mower_state.status["mainState"]).name
+        self._state = mower_state.state_message["short"]
         self.attrs.update(mower_state.status)
+        self.attrs["message"] = mower_state.state_message["short"]
+        self.attrs["message_long"] = mower_state.state_message["long"]
+        self.attrs["state"] = mower_state.state_message
 
 
 class ImowStatisticsEntity(ImowBaseEntity):
