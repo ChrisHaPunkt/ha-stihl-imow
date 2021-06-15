@@ -38,7 +38,10 @@ async def async_setup_entry(
 
         entities.append(ImowStateEntity(imow, mower))
         entities.append(info_entity)
-        entities.append(ImowInfoChildEntity("CoordinateLatitude", info_entity))
+        entities.append(ImowInfoChildEntity(
+            "CoordinateLatitude",
+            info_entity)
+        )
         entities.append(ImowStatisticsEntity(imow, mower))
     async_add_entities(entities, update_before_add=True)
 
@@ -91,7 +94,8 @@ class ImowInfoEntity(ImowBaseEntity):
     def __init__(self, imow: IMowApi, mower: dict):
         """Initialize the sensor."""
         super().__init__(imow, mower)
-        self._name = f"iMow {self.mower_configflow['name']} Battery Level"
+        self._name = f"iMow {self.mower_configflow['name']} " \
+                     f"Battery Level"
 
     @property
     def name(self):
@@ -116,7 +120,8 @@ class ImowInfoEntity(ImowBaseEntity):
     async def async_update(self):
         """Fetch new state data for the sensor.
 
-        This is the only method that should fetch new data for Home Assistant.
+        This is the only method that should
+        fetch new data for Home Assistant.
         """
         mower_state: MowerState = await self.imow.receive_mower_by_id(
             self.mower_configflow[CONF_MOWER_IDENTIFIER]
@@ -182,7 +187,8 @@ class ImowStateEntity(ImowBaseEntity):
     async def async_update(self):
         """Fetch new state data for the sensor.
 
-        This is the only method that should fetch new data for Home Assistant.
+        This is the only method that should
+        fetch new data for Home Assistant.
         """
         mower_state: MowerState = await self.imow.receive_mower_by_id(
             self.mower_configflow[CONF_MOWER_IDENTIFIER]
@@ -226,7 +232,8 @@ class ImowStatisticsEntity(ImowBaseEntity):
     async def async_update(self):
         """Fetch new state data for the sensor.
 
-        This is the only method that should fetch new data for Home Assistant.
+        This is the only method that should
+        fetch new data for Home Assistant.
         """
         statistics: dict = await self.imow.receive_mower_statistics(
             self.mower_configflow[CONF_MOWER_IDENTIFIER]
