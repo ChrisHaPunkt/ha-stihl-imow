@@ -34,8 +34,7 @@ STEP_USER_DATA_SCHEMA = vol.Schema({"username": str, "password": str})
 
 
 async def validate_input(
-        hass: HomeAssistant,
-        data: dict[str, Any]
+    hass: HomeAssistant, data: dict[str, Any]
 ) -> dict[str, Any]:
     """Validate the user input allows us to connect.
 
@@ -49,7 +48,9 @@ async def validate_input(
     imow = IMowApi()
     try:
         token, expire_time = await imow.get_token(
-            data["username"], data["password"], return_expire_time=True
+            data["username"],
+            data["password"],
+            return_expire_time=True,
         )
     except LoginError as e:
         await imow.close()
@@ -78,7 +79,9 @@ async def validate_input(
     await imow.close()
     return {
         CONF_API_TOKEN: token,
-        CONF_API_TOKEN_EXPIRE_TIME: datetime.datetime.timestamp(expire_time),
+        CONF_API_TOKEN_EXPIRE_TIME: datetime.datetime.timestamp(
+            expire_time
+        ),
         "user_input": data,
         CONF_MOWER: mowers,
     }
@@ -129,7 +132,7 @@ class StihlImowConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user",
             data_schema=STEP_USER_DATA_SCHEMA,
-            errors=errors
+            errors=errors,
         )
 
 

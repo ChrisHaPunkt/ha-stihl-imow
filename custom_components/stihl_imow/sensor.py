@@ -3,7 +3,9 @@ from typing import Any, Dict, List
 
 from homeassistant import config_entries, core
 from homeassistant.const import TIME_SECONDS, PERCENTAGE
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.aiohttp_client import (
+    async_get_clientsession,
+)
 from homeassistant.helpers.entity import Entity
 from imow.api import IMowApi
 from imow.common.mowerstate import MowerState
@@ -38,9 +40,8 @@ async def async_setup_entry(
 
         entities.append(ImowStateEntity(imow, mower))
         entities.append(info_entity)
-        entities.append(ImowInfoChildEntity(
-            "CoordinateLatitude",
-            info_entity)
+        entities.append(
+            ImowInfoChildEntity("CoordinateLatitude", info_entity)
         )
         entities.append(ImowStatisticsEntity(imow, mower))
     async_add_entities(entities, update_before_add=True)
@@ -65,7 +66,10 @@ class ImowBaseEntity(Entity):
             "identifiers": {
                 # Serial numbers are unique identifiers
                 # within a specific domain
-                (DOMAIN, self.mower_configflow[CONF_MOWER_STATE]["id"]),
+                (
+                    DOMAIN,
+                    self.mower_configflow[CONF_MOWER_STATE]["id"],
+                ),
             },
             "name": self.mower_configflow[CONF_MOWER_NAME],
             "manufacturer": "STIHL",
@@ -94,8 +98,9 @@ class ImowInfoEntity(ImowBaseEntity):
     def __init__(self, imow: IMowApi, mower: dict):
         """Initialize the sensor."""
         super().__init__(imow, mower)
-        self._name = f"iMow {self.mower_configflow['name']} " \
-                     f"Battery Level"
+        self._name = (
+            f"iMow {self.mower_configflow['name']} " f"Battery Level"
+        )
 
     @property
     def name(self):
@@ -211,8 +216,10 @@ class ImowStatisticsEntity(ImowBaseEntity):
     @property
     def name(self):
         """Return the name of the sensor."""
-        return f"iMow {self.mower_configflow['name']} " \
-               f"Total Blade Operating Time"
+        return (
+            f"iMow {self.mower_configflow['name']} "
+            f"Total Blade Operating Time"
+        )
 
     @property
     def unique_id(self) -> str:
