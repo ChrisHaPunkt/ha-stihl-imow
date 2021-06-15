@@ -46,12 +46,14 @@ async def validate_input(
 
     # If your PyPI package is not built with async, pass your methods
     # to the executor:
+    imow = IMowApi()
     try:
-        imow = IMowApi()
         token, expire_time = await imow.get_token(
             data["username"], data["password"], return_expire_time=True
         )
-    except LoginError:
+    except LoginError as e:
+        await imow.close()
+        _LOGGER.exception(e)
         raise InvalidAuth
 
     # If you cannot connect:
