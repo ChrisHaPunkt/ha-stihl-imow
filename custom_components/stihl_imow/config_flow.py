@@ -66,7 +66,7 @@ async def validate_input(
     mowers = []
     for mower in await imow.receive_mowers():
         mowers_state = dict(mower.__dict__)
-        del mowers_state["api"]
+        del mowers_state["imow"]
         mowers.append(
             {
                 CONF_MOWER_NAME: mower.name,
