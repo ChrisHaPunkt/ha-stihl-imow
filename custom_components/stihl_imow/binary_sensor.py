@@ -38,6 +38,7 @@ from .const import (
     API_UPDATE_INTERVALL_SECONDS,
 )
 from .maps import ENTITY_STRIP_OUT_PROPERTIES
+from aiohttp import ClientResponseError
 
 INFO_ATTR = {}
 
@@ -70,7 +71,7 @@ async def async_setup_entry(
         """
         entities: dict = {}
         complex_entities: dict = {}
-        sensor_entities = {}
+        binary_sensor_entities = {}
         try:
             # Note: asyncio.TimeoutError and aiohttp.ClientError are already
             # handled by the data update coordinator.
@@ -99,10 +100,9 @@ async def async_setup_entry(
                                         mower_state_property
                                     ]
                                 )
-                                is not bool
+                                is bool
                             ):
-
-                                sensor_entities[
+                                binary_sensor_entities[
                                     mower_state_property
                                 ] = mower_state.__dict__[
                                     mower_state_property
@@ -117,18 +117,18 @@ async def async_setup_entry(
                         ):
                             if (
                                 type(complex_entities[entity][prop])
-                                is not bool
+                                is bool
                             ):
-
-                                sensor_entities[
+                                binary_sensor_entities[
                                     property_identifier
                                 ] = complex_entities[entity][prop]
 
-                entities = sensor_entities
+                entities = binary_sensor_entities
                 return entities
 
-        except LoginError as err:
+        except ClientResponseError as err:
             # TODO Use token above, reauth with credentials, store new token in config if successful, else raise below
+            _LOGGER.warning(f"Config token raises {err.status}")
 
             # Raising ConfigEntryAuthFailed will cancel future updates
             # and start a config flow with SOURCE_REAUTH (async_step_reauth)
@@ -140,7 +140,7 @@ async def async_setup_entry(
         hass,
         _LOGGER,
         # Name of the data. For logging purposes.
-        name="imow_sensor",
+        name="imow_binarysensor",
         update_method=async_update_data,
         # Polling interval. Will only be polled if there are subscribers.
         update_interval=timedelta(seconds=API_UPDATE_INTERVALL_SECONDS),
@@ -158,27 +158,27 @@ async def async_setup_entry(
     await coordinator.async_config_entry_first_refresh()
 
     async_add_entities(
-        ImowSensorEntity(coordinator, idx, mower_state_property)
+        ImowBinarySensorEntity(coordinator, idx, mower_state_property)
         for idx, mower_state_property in enumerate(coordinator.data)
     )
 
 
-class ImowSensorEntity(CoordinatorEntity, SensorEntity):
+class ImowBinarySensorEntity(CoordinatorEntity, BinarySensorEntity):
     """Representation of a Sensor."""
 
     def __init__(self, coordinator, idx, mower_state_property):
         """Initialize the sensor."""
         super().__init__(coordinator)
         self.idx = idx
-        self.sensor_data = coordinator.data
+
+        self.mower_conf = coordinator.config_entry.data["mower"][0]
         self.property_name = mower_state_property
-        self._attr_state = self.sensor_data[self.property_name]
+        self._attr_is_on = coordinator.data[self.property_name]
 
     @property
     def state(self) -> StateType:
-        """Return the state of the entity."""
-
-        return self._attr_state
+        """Return the state of the binary sensor."""
+        return STATE_ON if self.is_on else STATE_OFF
 
     @property
     def device_info(self):
@@ -189,40 +189,20 @@ class ImowSensorEntity(CoordinatorEntity, SensorEntity):
                 # within a specific domain
                 (
                     DOMAIN,
-                    self.sensor_data["id"],
+                    self.mower_conf["mower_id"],
                 ),
             },
-            "name": self.sensor_data["name"],
+            "name": self.mower_conf["name"],
             "manufacturer": "STIHL",
-            "model": self.sensor_data[CONF_MOWER_MODEL],
+            "model": self.mower_conf[CONF_MOWER_MODEL],
         }
 
     @property
     def name(self):
         """Return the name of the sensor."""
-        return f"{self.sensor_data['name']} {self.property_name}"
+        return f"{self.mower_conf['name']} {self.property_name}"
 
     @property
     def unique_id(self) -> str:
         """Return the unique ID of the sensor."""
-        return f"{self.sensor_data['id']}_{self.idx}_{self.property_name}"
-
-    @property
-    def icon(self) -> str:
-        """Icon of the entity."""
-        return "mdi:battery"
-
-    @property
-    def unit_of_measurement(self):
-        """Return the unit of measurement."""
-        return None
-
-    # @property
-    # def state(self):
-    #     """Return the state of the sensor."""
-    #     return self.coordinator.data[self.mower_state_property]
-    #
-    # @property
-    # def device_state_attributes(self) -> Dict[str, Any]:
-    #     """Return the state attributes of the device."""
-    #     return self.attrs
+        return f"{self.mower_conf['mower_id']}_{self.idx}_{self.property_name}"
