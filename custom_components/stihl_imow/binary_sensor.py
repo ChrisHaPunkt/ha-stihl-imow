@@ -3,17 +3,10 @@ import logging
 from datetime import timedelta
 
 import async_timeout
-from imow.api import IMowApi
-from imow.common.exceptions import LoginError, ApiMaintenanceError
-from imow.common.mowerstate import MowerState
-
+from aiohttp import ClientResponseError
 from homeassistant import config_entries, core
 from homeassistant.components.binary_sensor import BinarySensorEntity
-from homeassistant.components.sensor import SensorEntity
 from homeassistant.const import (
-    TIME_SECONDS,
-    PERCENTAGE,
-    TEMP_CELSIUS,
     STATE_ON,
     STATE_OFF,
 )
@@ -21,24 +14,22 @@ from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.aiohttp_client import (
     async_get_clientsession,
 )
-from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
     UpdateFailed,
 )
+from imow.api import IMowApi
+from imow.common.exceptions import ApiMaintenanceError
+
 from .const import (
-    CONF_API_TOKEN,
     CONF_MOWER,
-    CONF_MOWER_IDENTIFIER,
     CONF_MOWER_MODEL,
     DOMAIN,
-    NAME_PREFIX,
     API_UPDATE_INTERVALL_SECONDS,
 )
 from .maps import ENTITY_STRIP_OUT_PROPERTIES
-from aiohttp import ClientResponseError
 
 INFO_ATTR = {}
 
@@ -173,6 +164,7 @@ class ImowBinarySensorEntity(CoordinatorEntity, BinarySensorEntity):
 
         self.mower_conf = coordinator.config_entry.data["mower"][0]
         self.property_name = mower_state_property
+        self.cleaned_property_name = mower_state_property.replace("_"," ")
         self._attr_is_on = coordinator.data[self.property_name]
 
     @property
@@ -200,7 +192,7 @@ class ImowBinarySensorEntity(CoordinatorEntity, BinarySensorEntity):
     @property
     def name(self):
         """Return the name of the sensor."""
-        return f"{self.mower_conf['name']} {self.property_name}"
+        return f"{self.mower_conf['name']} {self.cleaned_property_name}"
 
     @property
     def unique_id(self) -> str:
