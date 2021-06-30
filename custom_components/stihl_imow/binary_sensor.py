@@ -117,8 +117,7 @@ async def async_setup_entry(
                 return device, entities
 
         except ClientResponseError as err:
-            # TODO Use token above, reauth with credentials, store new token in config if successful, else raise below
-            await imow.get_token(force_reauth=True)
+
             # Raising ConfigEntryAuthFailed will cancel future updates
             # and start a config flow with SOURCE_REAUTH (async_step_reauth)
             raise ConfigEntryAuthFailed from err

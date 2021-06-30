@@ -15,7 +15,9 @@ IMOW_INTENT_SCHEMA = vol.Schema(
         vol.Optional("mower_external_id"): str,
         vol.Optional("mower_name"): str,
         vol.Optional("duration"): int,
-        vol.Optional("startpoint"): str,
+        vol.Optional("startpoint"): int,
+        vol.Optional("device_id"): any,
+        vol.Optional("entity_id"): any,
         vol.Required("action"): str,
     }
 )
