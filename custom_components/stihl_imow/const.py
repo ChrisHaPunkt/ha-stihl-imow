@@ -1,5 +1,7 @@
 """Constants for the STIHL iMow integration."""
 
+API_UPDATE_INTERVALL_SECONDS = 30
+
 DOMAIN = "stihl_imow"
 CONF_MOWER_IDENTIFIER = "mower_id"
 CONF_MOWER = "mower"
