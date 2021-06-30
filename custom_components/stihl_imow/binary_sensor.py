@@ -11,21 +11,17 @@ from homeassistant.const import (
     STATE_OFF,
 )
 from homeassistant.exceptions import ConfigEntryAuthFailed
-from homeassistant.helpers.aiohttp_client import (
-    async_get_clientsession,
-)
+
 from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
     UpdateFailed,
 )
-from imow.api import IMowApi
 from imow.common.exceptions import ApiMaintenanceError
 
 from .const import (
     CONF_MOWER,
-    CONF_MOWER_MODEL,
     DOMAIN,
     API_UPDATE_INTERVALL_SECONDS,
 )
@@ -48,12 +44,12 @@ async def async_setup_entry(
     imow = config["api"]
 
     async def async_update_data():
-        """Fetch data from API endpoint.
+        """
+        Fetch data from API endpoint.
 
         This is the place to pre-process the data to lookup tables
         so entities can quickly look up their data.
         """
-
         complex_entities: dict = {}
         binary_sensor_entities = {}
         try:

@@ -1,3 +1,8 @@
+"""
+Module helps to strip aut unneeded properties.
+
+map icons and classes to properties.
+"""
 from homeassistant.const import TEMP_CELSIUS
 
 IMOW_SENSORS_MAP = {

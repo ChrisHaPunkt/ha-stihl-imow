@@ -28,8 +28,11 @@ async def async_setup_entry(
     )
     await imow_api.get_token()
     hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][entry.entry_id] = {"mower": entry.data["mower"][0], "credentials": entry.data["user_input"],
-                                         "api": imow_api}
+    hass.data[DOMAIN][entry.entry_id] = {
+        "mower": entry.data["mower"][0],
+        "credentials": entry.data["user_input"],
+        "api": imow_api,
+    }
     hass.config_entries.async_setup_platforms(entry, PLATFORMS)
     await async_setup_services(hass, entry)
     return True
