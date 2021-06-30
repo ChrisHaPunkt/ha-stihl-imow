@@ -3,24 +3,19 @@ from __future__ import annotations
 
 from imow.api import IMowApi
 
-from homeassistant.config_entries import ConfigEntry, _LOGGER
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-
 from .const import DOMAIN
-import asyncio
-import logging
-from homeassistant.core import callback
+from .services import async_setup_services
 
 # TODO List the platforms that you want to support.
 # For your initial PR, limit it to 1 platform.
-PLATFORMS = [
-    "sensor",
-    "binary_sensor"]
+PLATFORMS = ["sensor", "binary_sensor"]
 
 
 async def async_setup_entry(
-        hass: HomeAssistant, entry: ConfigEntry
+    hass: HomeAssistant, entry: ConfigEntry
 ) -> bool:
     """Set up STIHL iMow from a config entry."""
     # TODO Store an API object for your platforms to access
@@ -36,31 +31,12 @@ async def async_setup_entry(
     hass.data[DOMAIN][entry.entry_id] = {"mower": entry.data["mower"][0], "credentials": entry.data["user_input"],
                                          "api": imow_api}
     hass.config_entries.async_setup_platforms(entry, PLATFORMS)
-
-    return True
-
-
-_LOGGER = logging.getLogger(__name__)
-
-
-@asyncio.coroutine
-def async_setup(hass, config):
-    """Set up the an async service example component."""
-
-    @callback
-    def my_service(call):
-        """My first service."""
-        _LOGGER.info('Received data', call.data)
-
-    # Register our service with Home Assistant.
-    hass.services.async_register(DOMAIN, 'demo', my_service)
-
-    # Return boolean to indicate that initialization was successfully.
+    await async_setup_services(hass, entry)
     return True
 
 
 async def async_unload_entry(
-        hass: HomeAssistant, entry: ConfigEntry
+    hass: HomeAssistant, entry: ConfigEntry
 ) -> bool:
     """Unload a config entry."""
     unload_ok = await hass.config_entries.async_unload_platforms(

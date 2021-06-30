@@ -62,5 +62,5 @@ ENTITY_STRIP_OUT_PROPERTIES = [
     "endOfContract",
     "cModuleId",
     "externalId",
-    "codePage"
+    "codePage",
 ]

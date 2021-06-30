@@ -44,7 +44,6 @@ async def async_setup_entry(
     imow = config["api"]
     credentials = config["credentials"]
 
-
     async def async_update_data():
         """Fetch data from API endpoint.
 
@@ -59,9 +58,7 @@ async def async_setup_entry(
             # handled by the data update coordinator.
             async with async_timeout.timeout(10):
 
-                mower_state = await imow.receive_mower_by_id(
-                    mower_id
-                )
+                mower_state = await imow.receive_mower_by_id(mower_id)
                 del mower_state.__dict__["imow"]
 
                 for mower_state_property in mower_state.__dict__:
@@ -114,7 +111,7 @@ async def async_setup_entry(
                     "externalId": mower_state.externalId,
                     "manufacturer": "STIHL",
                     "model": mower_state.deviceTypeDescription,
-                    "sw_version": mower_state.softwarePacket
+                    "sw_version": mower_state.softwarePacket,
                 }
                 return device, entities
 
@@ -149,7 +146,9 @@ async def async_setup_entry(
     await coordinator.async_config_entry_first_refresh()
 
     async_add_entities(
-        ImowSensorEntity(coordinator, coordinator.data[0], idx, mower_state_property)
+        ImowSensorEntity(
+            coordinator, coordinator.data[0], idx, mower_state_property
+        )
         for idx, mower_state_property in enumerate(coordinator.data[1])
     )
 
@@ -164,7 +163,7 @@ class ImowSensorEntity(CoordinatorEntity, SensorEntity):
         self.sensor_data = coordinator.data
         self.key_device_infos = device
         self.property_name = mower_state_property
-        self.cleaned_property_name = mower_state_property.replace("_"," ")
+        self.cleaned_property_name = mower_state_property.replace("_", " ")
         self._attr_state = self.sensor_data[1][self.property_name]
 
     @property
@@ -188,12 +187,15 @@ class ImowSensorEntity(CoordinatorEntity, SensorEntity):
             "name": self.key_device_infos["name"],
             "manufacturer": self.key_device_infos["manufacturer"],
             "model": self.key_device_infos["model"],
-            "sw_version": self.key_device_infos["sw_version"]
+            "sw_version": self.key_device_infos["sw_version"],
         }
+
     @property
     def name(self):
         """Return the name of the sensor."""
-        return f"{self.key_device_infos['name']} {self.cleaned_property_name}"
+        return (
+            f"{self.key_device_infos['name']} {self.cleaned_property_name}"
+        )
 
     @property
     def unique_id(self) -> str:
