@@ -37,17 +37,17 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
-    hass: core.HomeAssistant,
-    config_entry: config_entries.ConfigEntry,
-    async_add_entities,
+        hass: core.HomeAssistant,
+        config_entry: config_entries.ConfigEntry,
+        async_add_entities,
 ):
     """Add sensors for passed config_entry in HA."""
     config = hass.data[DOMAIN][config_entry.entry_id]
 
-    mower = config[CONF_MOWER][0]
-
-
-    token = await imow.get_token()
+    mower_id = config[CONF_MOWER]["mower_id"]
+    mower_name = config[CONF_MOWER]["name"]
+    imow = config["api"]
+    credentials = config["credentials"]
 
     async def async_update_data():
         """Fetch data from API endpoint.
@@ -63,30 +63,28 @@ async def async_setup_entry(
             # handled by the data update coordinator.
             async with async_timeout.timeout(10):
 
-                mower_state = await imow.receive_mower_by_id(
-                    mower["mower_id"]
-                )
+                mower_state = await imow.receive_mower_by_id(mower_id)
                 del mower_state.__dict__["imow"]
 
                 for mower_state_property in mower_state.__dict__:
                     if type(
-                        mower_state.__dict__[mower_state_property]
+                            mower_state.__dict__[mower_state_property]
                     ) in [dict]:
                         complex_entities[
                             mower_state_property
                         ] = mower_state.__dict__[mower_state_property]
                     else:
                         if (
-                            mower_state_property
-                            not in ENTITY_STRIP_OUT_PROPERTIES
+                                mower_state_property
+                                not in ENTITY_STRIP_OUT_PROPERTIES
                         ):
                             if (
-                                type(
-                                    mower_state.__dict__[
-                                        mower_state_property
-                                    ]
-                                )
-                                is bool
+                                    type(
+                                        mower_state.__dict__[
+                                            mower_state_property
+                                        ]
+                                    )
+                                    is bool
                             ):
                                 binary_sensor_entities[
                                     mower_state_property
@@ -98,19 +96,27 @@ async def async_setup_entry(
                     for prop in complex_entities[entity]:
                         property_identifier = f"{entity}_{prop}"
                         if (
-                            property_identifier
-                            not in ENTITY_STRIP_OUT_PROPERTIES
+                                property_identifier
+                                not in ENTITY_STRIP_OUT_PROPERTIES
                         ):
                             if (
-                                type(complex_entities[entity][prop])
-                                is bool
+                                    type(complex_entities[entity][prop])
+                                    is bool
                             ):
                                 binary_sensor_entities[
                                     property_identifier
                                 ] = complex_entities[entity][prop]
 
                 entities = binary_sensor_entities
-                return entities
+                device = {
+                    "name": mower_state.name,
+                    "id": mower_state.id,
+                    "externalId": mower_state.externalId,
+                    "manufacturer": "STIHL",
+                    "model": mower_state.deviceTypeDescription,
+                    "sw_version": mower_state.softwarePacket
+                }
+                return device, entities
 
         except ClientResponseError as err:
             # TODO Use token above, reauth with credentials, store new token in config if successful, else raise below
@@ -144,23 +150,22 @@ async def async_setup_entry(
     await coordinator.async_config_entry_first_refresh()
 
     async_add_entities(
-        ImowBinarySensorEntity(coordinator, idx, mower_state_property)
-        for idx, mower_state_property in enumerate(coordinator.data)
+        ImowBinarySensorEntity(coordinator, coordinator.data[0], idx, mower_state_property)
+        for idx, mower_state_property in enumerate(coordinator.data[1])
     )
 
 
 class ImowBinarySensorEntity(CoordinatorEntity, BinarySensorEntity):
     """Representation of a Sensor."""
 
-    def __init__(self, coordinator, idx, mower_state_property):
+    def __init__(self, coordinator, device, idx, mower_state_property):
         """Initialize the sensor."""
         super().__init__(coordinator)
         self.idx = idx
-
-        self.mower_conf = coordinator.config_entry.data["mower"][0]
+        self.key_device_infos = device
         self.property_name = mower_state_property
-        self.cleaned_property_name = mower_state_property.replace("_"," ")
-        self._attr_is_on = coordinator.data[self.property_name]
+        self.cleaned_property_name = mower_state_property.replace("_", " ")
+        self._attr_is_on = coordinator.data[1][self.property_name]
 
     @property
     def state(self) -> StateType:
@@ -176,20 +181,21 @@ class ImowBinarySensorEntity(CoordinatorEntity, BinarySensorEntity):
                 # within a specific domain
                 (
                     DOMAIN,
-                    self.mower_conf["mower_id"],
+                    self.key_device_infos["id"],
                 ),
             },
-            "name": self.mower_conf["name"],
-            "manufacturer": "STIHL",
-            "model": self.mower_conf[CONF_MOWER_MODEL],
+            "name": self.key_device_infos["name"],
+            "manufacturer": self.key_device_infos["manufacturer"],
+            "model": self.key_device_infos["model"],
+            "sw_version": self.key_device_infos["sw_version"]
         }
 
     @property
     def name(self):
         """Return the name of the sensor."""
-        return f"{self.mower_conf['name']} {self.cleaned_property_name}"
+        return f"{self.key_device_infos['name']} {self.cleaned_property_name}"
 
     @property
     def unique_id(self) -> str:
         """Return the unique ID of the sensor."""
-        return f"{self.mower_conf['mower_id']}_{self.idx}_{self.property_name}"
+        return f"{self.key_device_infos['id']}_{self.idx}_{self.property_name}"

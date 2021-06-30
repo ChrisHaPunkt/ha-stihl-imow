@@ -39,15 +39,11 @@ async def async_setup_entry(
     """Add sensors for passed config_entry in HA."""
     config = hass.data[DOMAIN][config_entry.entry_id]
 
-    session = async_get_clientsession(hass)
-    mower = config[CONF_MOWER][0]
-    imow = IMowApi(
-        aiohttp_session=session,
-        email=config["user_input"]["username"],
-        password=config["user_input"]["password"],
-    )
+    mower_id = config[CONF_MOWER]["mower_id"]
+    mower_name = config[CONF_MOWER]["name"]
+    imow = config["api"]
+    credentials = config["credentials"]
 
-    token = await imow.get_token()
 
     async def async_update_data():
         """Fetch data from API endpoint.
@@ -64,7 +60,7 @@ async def async_setup_entry(
             async with async_timeout.timeout(10):
 
                 mower_state = await imow.receive_mower_by_id(
-                    mower["mower_id"]
+                    mower_id
                 )
                 del mower_state.__dict__["imow"]
 
@@ -112,7 +108,15 @@ async def async_setup_entry(
                                 ] = complex_entities[entity][prop]
 
                 entities = sensor_entities
-                return entities
+                device = {
+                    "name": mower_state.name,
+                    "id": mower_state.id,
+                    "externalId": mower_state.externalId,
+                    "manufacturer": "STIHL",
+                    "model": mower_state.deviceTypeDescription,
+                    "sw_version": mower_state.softwarePacket
+                }
+                return device, entities
 
         except LoginError as err:
             # TODO Use token above, reauth with credentials, store new token in config if successful, else raise below
@@ -145,22 +149,23 @@ async def async_setup_entry(
     await coordinator.async_config_entry_first_refresh()
 
     async_add_entities(
-        ImowSensorEntity(coordinator, idx, mower_state_property)
-        for idx, mower_state_property in enumerate(coordinator.data)
+        ImowSensorEntity(coordinator, coordinator.data[0], idx, mower_state_property)
+        for idx, mower_state_property in enumerate(coordinator.data[1])
     )
 
 
 class ImowSensorEntity(CoordinatorEntity, SensorEntity):
     """Representation of a Sensor."""
 
-    def __init__(self, coordinator, idx, mower_state_property):
+    def __init__(self, coordinator, device, idx, mower_state_property):
         """Initialize the sensor."""
         super().__init__(coordinator)
         self.idx = idx
         self.sensor_data = coordinator.data
+        self.key_device_infos = device
         self.property_name = mower_state_property
         self.cleaned_property_name = mower_state_property.replace("_"," ")
-        self._attr_state = self.sensor_data[self.property_name]
+        self._attr_state = self.sensor_data[1][self.property_name]
 
     @property
     def state(self) -> StateType:
@@ -177,23 +182,23 @@ class ImowSensorEntity(CoordinatorEntity, SensorEntity):
                 # within a specific domain
                 (
                     DOMAIN,
-                    self.sensor_data["id"],
+                    self.key_device_infos["id"],
                 ),
             },
-            "name": self.sensor_data["name"],
-            "manufacturer": "STIHL",
-            "model": self.sensor_data[CONF_MOWER_MODEL],
+            "name": self.key_device_infos["name"],
+            "manufacturer": self.key_device_infos["manufacturer"],
+            "model": self.key_device_infos["model"],
+            "sw_version": self.key_device_infos["sw_version"]
         }
-
     @property
     def name(self):
         """Return the name of the sensor."""
-        return f"{self.sensor_data['name']} {self.cleaned_property_name}"
+        return f"{self.key_device_infos['name']} {self.cleaned_property_name}"
 
     @property
     def unique_id(self) -> str:
         """Return the unique ID of the sensor."""
-        return f"{self.sensor_data['id']}_{self.idx}_{self.property_name}"
+        return f"{self.key_device_infos['id']}_{self.idx}_{self.property_name}"
 
     @property
     def icon(self) -> str:

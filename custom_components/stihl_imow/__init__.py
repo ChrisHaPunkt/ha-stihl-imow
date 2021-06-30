@@ -14,7 +14,9 @@ from homeassistant.core import callback
 
 # TODO List the platforms that you want to support.
 # For your initial PR, limit it to 1 platform.
-PLATFORMS = ["sensor", "binary_sensor"]
+PLATFORMS = [
+    "sensor",
+    "binary_sensor"]
 
 
 async def async_setup_entry(
@@ -24,17 +26,16 @@ async def async_setup_entry(
     # TODO Store an API object for your platforms to access
 
     session = async_get_clientsession(hass)
-    hass.data.setdefault(DOMAIN, {})
     imow_api = IMowApi(
         aiohttp_session=session,
         email=entry.data["user_input"]["username"],
         password=entry.data["user_input"]["password"],
     )
     await imow_api.get_token()
-    for idx, mower in enumerate(entry.data["mower"]):
-        hass.data[DOMAIN][entry.entry_id] = {"data": entry.data, "api": imow_api}
-        hass.config_entries.async_setup_platforms(
-            {"mower": mower, "credentials": entry.data["user_input"], "api": imow_api}, PLATFORMS)
+    hass.data.setdefault(DOMAIN, {})
+    hass.data[DOMAIN][entry.entry_id] = {"mower": entry.data["mower"][0], "credentials": entry.data["user_input"],
+                                         "api": imow_api}
+    hass.config_entries.async_setup_platforms(entry, PLATFORMS)
 
     return True
 
