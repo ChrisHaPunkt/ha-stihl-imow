@@ -44,13 +44,8 @@ async def async_setup_entry(
     """Add sensors for passed config_entry in HA."""
     config = hass.data[DOMAIN][config_entry.entry_id]
 
-    session = async_get_clientsession(hass)
     mower = config[CONF_MOWER][0]
-    imow = IMowApi(
-        aiohttp_session=session,
-        email=config["user_input"]["username"],
-        password=config["user_input"]["password"],
-    )
+
 
     token = await imow.get_token()
 

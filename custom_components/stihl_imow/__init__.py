@@ -1,10 +1,16 @@
 """The STIHL iMow integration."""
 from __future__ import annotations
 
-from homeassistant.config_entries import ConfigEntry
+from imow.api import IMowApi
+
+from homeassistant.config_entries import ConfigEntry, _LOGGER
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .const import DOMAIN
+import asyncio
+import logging
+from homeassistant.core import callback
 
 # TODO List the platforms that you want to support.
 # For your initial PR, limit it to 1 platform.
@@ -12,20 +18,48 @@ PLATFORMS = ["sensor", "binary_sensor"]
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry
+        hass: HomeAssistant, entry: ConfigEntry
 ) -> bool:
     """Set up STIHL iMow from a config entry."""
     # TODO Store an API object for your platforms to access
-    hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][entry.entry_id] = entry.data
 
-    hass.config_entries.async_setup_platforms(entry, PLATFORMS)
+    session = async_get_clientsession(hass)
+    hass.data.setdefault(DOMAIN, {})
+    imow_api = IMowApi(
+        aiohttp_session=session,
+        email=entry.data["user_input"]["username"],
+        password=entry.data["user_input"]["password"],
+    )
+    await imow_api.get_token()
+    for idx, mower in enumerate(entry.data["mower"]):
+        hass.data[DOMAIN][entry.entry_id] = {"data": entry.data, "api": imow_api}
+        hass.config_entries.async_setup_platforms(
+            {"mower": mower, "credentials": entry.data["user_input"], "api": imow_api}, PLATFORMS)
 
     return True
 
 
+_LOGGER = logging.getLogger(__name__)
+
+
+@asyncio.coroutine
+def async_setup(hass, config):
+    """Set up the an async service example component."""
+
+    @callback
+    def my_service(call):
+        """My first service."""
+        _LOGGER.info('Received data', call.data)
+
+    # Register our service with Home Assistant.
+    hass.services.async_register(DOMAIN, 'demo', my_service)
+
+    # Return boolean to indicate that initialization was successfully.
+    return True
+
+
 async def async_unload_entry(
-    hass: HomeAssistant, entry: ConfigEntry
+        hass: HomeAssistant, entry: ConfigEntry
 ) -> bool:
     """Unload a config entry."""
     unload_ok = await hass.config_entries.async_unload_platforms(
