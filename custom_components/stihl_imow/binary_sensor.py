@@ -37,17 +37,15 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
-        hass: core.HomeAssistant,
-        config_entry: config_entries.ConfigEntry,
-        async_add_entities,
+    hass: core.HomeAssistant,
+    config_entry: config_entries.ConfigEntry,
+    async_add_entities,
 ):
     """Add sensors for passed config_entry in HA."""
     config = hass.data[DOMAIN][config_entry.entry_id]
 
     mower_id = config[CONF_MOWER]["mower_id"]
-    mower_name = config[CONF_MOWER]["name"]
     imow = config["api"]
-    credentials = config["credentials"]
 
     async def async_update_data():
         """Fetch data from API endpoint.
@@ -55,7 +53,7 @@ async def async_setup_entry(
         This is the place to pre-process the data to lookup tables
         so entities can quickly look up their data.
         """
-        entities: dict = {}
+
         complex_entities: dict = {}
         binary_sensor_entities = {}
         try:
@@ -68,23 +66,23 @@ async def async_setup_entry(
 
                 for mower_state_property in mower_state.__dict__:
                     if type(
-                            mower_state.__dict__[mower_state_property]
+                        mower_state.__dict__[mower_state_property]
                     ) in [dict]:
                         complex_entities[
                             mower_state_property
                         ] = mower_state.__dict__[mower_state_property]
                     else:
                         if (
-                                mower_state_property
-                                not in ENTITY_STRIP_OUT_PROPERTIES
+                            mower_state_property
+                            not in ENTITY_STRIP_OUT_PROPERTIES
                         ):
                             if (
-                                    type(
-                                        mower_state.__dict__[
-                                            mower_state_property
-                                        ]
-                                    )
-                                    is bool
+                                type(
+                                    mower_state.__dict__[
+                                        mower_state_property
+                                    ]
+                                )
+                                is bool
                             ):
                                 binary_sensor_entities[
                                     mower_state_property
@@ -96,12 +94,12 @@ async def async_setup_entry(
                     for prop in complex_entities[entity]:
                         property_identifier = f"{entity}_{prop}"
                         if (
-                                property_identifier
-                                not in ENTITY_STRIP_OUT_PROPERTIES
+                            property_identifier
+                            not in ENTITY_STRIP_OUT_PROPERTIES
                         ):
                             if (
-                                    type(complex_entities[entity][prop])
-                                    is bool
+                                type(complex_entities[entity][prop])
+                                is bool
                             ):
                                 binary_sensor_entities[
                                     property_identifier
@@ -114,14 +112,13 @@ async def async_setup_entry(
                     "externalId": mower_state.externalId,
                     "manufacturer": "STIHL",
                     "model": mower_state.deviceTypeDescription,
-                    "sw_version": mower_state.softwarePacket
+                    "sw_version": mower_state.softwarePacket,
                 }
                 return device, entities
 
         except ClientResponseError as err:
             # TODO Use token above, reauth with credentials, store new token in config if successful, else raise below
-            _LOGGER.warning(f"Config token raises {err.status}")
-
+            await imow.get_token(force_reauth=True)
             # Raising ConfigEntryAuthFailed will cancel future updates
             # and start a config flow with SOURCE_REAUTH (async_step_reauth)
             raise ConfigEntryAuthFailed from err
@@ -150,7 +147,9 @@ async def async_setup_entry(
     await coordinator.async_config_entry_first_refresh()
 
     async_add_entities(
-        ImowBinarySensorEntity(coordinator, coordinator.data[0], idx, mower_state_property)
+        ImowBinarySensorEntity(
+            coordinator, coordinator.data[0], idx, mower_state_property
+        )
         for idx, mower_state_property in enumerate(coordinator.data[1])
     )
 
@@ -187,13 +186,15 @@ class ImowBinarySensorEntity(CoordinatorEntity, BinarySensorEntity):
             "name": self.key_device_infos["name"],
             "manufacturer": self.key_device_infos["manufacturer"],
             "model": self.key_device_infos["model"],
-            "sw_version": self.key_device_infos["sw_version"]
+            "sw_version": self.key_device_infos["sw_version"],
         }
 
     @property
     def name(self):
         """Return the name of the sensor."""
-        return f"{self.key_device_infos['name']} {self.cleaned_property_name}"
+        return (
+            f"{self.key_device_infos['name']} {self.cleaned_property_name}"
+        )
 
     @property
     def unique_id(self) -> str:
