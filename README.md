@@ -7,6 +7,11 @@
 ## HomeAssistant custom component for STIHL iMow lawn mower
 A platform which allows you to interact with the STIHL iMow lawn mower.
 
+If you want to  
+[!["Buy Me A Coffee"](
+https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=&slug=chrishapunkt&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff)](https://www.buymeacoffee.com/chrishapunkt)
+
+
 ### Warning
 This is an early development version. Things are going to change in upcoming releases like entity names and the information currently available in the entity attributes will become own entities. 
 
