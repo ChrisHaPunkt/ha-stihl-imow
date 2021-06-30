@@ -43,7 +43,6 @@ async def async_setup_services(hass, entry):
 
 async def intent_service(hass, entry, service_call):
     """Call correct iMow service."""
-    service = service_call.service
     service_data_mower_id = (
         service_call.data["mower_id"]
         if "mower_id" in service_call.data

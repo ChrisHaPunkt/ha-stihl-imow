@@ -6,21 +6,17 @@ import async_timeout
 from homeassistant import config_entries, core
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.exceptions import ConfigEntryAuthFailed
-from homeassistant.helpers.aiohttp_client import (
-    async_get_clientsession,
-)
+
 from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
     UpdateFailed,
 )
-from imow.api import IMowApi
 from imow.common.exceptions import LoginError, ApiMaintenanceError
 
 from .const import (
     CONF_MOWER,
-    CONF_MOWER_MODEL,
     DOMAIN,
     API_UPDATE_INTERVALL_SECONDS,
 )
@@ -40,9 +36,7 @@ async def async_setup_entry(
     config = hass.data[DOMAIN][config_entry.entry_id]
 
     mower_id = config[CONF_MOWER]["mower_id"]
-    mower_name = config[CONF_MOWER]["name"]
     imow = config["api"]
-    credentials = config["credentials"]
 
     async def async_update_data():
         """Fetch data from API endpoint.
@@ -50,7 +44,6 @@ async def async_setup_entry(
         This is the place to pre-process the data to lookup tables
         so entities can quickly look up their data.
         """
-        entities: dict = {}
         complex_entities: dict = {}
         sensor_entities = {}
         try:
@@ -116,7 +109,6 @@ async def async_setup_entry(
                 return device, entities
 
         except LoginError as err:
-            # TODO Use token above, reauth with credentials, store new token in config if successful, else raise below
 
             # Raising ConfigEntryAuthFailed will cancel future updates
             # and start a config flow with SOURCE_REAUTH (async_step_reauth)
@@ -169,7 +161,6 @@ class ImowSensorEntity(CoordinatorEntity, SensorEntity):
     @property
     def state(self) -> StateType:
         """Return the state of the entity."""
-
         return self._attr_state
 
     @property
