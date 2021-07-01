@@ -1,0 +1,78 @@
+from config.custom_components.stihl_imow import DOMAIN
+from config.custom_components.stihl_imow.maps import IMOW_SENSORS_MAP
+from homeassistant.components.sensor import SensorEntity
+from homeassistant.const import STATE_OFF
+from homeassistant.helpers.typing import StateType
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
+
+class ImowBaseEntity(CoordinatorEntity):
+    """Representation of a Sensor."""
+
+    def __init__(self, coordinator, device, idx, mower_state_property):
+        """Initialize the sensor."""
+        super().__init__(coordinator)
+        self.idx = idx
+        self.sensor_data = coordinator.data
+        self.key_device_infos = device
+        self.property_name = mower_state_property
+        self.cleaned_property_name = mower_state_property.replace("_", " ")
+        self._attr_state = self.sensor_data[1][self.property_name]
+
+    @property
+    def state(self) -> StateType:
+        """Return the state of the entity."""
+        return self._attr_state if self._attr_state is not None else STATE_OFF
+
+    @property
+    def device_info(self):
+        """Provide info for device registration."""
+        return {
+            "identifiers": {
+                # Serial numbers are unique identifiers
+                # within a specific domain
+                (
+                    DOMAIN,
+                    self.key_device_infos["id"],
+                ),
+            },
+            "name": self.key_device_infos["name"],
+            "manufacturer": self.key_device_infos["manufacturer"],
+            "model": self.key_device_infos["model"],
+            "sw_version": self.key_device_infos["sw_version"],
+        }
+
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return (
+            f"{self.key_device_infos['name']} {self.cleaned_property_name}"
+        )
+
+    @property
+    def unique_id(self) -> str:
+        """Return the unique ID of the sensor."""
+        return f"{self.key_device_infos['id']}_{self.idx}_{self.property_name}"
+
+    @property
+    def icon(self) -> str:
+        """Icon of the entity."""
+
+        if self.property_name in IMOW_SENSORS_MAP:
+            return IMOW_SENSORS_MAP[self.property_name]["icon"]
+        return self._attr_icon
+
+    @property
+    def unit_of_measurement(self):
+        """Return the unit of measurement."""
+
+        if self.property_name in IMOW_SENSORS_MAP:
+            return IMOW_SENSORS_MAP[self.property_name]["uom"]
+        return self._attr_unit_of_measurement
+
+    @property
+    def device_class(self):
+        """Return the class of this device, from component DEVICE_CLASSES."""
+        if self.property_name in IMOW_SENSORS_MAP:
+            return IMOW_SENSORS_MAP[self.property_name]["type"]
+        return self._attr_device_class

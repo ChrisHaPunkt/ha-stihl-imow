@@ -3,47 +3,30 @@ Module helps to strip aut unneeded properties.
 
 map icons and classes to properties.
 """
-from homeassistant.const import TEMP_CELSIUS
+from homeassistant.const import TEMP_CELSIUS, LENGTH_METERS, DEVICE_CLASS_ENERGY
 
 IMOW_SENSORS_MAP = {
-    "asmEnabled": {
-        "type": "power",
-        "uom": "W",
-        "icon": "mdi:flash-outline",
-    },
-    "current": {"type": "current", "uom": "A", "icon": "mdi:current-ac"},
-    "voltage": {"type": "voltage", "uom": "V", "icon": "mdi:power-plug"},
-    "dusty": {
-        "type": "dusty",
-        "uom": "µg/m3",
-        "icon": "mdi:select-inverse",
-    },
-    "light": {
-        "type": "light",
-        "uom": "lx",
-        "icon": "mdi:car-parking-lights",
-    },
-    "noise": {"type": "noise", "uom": "Db", "icon": "mdi:surround-sound"},
-    "currentHumidity": {
-        "type": "humidity",
-        "uom": "%",
-        "icon": "mdi:water-percent",
-    },
-    "humidity": {
-        "type": "humidity",
-        "uom": "%",
-        "icon": "mdi:water-percent",
-    },
-    "currentTemperature": {
-        "type": "temperature",
-        "uom": TEMP_CELSIUS,
-        "icon": "mdi:thermometer",
-    },
-    "temperature": {
-        "type": "temperature",
-        "uom": TEMP_CELSIUS,
-        "icon": "mdi:thermometer",
-    },
+    "asmEnabled": {"type": None, "uom": None, "icon": None, },
+    "automaticModeEnabled": {"type": None, "uom": None, "icon": None, },
+    "childLock": {"type": None, "uom": None, "icon": "mdi:baby-carriage"},
+    "circumference": {"type": None, "uom": LENGTH_METERS, "icon": "mdi:go-kart-track"},
+    "coordinateLatitude": {"type": None, "uom": None, "icon": "mdi:map"},
+    "coordinateLongitude": {"type": None, "uom": None, "icon": "mdi:map"},
+    "corridorMode": {"type": None, "uom": None, "icon": "mdi:go-kart-track"},
+    "demoModeEnabled": {"type": None, "uom": None, "icon": "mdi:information-outline"},
+    "deviceTypeDescription": {"type": None, "uom": None, "icon": "mdi:robot-mower"},
+    "edgeMowingMode": {"type": None, "uom": None, "icon": "mdi:axis-arrow-info"},
+    "energyMode": {"type": DEVICE_CLASS_ENERGY, "uom": None, "icon": "mdi:lightning-bolt"},
+    "firmwareVersion": {"type": None, "uom": None, "icon": "mdi:information-outline"},
+    "gpsProtectionEnabled": {"type": None, "uom": None, "icon": "mdi:shield-half-full"},
+    "lastWeatherCheck": {"type": None, "uom": None, "icon": "mdi:weather-cloudy"},
+    "ledStatus": {"type": None, "uom": None, "icon": "mdi:lightbulb"},
+    "machineError": {"type": None, "uom": None, "icon": "mdi:lightning-bolt-outline"},
+    "machineState": {"type": None, "uom": None, "icon": "mdi:lightning-bolt-outline"},
+
+    "name": {"type": "power", "uom": None, "icon": "mdi:robot-mower"},
+    "rainSensorMode": {"type": "power", "uom": None, "icon": "mdi:weather-pouring"},
+    "status_rainStatus": {"type": "power", "uom": None, "icon": "mdi:weather-pouring", },
 }
 
 ENTITY_STRIP_OUT_PROPERTIES = [
@@ -68,4 +51,8 @@ ENTITY_STRIP_OUT_PROPERTIES = [
     "cModuleId",
     "externalId",
     "codePage",
+    "boundryOffset",
+    "deviceType",
+    "id",
+    "mappingIntelligentHomeDrive"
 ]
