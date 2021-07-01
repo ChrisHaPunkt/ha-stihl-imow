@@ -1,4 +1,5 @@
 """Constants for the STIHL iMow integration."""
+from enum import Enum
 
 API_UPDATE_INTERVALL_SECONDS = 30
 
@@ -16,4 +17,32 @@ CONF_MOWER_STATE = "mower_state"
 # SENSOR
 NAME_PREFIX = "imow"
 
+
 # ATTRIBUTES
+
+class LANGUAGES(Enum):
+    da = "Dansk"
+    de = "Deutsch"
+    en = "English"
+    et = "Eesti"
+    es = "Español"
+    fr = "Français"
+    hr = "Hrvatski"
+    it = "Italiano"
+    lv = "Latviešu"
+    lt = "Lietuvių"
+    hu = "Magyar"
+    nl = "Nederlands"
+    nb = "Norsk Bokmål"
+    pl = "Polski"
+    pt = "Português"
+    ro = "Română"
+    sk = "Slovenčina"
+    sl = "Slovenščina"
+    fi = "Suomi"
+    sv = "Svenska"
+    cs = "čeština"
+    el = "ελληνικά"
+    bg = "български"
+    sr = "српски"
+    ru = "русский"

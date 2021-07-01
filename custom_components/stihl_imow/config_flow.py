@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import datetime
+import json
 import logging
 from typing import Any
 
@@ -13,6 +14,8 @@ from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
+import aiohttp
 
 from .const import (
     CONF_API_TOKEN,
@@ -24,13 +27,13 @@ from .const import (
     CONF_MOWER_NAME,
     CONF_MOWER_STATE,
     CONF_MOWER_VERSION,
-    DOMAIN,
+    DOMAIN, LANGUAGES,
 )
 
 _LOGGER = logging.getLogger(__name__)
 
+
 # TODO adjust the data schema to the data that you need
-STEP_USER_DATA_SCHEMA = vol.Schema({"username": str, "password": str})
 
 
 async def validate_input(
@@ -45,7 +48,10 @@ async def validate_input(
 
     # If your PyPI package is not built with async, pass your methods
     # to the executor:
-    imow = IMowApi(email=data["username"], password=data["password"])
+    session = async_get_clientsession(hass)
+    lang_choice = LANGUAGES(data["language"]).name
+
+    imow = IMowApi(email=data["username"], password=data["password"], aiohttp_session=session, lang=lang_choice)
     try:
         token, expire_time = await imow.get_token(force_reauth=True, return_expire_time=True)
     except LoginError as e:
@@ -79,6 +85,7 @@ async def validate_input(
             expire_time
         ),
         "user_input": data,
+        "language" : lang_choice,
         CONF_MOWER: mowers,
     }
 
@@ -99,6 +106,14 @@ class StihlImowConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle the initial step."""
+
+        langs_choice = [e.value for e in LANGUAGES]
+
+        STEP_USER_DATA_SCHEMA = vol.Schema({"username": str, "password": str,
+                                            vol.Optional("language",
+                                                         description={"suggested_value": "English"}): vol.In(
+                                                langs_choice),
+                                            })
         if user_input is None:
             return self.async_show_form(
                 step_id="user", data_schema=STEP_USER_DATA_SCHEMA
