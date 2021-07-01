@@ -25,7 +25,8 @@ from .const import (
     DOMAIN,
     API_UPDATE_INTERVALL_SECONDS,
 )
-from .maps import ENTITY_STRIP_OUT_PROPERTIES
+from .entity import ImowBaseEntity
+from .maps import ENTITY_STRIP_OUT_PROPERTIES, IMOW_SENSORS_MAP
 
 INFO_ATTR = {}
 
@@ -149,49 +150,17 @@ async def async_setup_entry(
     )
 
 
-class ImowBinarySensorEntity(CoordinatorEntity, BinarySensorEntity):
+class ImowBinarySensorEntity(ImowBaseEntity, BinarySensorEntity):
     """Representation of a Sensor."""
 
-    def __init__(self, coordinator, device, idx, mower_state_property):
-        """Initialize the sensor."""
-        super().__init__(coordinator)
-        self.idx = idx
-        self.key_device_infos = device
-        self.property_name = mower_state_property
-        self.cleaned_property_name = mower_state_property.replace("_", " ")
-        self._attr_is_on = coordinator.data[1][self.property_name]
+    @property
+    def is_on(self) -> bool:
+        """Return true if the binary sensor is on."""
+        return self.sensor_data[1][self.property_name]
 
     @property
     def state(self) -> StateType:
         """Return the state of the binary sensor."""
-        return STATE_ON if self.is_on else STATE_OFF
+        return STATE_ON if self.sensor_data[1][self.property_name] else STATE_OFF
 
-    @property
-    def device_info(self):
-        """Provide info for device registration."""
-        return {
-            "identifiers": {
-                # Serial numbers are unique identifiers
-                # within a specific domain
-                (
-                    DOMAIN,
-                    self.key_device_infos["id"],
-                ),
-            },
-            "name": self.key_device_infos["name"],
-            "manufacturer": self.key_device_infos["manufacturer"],
-            "model": self.key_device_infos["model"],
-            "sw_version": self.key_device_infos["sw_version"],
-        }
 
-    @property
-    def name(self):
-        """Return the name of the sensor."""
-        return (
-            f"{self.key_device_infos['name']} {self.cleaned_property_name}"
-        )
-
-    @property
-    def unique_id(self) -> str:
-        """Return the unique ID of the sensor."""
-        return f"{self.key_device_infos['id']}_{self.idx}_{self.property_name}"
