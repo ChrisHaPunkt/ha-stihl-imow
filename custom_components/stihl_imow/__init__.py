@@ -26,7 +26,7 @@ async def async_setup_entry(
         email=entry.data["user_input"]["username"],
         password=entry.data["user_input"]["password"],
     )
-    await imow_api.get_token()
+    await imow_api.get_token(force_reauth=True)
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = {
         "mower": entry.data["mower"][0],

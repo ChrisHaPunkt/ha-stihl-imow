@@ -34,7 +34,7 @@ STEP_USER_DATA_SCHEMA = vol.Schema({"username": str, "password": str})
 
 
 async def validate_input(
-    hass: HomeAssistant, data: dict[str, Any]
+        hass: HomeAssistant, data: dict[str, Any]
 ) -> dict[str, Any]:
     """Validate the user input allows us to connect.
 
@@ -45,13 +45,9 @@ async def validate_input(
 
     # If your PyPI package is not built with async, pass your methods
     # to the executor:
-    imow = IMowApi()
+    imow = IMowApi(email=data["username"], password=data["password"])
     try:
-        token, expire_time = await imow.get_token(
-            data["username"],
-            data["password"],
-            return_expire_time=True,
-        )
+        token, expire_time = await imow.get_token(force_reauth=True, return_expire_time=True)
     except LoginError as e:
         await imow.close()
         _LOGGER.exception(e)
@@ -100,7 +96,7 @@ class StihlImowConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self.token_expire = None
 
     async def async_step_user(
-        self, user_input: dict[str, Any] | None = None
+            self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle the initial step."""
         if user_input is None:
