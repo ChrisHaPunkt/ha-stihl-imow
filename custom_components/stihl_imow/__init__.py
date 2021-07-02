@@ -23,11 +23,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # TODO Store an API object for your platforms to access
 
     session = async_get_clientsession(hass)
+    if "language" in entry.data:
+      lang= entry.data["language"]
+    else:
+      lang="en"
     imow_api = IMowApi(
         aiohttp_session=session,
         email=entry.data["user_input"]["username"],
         password=entry.data["user_input"]["password"],
-        lang=entry.data["language"],
+        lang=lang,
     )
     await imow_api.get_token(force_reauth=True)
     hass.data.setdefault(DOMAIN, {})
