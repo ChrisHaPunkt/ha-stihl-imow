@@ -4,6 +4,8 @@ from datetime import timedelta
 
 import async_timeout
 from aiohttp import ClientResponseError
+from imow.common.exceptions import ApiMaintenanceError
+
 from homeassistant import config_entries, core
 from homeassistant.components.binary_sensor import BinarySensorEntity
 from homeassistant.exceptions import ConfigEntryAuthFailed
@@ -11,15 +13,14 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
     UpdateFailed,
 )
-from imow.common.exceptions import ApiMaintenanceError
-
+from . import extract_properties_by_type
 from .const import (
     CONF_MOWER,
     DOMAIN,
     API_UPDATE_INTERVALL_SECONDS,
 )
 from .entity import ImowBaseEntity
-from .maps import ENTITY_STRIP_OUT_PROPERTIES
+from .maps import IMOW_SENSORS_MAP
 
 INFO_ATTR = {}
 
@@ -44,8 +45,7 @@ async def async_setup_entry(
         This is the place to pre-process the data to lookup tables
         so entities can quickly look up their data.
         """
-        complex_entities: dict = {}
-        binary_sensor_entities = {}
+        filtered_entities = {}
         try:
             # Note: asyncio.TimeoutError and aiohttp.ClientError are already
             # handled by the data update coordinator.
@@ -54,57 +54,15 @@ async def async_setup_entry(
                 mower_state = await imow.receive_mower_by_id(mower_id)
                 del mower_state.__dict__["imow"]
 
-                for mower_state_property in mower_state.__dict__:
-                    if type(
-                        mower_state.__dict__[mower_state_property]
-                    ) in [dict]:
-                        complex_entities[
-                            mower_state_property
-                        ] = mower_state.__dict__[mower_state_property]
-                    else:
-                        if (
-                            mower_state_property
-                            not in ENTITY_STRIP_OUT_PROPERTIES
-                        ):
-                            if (
-                                type(
-                                    mower_state.__dict__[
-                                        mower_state_property
-                                    ]
-                                )
-                                is bool
-                            ):
-                                binary_sensor_entities[
-                                    mower_state_property
-                                ] = mower_state.__dict__[
-                                    mower_state_property
-                                ]
+                entities, device = extract_properties_by_type(
+                    mower_state, bool
+                )
 
-                for entity in complex_entities:
-                    for prop in complex_entities[entity]:
-                        property_identifier = f"{entity}_{prop}"
-                        if (
-                            property_identifier
-                            not in ENTITY_STRIP_OUT_PROPERTIES
-                        ):
-                            if (
-                                type(complex_entities[entity][prop])
-                                is bool
-                            ):
-                                binary_sensor_entities[
-                                    property_identifier
-                                ] = complex_entities[entity][prop]
+                for entity in entities:
+                    if not IMOW_SENSORS_MAP[entity]["switch"]:
+                        filtered_entities[entity] = entities[entity]
 
-                entities = binary_sensor_entities
-                device = {
-                    "name": mower_state.name,
-                    "id": mower_state.id,
-                    "externalId": mower_state.externalId,
-                    "manufacturer": "STIHL",
-                    "model": mower_state.deviceTypeDescription,
-                    "sw_version": mower_state.softwarePacket,
-                }
-                return device, entities
+                return device, filtered_entities
 
         except ClientResponseError as err:
 
@@ -146,11 +104,7 @@ async def async_setup_entry(
 class ImowBinarySensorEntity(ImowBaseEntity, BinarySensorEntity):
     """Representation of a Sensor."""
 
-    def __init__(
-        self, coordinator, device_info, idx, mower_state_property
-    ):
+    def __init__(self, coordinator, device_info, idx, mower_state_property):
         """Override the BaseEntity with Binary Sensor content."""
-        super().__init__(
-            coordinator, device_info, idx, mower_state_property
-        )
+        super().__init__(coordinator, device_info, idx, mower_state_property)
         self._attr_is_on = self.sensor_data[self.property_name]
