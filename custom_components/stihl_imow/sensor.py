@@ -5,16 +5,13 @@ from datetime import timedelta
 import async_timeout
 from homeassistant import config_entries, core
 from homeassistant.components.sensor import SensorEntity
-from homeassistant.const import STATE_UNAVAILABLE, STATE_OFF
 from homeassistant.exceptions import ConfigEntryAuthFailed
-
-from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import (
-    CoordinatorEntity,
     DataUpdateCoordinator,
     UpdateFailed,
 )
 from imow.common.exceptions import LoginError, ApiMaintenanceError
+from imow.common.mowerstate import MowerState
 
 from .const import (
     CONF_MOWER,
@@ -22,7 +19,7 @@ from .const import (
     API_UPDATE_INTERVALL_SECONDS,
 )
 from .entity import ImowBaseEntity
-from .maps import ENTITY_STRIP_OUT_PROPERTIES, IMOW_SENSORS_MAP
+from .maps import ENTITY_STRIP_OUT_PROPERTIES
 
 INFO_ATTR = {}
 
@@ -30,9 +27,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
-        hass: core.HomeAssistant,
-        config_entry: config_entries.ConfigEntry,
-        async_add_entities,
+    hass: core.HomeAssistant,
+    config_entry: config_entries.ConfigEntry,
+    async_add_entities,
 ):
     """Add sensors for passed config_entry in HA."""
     config = hass.data[DOMAIN][config_entry.entry_id]
@@ -53,28 +50,33 @@ async def async_setup_entry(
             # handled by the data update coordinator.
             async with async_timeout.timeout(10):
 
-                mower_state = await imow.receive_mower_by_id(mower_id)
+                mower_state: MowerState = await imow.receive_mower_by_id(
+                    mower_id
+                )
+                mower_state.__dict__[
+                    "statistics"
+                ] = await mower_state.get_statistics()
                 del mower_state.__dict__["imow"]
 
                 for mower_state_property in mower_state.__dict__:
                     if type(
-                            mower_state.__dict__[mower_state_property]
+                        mower_state.__dict__[mower_state_property]
                     ) in [dict]:
                         complex_entities[
                             mower_state_property
                         ] = mower_state.__dict__[mower_state_property]
                     else:
                         if (
-                                mower_state_property
-                                not in ENTITY_STRIP_OUT_PROPERTIES
+                            mower_state_property
+                            not in ENTITY_STRIP_OUT_PROPERTIES
                         ):
                             if (
-                                    type(
-                                        mower_state.__dict__[
-                                            mower_state_property
-                                        ]
-                                    )
-                                    is not bool
+                                type(
+                                    mower_state.__dict__[
+                                        mower_state_property
+                                    ]
+                                )
+                                is not bool
                             ):
                                 sensor_entities[
                                     mower_state_property
@@ -86,12 +88,12 @@ async def async_setup_entry(
                     for prop in complex_entities[entity]:
                         property_identifier = f"{entity}_{prop}"
                         if (
-                                property_identifier
-                                not in ENTITY_STRIP_OUT_PROPERTIES
+                            property_identifier
+                            not in ENTITY_STRIP_OUT_PROPERTIES
                         ):
                             if (
-                                    type(complex_entities[entity][prop])
-                                    is not bool
+                                type(complex_entities[entity][prop])
+                                is not bool
                             ):
                                 sensor_entities[
                                     property_identifier
@@ -148,7 +150,15 @@ async def async_setup_entry(
 class ImowSensorEntity(ImowBaseEntity, SensorEntity):
     """Representation of a Sensor."""
 
-    @property
-    def state(self) -> StateType:
-        """Return the state of the entity."""
-        return self._attr_state if self._attr_state is not None else STATE_OFF
+    def __init__(
+        self, coordinator, device_info, idx, mower_state_property
+    ):
+        """Override the BaseEntity with Binary Sensor content."""
+        super().__init__(
+            coordinator, device_info, idx, mower_state_property
+        )
+        if mower_state_property == "machineState":
+            self._attr_extra_state_attributes = {
+                "short": self.sensor_data["stateMessage_short"],
+                "long": self.sensor_data["stateMessage_long"],
+            }

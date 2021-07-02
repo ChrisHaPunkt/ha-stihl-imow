@@ -18,9 +18,9 @@ CONF_MOWER_STATE = "mower_state"
 NAME_PREFIX = "imow"
 
 
-# ATTRIBUTES
-
 class LANGUAGES(Enum):
+    """Enum for languagecode mapping."""
+
     da = "Dansk"
     de = "Deutsch"
     en = "English"

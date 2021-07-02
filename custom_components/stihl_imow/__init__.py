@@ -25,7 +25,7 @@ async def async_setup_entry(
         aiohttp_session=session,
         email=entry.data["user_input"]["username"],
         password=entry.data["user_input"]["password"],
-        lang=entry.data["language"]
+        lang=entry.data["language"],
     )
     await imow_api.get_token(force_reauth=True)
     hass.data.setdefault(DOMAIN, {})
