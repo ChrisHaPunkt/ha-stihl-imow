@@ -86,9 +86,7 @@ async def validate_input(
     await imow.close()
     return {
         CONF_API_TOKEN: token,
-        CONF_API_TOKEN_EXPIRE_TIME: datetime.datetime.timestamp(
-            expire_time
-        ),
+        CONF_API_TOKEN_EXPIRE_TIME: datetime.datetime.timestamp(expire_time),
         "user_input": data,
         "language": lang_choice,
         CONF_MOWER: mowers,

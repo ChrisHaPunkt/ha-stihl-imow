@@ -19,12 +19,19 @@ class ImowBaseEntity(CoordinatorEntity):
         self.cleaned_property_name = mower_state_property.replace("_", " ")
         self._attr_state = self.sensor_data[self.property_name]
 
+        if (
+            self.property_name in IMOW_SENSORS_MAP
+            and IMOW_SENSORS_MAP[self.property_name]["picture"]
+        ):
+            if self.sensor_data["mowerImageThumbnailUrl"]:
+                self._attr_entity_picture = self.sensor_data[
+                    "mowerImageThumbnailUrl"
+                ]
+
     @property
     def state(self) -> StateType:
         """Return the state of the entity."""
-        return (
-            self._attr_state if self._attr_state is not None else STATE_OFF
-        )
+        return self._attr_state if self._attr_state is not None else STATE_OFF
 
     @property
     def device_info(self):
@@ -47,9 +54,7 @@ class ImowBaseEntity(CoordinatorEntity):
     @property
     def name(self):
         """Return the name of the sensor."""
-        return (
-            f"{self.key_device_infos['name']} {self.cleaned_property_name}"
-        )
+        return f"{self.key_device_infos['name']} {self.cleaned_property_name}"
 
     @property
     def unique_id(self) -> str:

@@ -3,16 +3,16 @@ import logging
 from datetime import timedelta
 
 import async_timeout
-from imow.common.exceptions import LoginError, ApiMaintenanceError
-from imow.common.mowerstate import MowerState
-
+from aiohttp import ClientResponseError
 from homeassistant import config_entries, core
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.switch import SwitchEntity
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
     UpdateFailed,
 )
+from imow.common.exceptions import ApiMaintenanceError
+
 from . import extract_properties_by_type
 from .const import (
     CONF_MOWER,
@@ -20,6 +20,7 @@ from .const import (
     API_UPDATE_INTERVALL_SECONDS,
 )
 from .entity import ImowBaseEntity
+from .maps import IMOW_SENSORS_MAP
 
 INFO_ATTR = {}
 
@@ -38,31 +39,32 @@ async def async_setup_entry(
     imow = config["api"]
 
     async def async_update_data():
-        """Fetch data from API endpoint.
+        """
+        Fetch data from API endpoint.
 
         This is the place to pre-process the data to lookup tables
         so entities can quickly look up their data.
         """
+        switch_entities = {}
         try:
             # Note: asyncio.TimeoutError and aiohttp.ClientError are already
             # handled by the data update coordinator.
             async with async_timeout.timeout(10):
 
-                mower_state: MowerState = await imow.receive_mower_by_id(
-                    mower_id
-                )
-                mower_state.__dict__[
-                    "statistics"
-                ] = await mower_state.get_statistics()
+                mower_state = await imow.receive_mower_by_id(mower_id)
                 del mower_state.__dict__["imow"]
 
                 entities, device = extract_properties_by_type(
-                    mower_state, bool, negotiate=True
+                    mower_state, bool
                 )
 
-                return device, entities
+                for entity in entities:
+                    if IMOW_SENSORS_MAP[entity]["switch"]:
+                        switch_entities[entity] = entities[entity]
 
-        except LoginError as err:
+                return device, switch_entities
+
+        except ClientResponseError as err:
 
             # Raising ConfigEntryAuthFailed will cancel future updates
             # and start a config flow with SOURCE_REAUTH (async_step_reauth)
@@ -74,7 +76,7 @@ async def async_setup_entry(
         hass,
         _LOGGER,
         # Name of the data. For logging purposes.
-        name="imow_sensor",
+        name="imow_switch_entity",
         update_method=async_update_data,
         # Polling interval. Will only be polled if there are subscribers.
         update_interval=timedelta(seconds=API_UPDATE_INTERVALL_SECONDS),
@@ -92,21 +94,30 @@ async def async_setup_entry(
     await coordinator.async_config_entry_first_refresh()
 
     async_add_entities(
-        ImowSensorEntity(
+        ImowSwitchSensorEntity(
             coordinator, coordinator.data[0], idx, mower_state_property
         )
         for idx, mower_state_property in enumerate(coordinator.data[1])
     )
 
 
-class ImowSensorEntity(ImowBaseEntity, SensorEntity):
+class ImowSwitchSensorEntity(ImowBaseEntity, SwitchEntity):
     """Representation of a Sensor."""
 
     def __init__(self, coordinator, device_info, idx, mower_state_property):
-        """Override the BaseEntity with Binary Sensor content."""
+        """Override the BaseEntity with Switch Entity content."""
         super().__init__(coordinator, device_info, idx, mower_state_property)
-        if self.property_name == "machineState":
-            self._attr_extra_state_attributes = {
-                "short": self.sensor_data["stateMessage_short"],
-                "long": self.sensor_data["stateMessage_long"],
-            }
+        self._attr_is_on = self.sensor_data[self.property_name]
+
+    @property
+    def is_on(self) -> bool:
+        """State of the entity."""
+        return self._attr_is_on
+
+    async def async_turn_on(self, **kwargs):
+        """Turn the entity on."""
+        pass
+
+    async def async_turn_off(self, **kwargs):
+        """Turn the entity off."""
+        pass

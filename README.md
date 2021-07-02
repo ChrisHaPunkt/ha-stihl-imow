@@ -12,9 +12,6 @@ If you want to
 https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=&slug=chrishapunkt&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff)](https://www.buymeacoffee.com/chrishapunkt)
 
 
-### Warning
-This is an early development version. Things are going to change in upcoming releases like entity names and the information currently available in the entity attributes will become own entities. 
-
 ## Installation
 
 Add the URL to this repo as a custom repo in your HACS UI inside Home Assistant:
@@ -23,9 +20,8 @@ https://github.com/ChrisHaPunkt/ha-stihl-imow.git
 ``
 
 ## Features
-* Display current state as human readable string if the action is already known by the python-api package. If not, the corresponding number is displayed. Information like `RainStaus` or `BladeService` are available on the attributes on the `sensor.imow_<mower>_state`) 
-* Fetch statistics `TotalBladeOperatingTime`,`TotalDistanceTravelled`, `TotalOperatingTime` (Available via attributes in `sensor.imow_<mower>_total_operating_time`)
-* Fetch all mower upstream information like battery_level, current settings or location (Available via attributes in `sensor.imow_<mower>_battery_level`)
+* Display current state, statistics and settings in Home Assistant.
+* Entities for error indication
 
 ### Installation
 You can use HACS or install the component manually by putting the files from `/custom_components/stihl_imow/` in your folder `<config directory>/custom_components/stihl_imow/` 
