@@ -2,20 +2,17 @@
 from __future__ import annotations
 
 import datetime
-import json
 import logging
 from typing import Any
 
-from imow.api import IMowApi
-from imow.common.exceptions import LoginError
 import voluptuous as vol
-
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-import aiohttp
+from imow.api import IMowApi
+from imow.common.exceptions import LoginError
 
 from .const import (
     CONF_API_TOKEN,
@@ -27,7 +24,8 @@ from .const import (
     CONF_MOWER_NAME,
     CONF_MOWER_STATE,
     CONF_MOWER_VERSION,
-    DOMAIN, LANGUAGES,
+    DOMAIN,
+    LANGUAGES,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -37,7 +35,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def validate_input(
-        hass: HomeAssistant, data: dict[str, Any]
+    hass: HomeAssistant, data: dict[str, Any]
 ) -> dict[str, Any]:
     """Validate the user input allows us to connect.
 
@@ -51,9 +49,16 @@ async def validate_input(
     session = async_get_clientsession(hass)
     lang_choice = LANGUAGES(data["language"]).name
 
-    imow = IMowApi(email=data["username"], password=data["password"], aiohttp_session=session, lang=lang_choice)
+    imow = IMowApi(
+        email=data["username"],
+        password=data["password"],
+        aiohttp_session=session,
+        lang=lang_choice,
+    )
     try:
-        token, expire_time = await imow.get_token(force_reauth=True, return_expire_time=True)
+        token, expire_time = await imow.get_token(
+            force_reauth=True, return_expire_time=True
+        )
     except LoginError as e:
         await imow.close()
         _LOGGER.exception(e)
@@ -85,7 +90,7 @@ async def validate_input(
             expire_time
         ),
         "user_input": data,
-        "language" : lang_choice,
+        "language": lang_choice,
         CONF_MOWER: mowers,
     }
 
@@ -103,17 +108,20 @@ class StihlImowConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self.token_expire = None
 
     async def async_step_user(
-            self, user_input: dict[str, Any] | None = None
+        self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle the initial step."""
-
         langs_choice = [e.value for e in LANGUAGES]
 
-        STEP_USER_DATA_SCHEMA = vol.Schema({"username": str, "password": str,
-                                            vol.Optional("language",
-                                                         description={"suggested_value": "English"}): vol.In(
-                                                langs_choice),
-                                            })
+        STEP_USER_DATA_SCHEMA = vol.Schema(
+            {
+                "username": str,
+                "password": str,
+                vol.Optional(
+                    "language", description={"suggested_value": "English"}
+                ): vol.In(langs_choice),
+            }
+        )
         if user_input is None:
             return self.async_show_form(
                 step_id="user", data_schema=STEP_USER_DATA_SCHEMA

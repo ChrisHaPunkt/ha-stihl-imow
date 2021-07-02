@@ -1,6 +1,6 @@
+"""BaseEntity for iMow Sensors."""
 from config.custom_components.stihl_imow import DOMAIN
 from config.custom_components.stihl_imow.maps import IMOW_SENSORS_MAP
-from homeassistant.components.sensor import SensorEntity
 from homeassistant.const import STATE_OFF
 from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -13,16 +13,18 @@ class ImowBaseEntity(CoordinatorEntity):
         """Initialize the sensor."""
         super().__init__(coordinator)
         self.idx = idx
-        self.sensor_data = coordinator.data
+        self.sensor_data = coordinator.data[1]
         self.key_device_infos = device
         self.property_name = mower_state_property
         self.cleaned_property_name = mower_state_property.replace("_", " ")
-        self._attr_state = self.sensor_data[1][self.property_name]
+        self._attr_state = self.sensor_data[self.property_name]
 
     @property
     def state(self) -> StateType:
         """Return the state of the entity."""
-        return self._attr_state if self._attr_state is not None else STATE_OFF
+        return (
+            self._attr_state if self._attr_state is not None else STATE_OFF
+        )
 
     @property
     def device_info(self):
@@ -57,7 +59,6 @@ class ImowBaseEntity(CoordinatorEntity):
     @property
     def icon(self) -> str:
         """Icon of the entity."""
-
         if self.property_name in IMOW_SENSORS_MAP:
             return IMOW_SENSORS_MAP[self.property_name]["icon"]
         return self._attr_icon
@@ -65,7 +66,6 @@ class ImowBaseEntity(CoordinatorEntity):
     @property
     def unit_of_measurement(self):
         """Return the unit of measurement."""
-
         if self.property_name in IMOW_SENSORS_MAP:
             return IMOW_SENSORS_MAP[self.property_name]["uom"]
         return self._attr_unit_of_measurement
