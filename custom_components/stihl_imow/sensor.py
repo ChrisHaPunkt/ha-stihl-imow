@@ -3,9 +3,6 @@ import logging
 from datetime import timedelta
 
 import async_timeout
-from imow.common.exceptions import LoginError, ApiMaintenanceError
-from imow.common.mowerstate import MowerState
-
 from homeassistant import config_entries, core
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.exceptions import ConfigEntryAuthFailed
@@ -13,11 +10,13 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
     UpdateFailed,
 )
+from imow.common.exceptions import LoginError, ApiMaintenanceError
+from imow.common.mowerstate import MowerState
+
 from . import extract_properties_by_type
 from .const import (
     CONF_MOWER,
     DOMAIN,
-    API_UPDATE_INTERVALL_SECONDS,
 )
 from .entity import ImowBaseEntity
 
@@ -27,9 +26,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
-        hass: core.HomeAssistant,
-        config_entry: config_entries.ConfigEntry,
-        async_add_entities,
+    hass: core.HomeAssistant,
+    config_entry: config_entries.ConfigEntry,
+    async_add_entities,
 ):
     """Add sensors for passed config_entry in HA."""
     config = hass.data[DOMAIN][config_entry.entry_id]

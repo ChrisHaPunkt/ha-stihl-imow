@@ -17,7 +17,6 @@ from . import extract_properties_by_type
 from .const import (
     CONF_MOWER,
     DOMAIN,
-    API_UPDATE_INTERVALL_SECONDS,
 )
 from .entity import ImowBaseEntity
 from .maps import IMOW_SENSORS_MAP

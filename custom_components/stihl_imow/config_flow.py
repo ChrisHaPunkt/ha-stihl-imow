@@ -25,7 +25,9 @@ from .const import (
     CONF_MOWER_STATE,
     CONF_MOWER_VERSION,
     DOMAIN,
-    LANGUAGES, API_UPDATE_INTERVALL_SECONDS, API_DEFAULT_LANGUAGE,
+    LANGUAGES,
+    API_UPDATE_INTERVALL_SECONDS,
+    API_DEFAULT_LANGUAGE,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -35,7 +37,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def validate_input(
-        hass: HomeAssistant, data: dict[str, Any]
+    hass: HomeAssistant, data: dict[str, Any]
 ) -> dict[str, Any]:
     """Validate the user input allows us to connect.
 
@@ -94,13 +96,13 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Required("email"): cv.string,
         vol.Required("password"): cv.string,
-
     },
 )
 STEP_ADVANCED = vol.Schema(
     {
-        vol.Optional("language", default=API_DEFAULT_LANGUAGE): vol.In([e.value for e in LANGUAGES]),
-
+        vol.Optional("language", default=API_DEFAULT_LANGUAGE): vol.In(
+            [e.value for e in LANGUAGES]
+        ),
         vol.Optional(
             "polling_interval", default=API_UPDATE_INTERVALL_SECONDS
         ): vol.In([20, 30, 60, 120, 300]),
@@ -123,13 +125,14 @@ class StihlImowConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self.polling_interval = None
 
     async def async_step_user(
-            self, user_input: dict[str, Any] | None = None
+        self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle the initial step."""
-
         if user_input is None:
             return self.async_show_form(
-                step_id="user", data_schema=STEP_USER_DATA_SCHEMA, last_step=False
+                step_id="user",
+                data_schema=STEP_USER_DATA_SCHEMA,
+                last_step=False,
             )
 
         errors = {}
@@ -154,14 +157,14 @@ class StihlImowConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user",
             data_schema=STEP_USER_DATA_SCHEMA,
-            errors=errors, last_step=False
+            errors=errors,
+            last_step=False,
         )
 
     async def async_step_advanced(
-            self, user_input: dict[str, int] | None = None
+        self, user_input: dict[str, int] | None = None
     ) -> FlowResult:
         """Handle the initial step."""
-
         if user_input is None:
             return self.async_show_form(
                 step_id="advanced", data_schema=STEP_ADVANCED
