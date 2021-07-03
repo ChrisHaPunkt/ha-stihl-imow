@@ -4,9 +4,6 @@ from datetime import timedelta
 
 import async_timeout
 from aiohttp import ClientResponseError
-from imow.common.exceptions import ApiMaintenanceError
-from imow.common.mowerstate import MowerState
-
 from homeassistant import config_entries, core
 from homeassistant.components.binary_sensor import BinarySensorEntity
 from homeassistant.exceptions import ConfigEntryAuthFailed
@@ -14,11 +11,13 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
     UpdateFailed,
 )
+from imow.common.exceptions import ApiMaintenanceError
+from imow.common.mowerstate import MowerState
+
 from . import extract_properties_by_type
 from .const import (
     CONF_MOWER,
     DOMAIN,
-    API_UPDATE_INTERVALL_SECONDS,
 )
 from .entity import ImowBaseEntity
 from .maps import IMOW_SENSORS_MAP
@@ -52,7 +51,9 @@ async def async_setup_entry(
             # handled by the data update coordinator.
             async with async_timeout.timeout(10):
 
-                mower_state: MowerState = await imow.receive_mower_by_id(mower_id)
+                mower_state: MowerState = await imow.receive_mower_by_id(
+                    mower_id
+                )
                 del mower_state.__dict__["imow"]
 
                 entities, device = extract_properties_by_type(
