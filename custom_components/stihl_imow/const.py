@@ -2,6 +2,7 @@
 from enum import Enum
 
 API_UPDATE_INTERVALL_SECONDS = 30
+API_DEFAULT_LANGUAGE = "English"
 
 DOMAIN = "stihl_imow"
 CONF_MOWER_IDENTIFIER = "mower_id"

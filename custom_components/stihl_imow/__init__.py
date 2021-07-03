@@ -24,12 +24,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     session = async_get_clientsession(hass)
     if "language" in entry.data:
-      lang= entry.data["language"]
+        lang = entry.data["language"]
     else:
-      lang="en"
+        lang = "en"
+
+    config_email = entry.data["user_input"]["email"] if "email" in entry.data["user_input"] else \
+        entry.data["user_input"]["username"]
     imow_api = IMowApi(
         aiohttp_session=session,
-        email=entry.data["user_input"]["username"],
+        email=config_email,
         password=entry.data["user_input"]["password"],
         lang=lang,
     )
@@ -39,6 +42,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "mower": entry.data["mower"][0],
         "credentials": entry.data["user_input"],
         "api": imow_api,
+        "language": entry.data["language"],
+        "polling_interval": entry.data["polling_interval"]
     }
     hass.config_entries.async_setup_platforms(entry, PLATFORMS)
     await async_setup_services(hass, entry)
@@ -57,7 +62,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 def extract_properties_by_type(
-    mower_state: MowerState, property_python_type: typing.Any, negotiate=False
+        mower_state: MowerState, property_python_type: typing.Any, negotiate=False
 ) -> (dict, dict):
     """Extract Properties used by different Sensors."""
     complex_entities: dict = {}
@@ -72,16 +77,16 @@ def extract_properties_by_type(
                 if not negotiate:
 
                     if (
-                        type(mower_state.__dict__[mower_state_property])
-                        is property_python_type
+                            type(mower_state.__dict__[mower_state_property])
+                            is property_python_type
                     ):
                         entities[mower_state_property] = mower_state.__dict__[
                             mower_state_property
                         ]
                 else:
                     if (
-                        type(mower_state.__dict__[mower_state_property])
-                        is not property_python_type
+                            type(mower_state.__dict__[mower_state_property])
+                            is not property_python_type
                     ):
                         entities[mower_state_property] = mower_state.__dict__[
                             mower_state_property
@@ -93,16 +98,16 @@ def extract_properties_by_type(
             if property_identifier not in ENTITY_STRIP_OUT_PROPERTIES:
                 if not negotiate:
                     if (
-                        type(complex_entities[entity][prop])
-                        is property_python_type
+                            type(complex_entities[entity][prop])
+                            is property_python_type
                     ):
                         entities[property_identifier] = complex_entities[
                             entity
                         ][prop]
                 else:
                     if (
-                        type(complex_entities[entity][prop])
-                        is not property_python_type
+                            type(complex_entities[entity][prop])
+                            is not property_python_type
                     ):
                         entities[property_identifier] = complex_entities[
                             entity
