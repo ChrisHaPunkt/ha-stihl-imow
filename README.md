@@ -35,10 +35,10 @@ This platform is using the [STIHL iMow API](https://app.imow.stihl.com/#) via th
 get the information from the mower via the upstream STIHL Server.
 
 ### Screenshots
-
-![Bildschirmfoto vom 2021-06-06 17-55-35](https://user-images.githubusercontent.com/4389395/120931107-71e1b480-c6f0-11eb-8a3b-ceb1fd82c8dc.png)  
-![Bildschirmfoto vom 2021-06-06 17-52-10](https://user-images.githubusercontent.com/4389395/120931060-42cb4300-c6f0-11eb-9573-d91162d25506.png)  
-![Bildschirmfoto vom 2021-06-06 17-52-51](https://user-images.githubusercontent.com/4389395/120931062-452d9d00-c6f0-11eb-8299-b160addc2fce.png)  
-![Bildschirmfoto vom 2021-06-06 17-53-34](https://user-images.githubusercontent.com/4389395/120931065-45c63380-c6f0-11eb-9689-3fc8caf51ab1.png)  
-
+#### Integration
+![grafik](https://user-images.githubusercontent.com/4389395/124358848-71bad300-dc22-11eb-9095-567a069db925.png)
+#### Overview
+![grafik](https://user-images.githubusercontent.com/4389395/124358816-4f28ba00-dc22-11eb-81d1-6e72f9a4b16d.png)
+#### Service
+![grafik](https://user-images.githubusercontent.com/4389395/124358851-74b5c380-dc22-11eb-9435-3248b84e84f6.png)
 
