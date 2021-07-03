@@ -13,10 +13,6 @@ A platform which allows you to interact with the STIHL iMow lawn mower.
 * Switch settings on and off,
 * Initiate a Job to a Mower via Home Assistant Services
 
-If you want to 
-[!["Buy Me A Coffee"](
-https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=&slug=chrishapunkt&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff)](https://www.buymeacoffee.com/chrishapunkt)
-
 
 
 ### Installation
@@ -42,4 +38,8 @@ get the information from the mower via the upstream STIHL Server.
 ![grafik](https://user-images.githubusercontent.com/4389395/124358816-4f28ba00-dc22-11eb-81d1-6e72f9a4b16d.png)
 #### Service
 ![grafik](https://user-images.githubusercontent.com/4389395/124358851-74b5c380-dc22-11eb-9435-3248b84e84f6.png)
+
+If you want to buy me a coffee, feel free: :)
+[!["Buy Me A Coffee"](
+https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=&slug=chrishapunkt&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff)](https://www.buymeacoffee.com/chrishapunkt)
 
