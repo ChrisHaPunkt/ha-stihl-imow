@@ -9,34 +9,42 @@
 A platform which allows you to interact with the STIHL iMow lawn mower.
 
 ## Features
+This platform is using the [STIHL iMow API](https://app.imow.stihl.com/#) via the [unofficial STIHL iMow Python WebAPI wrapper](https://github.com/ChrisHaPunkt/stihl-imow-webapi) to 
+get the information from the mower via the upstream STIHL Server.  
+
+In Home Assistant, this enables me to provide the following:
+
 * Display current state, statistics and settings in Home Assistant,
 * Upstream localisation, display state messages in you configured language
 * Polling interval, 
-* Switch settings automaic mode or gps protection on or off,
+* Switch settings like automatic mode or gps protection on or off,
 * Initiate an action to a Mower via Home Assistant service call (edgeMowing, toDocking, startMowingFromPoint)
 
 ## Installation
 
-### HACS (Home Assistant Community Store -> (Link)[https://hacs.xyz/])
-If you're using HACS, add this Github-Repo url as a custom repo:
+### 1.a Using the Home Assistant Community Store ( [HACS](https://hacs.xyz/) ) 
+If you're using HACS, add this Github-Repo url as a custom repo:   
+`HACS 🠊 custom repositories 🠊 Type: 'Integration' 🠊 URL:`
 ```
 https://github.com/ChrisHaPunkt/ha-stihl-imow.git
 ```
-Afterwards install go to your conintegration
+Afterwards go to your `HACS 🠊 Integrations 🠊 '+ EXPLORE & ADD REPOSITORIES' 🠊 search for 'STIHL'`,   
+if you're not presented with a `New repository` banner, to install the component to your server.
 
-### Without HACS
+### 1.b Without HACS
 Otherwise install the component manually by putting the files from `/custom_components/stihl_imow/` in your folder `<config directory>/custom_components/stihl_imow/`
 
+### 2. Restart your Home Assistant
+You have to restart Home Assistant to make you server recognize the new integration.
 
+## Configuration
+After installing, you have to configure the new component in your Home Assistant. This is done via the UI.  
 
-### Configuration
-#### ConfigFlow
+To do so, add the STIHL iMow Integration in your Servers `Configuration 🠊 Integrations 🠊 '+ ADD INTEGRATION'`.   
 
-The configuration is done via the UI. Install the component via HACS and add the STIHL iMow Integration. Within the configuration flow provide your `https://app.imow.stihl.com/#` credentials to let HA access the API
+Within the configuration flow provide your `https://app.imow.stihl.com/#` credentials to let Home Assistant access the upstream API and configure your preferred language for the state messages.
 
-
-This platform is using the [STIHL iMow API](https://app.imow.stihl.com/#) via the [unofficial STIHL iMow Python WebAPI wrapper](https://github.com/ChrisHaPunkt/stihl-imow-webapi) to 
-get the information from the mower via the upstream STIHL Server.
+If you want to, you can adjust the update (polling-)interval. This changes how often Home Assistant is aksing the upstream server for an update. The default and suggested value is 30 seconds.
 
 ### Screenshots
 #### Integration
