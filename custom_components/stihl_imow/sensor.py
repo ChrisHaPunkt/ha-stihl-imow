@@ -27,9 +27,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
-    hass: core.HomeAssistant,
-    config_entry: config_entries.ConfigEntry,
-    async_add_entities,
+        hass: core.HomeAssistant,
+        config_entry: config_entries.ConfigEntry,
+        async_add_entities,
 ):
     """Add sensors for passed config_entry in HA."""
     config = hass.data[DOMAIN][config_entry.entry_id]
@@ -57,7 +57,7 @@ async def async_setup_entry(
                 del mower_state.__dict__["imow"]
 
                 entities, device = extract_properties_by_type(
-                    mower_state, bool, negotiate=True
+                    mower_state, bool, negotiate=True  # all, but bool
                 )
 
                 return device, entities
@@ -77,7 +77,7 @@ async def async_setup_entry(
         name="imow_sensor",
         update_method=async_update_data,
         # Polling interval. Will only be polled if there are subscribers.
-        update_interval=timedelta(seconds=API_UPDATE_INTERVALL_SECONDS),
+        update_interval=timedelta(seconds=config["polling_interval"]),
     )
 
     #

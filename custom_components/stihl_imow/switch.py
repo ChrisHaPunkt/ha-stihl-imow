@@ -79,7 +79,7 @@ async def async_setup_entry(
         name="imow_switch_entity",
         update_method=async_update_data,
         # Polling interval. Will only be polled if there are subscribers.
-        update_interval=timedelta(seconds=API_UPDATE_INTERVALL_SECONDS),
+        update_interval=timedelta(seconds=config["polling_interval"]),
     )
 
     #

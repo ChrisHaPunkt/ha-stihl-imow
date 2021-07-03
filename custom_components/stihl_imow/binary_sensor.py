@@ -5,6 +5,7 @@ from datetime import timedelta
 import async_timeout
 from aiohttp import ClientResponseError
 from imow.common.exceptions import ApiMaintenanceError
+from imow.common.mowerstate import MowerState
 
 from homeassistant import config_entries, core
 from homeassistant.components.binary_sensor import BinarySensorEntity
@@ -51,7 +52,7 @@ async def async_setup_entry(
             # handled by the data update coordinator.
             async with async_timeout.timeout(10):
 
-                mower_state = await imow.receive_mower_by_id(mower_id)
+                mower_state: MowerState = await imow.receive_mower_by_id(mower_id)
                 del mower_state.__dict__["imow"]
 
                 entities, device = extract_properties_by_type(
@@ -79,7 +80,7 @@ async def async_setup_entry(
         name="imow_binarysensor",
         update_method=async_update_data,
         # Polling interval. Will only be polled if there are subscribers.
-        update_interval=timedelta(seconds=API_UPDATE_INTERVALL_SECONDS),
+        update_interval=timedelta(seconds=config["polling_interval"]),
     )
 
     #
