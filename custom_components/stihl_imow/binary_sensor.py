@@ -6,6 +6,7 @@ import async_timeout
 from aiohttp import ClientResponseError
 from homeassistant import config_entries, core
 from homeassistant.components.binary_sensor import BinarySensorEntity
+from homeassistant.const import STATE_ON, STATE_OFF
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
@@ -109,4 +110,9 @@ class ImowBinarySensorEntity(ImowBaseEntity, BinarySensorEntity):
     def __init__(self, coordinator, device_info, idx, mower_state_property):
         """Override the BaseEntity with Binary Sensor content."""
         super().__init__(coordinator, device_info, idx, mower_state_property)
-        self._attr_is_on = self.sensor_data[self.property_name]
+        self._is_on = self.sensor_data[self.property_name]
+
+    @property
+    def state(self):
+        """Return the state of the entity."""
+        return STATE_ON if self._is_on else STATE_OFF

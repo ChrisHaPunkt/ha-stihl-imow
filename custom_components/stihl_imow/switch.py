@@ -6,12 +6,14 @@ import async_timeout
 from aiohttp import ClientResponseError
 from homeassistant import config_entries, core
 from homeassistant.components.switch import SwitchEntity
+from homeassistant.const import STATE_OFF, STATE_ON
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
     UpdateFailed,
 )
 from imow.common.exceptions import ApiMaintenanceError
+from imow.common.mowerstate import MowerState
 
 from . import extract_properties_by_type
 from .const import (
@@ -106,17 +108,35 @@ class ImowSwitchSensorEntity(ImowBaseEntity, SwitchEntity):
     def __init__(self, coordinator, device_info, idx, mower_state_property):
         """Override the BaseEntity with Switch Entity content."""
         super().__init__(coordinator, device_info, idx, mower_state_property)
-        self._attr_is_on = self.sensor_data[self.property_name]
+        self._is_on = self.sensor_data[self.property_name]
+        self.api = self.coordinator.hass.data[DOMAIN][
+            self.coordinator.config_entry.entry_id
+        ]["api"]
+        self._state = STATE_ON if self._is_on else STATE_OFF
+
+    @property
+    def state(self):
+        """Return the state of the entity."""
+        return self._state
 
     @property
     def is_on(self) -> bool:
         """State of the entity."""
-        return self._attr_is_on
+        return self._is_on
 
     async def async_turn_on(self, **kwargs):
         """Turn the entity on."""
-        pass
+        new_mower_state: MowerState = await self.api.update_setting(
+            self.key_device_infos["id"], self.property_name, True
+        )
+        self._is_on = new_mower_state.__dict__[self.property_name]
+        self._state = STATE_ON if self._is_on else STATE_OFF
 
     async def async_turn_off(self, **kwargs):
         """Turn the entity off."""
-        pass
+        new_mower_state: MowerState = await self.api.update_setting(
+            self.key_device_infos["id"], self.property_name, False
+        )
+
+        self._is_on = new_mower_state.__dict__[self.property_name]
+        self._state = STATE_ON if self._is_on else STATE_OFF
