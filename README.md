@@ -16,7 +16,7 @@ In Home Assistant, this enables me to provide the following:
 
 * Display current state, statistics and settings in Home Assistant,
 * Upstream localisation, display state messages in you configured language
-* Polling interval, 
+* Configure Update/Polling interval, 
 * Switch settings like automatic mode or gps protection on or off,
 * Initiate an action to a Mower via Home Assistant service call (edgeMowing, toDocking, startMowingFromPoint)
 
