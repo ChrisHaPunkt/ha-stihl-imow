@@ -10,16 +10,25 @@ A platform which allows you to interact with the STIHL iMow lawn mower.
 
 ## Features
 * Display current state, statistics and settings in Home Assistant,
-* Switch settings on and off,
-* Initiate a Job to a Mower via Home Assistant Services
+* Upstream localisation, display state messages in you configured language
+* Polling interval, 
+* Switch settings automaic mode or gps protection on or off,
+* Initiate an action to a Mower via Home Assistant service call (edgeMowing, toDocking, startMowingFromPoint)
 
-### Installation
-You can use HACS or install the component manually by putting the files from `/custom_components/stihl_imow/` in your folder `<config directory>/custom_components/stihl_imow/`
+## Installation
 
-Otherwise add this Repo to your HACS:
-``
+### HACS (Home Assistant Community Store -> (Link)[https://hacs.xyz/])
+If you're using HACS, add this Github-Repo url as a custom repo:
+```
 https://github.com/ChrisHaPunkt/ha-stihl-imow.git
-``
+```
+Afterwards install go to your conintegration
+
+### Without HACS
+Otherwise install the component manually by putting the files from `/custom_components/stihl_imow/` in your folder `<config directory>/custom_components/stihl_imow/`
+
+
+
 ### Configuration
 #### ConfigFlow
 
