@@ -31,7 +31,7 @@ class ImowBaseEntity(CoordinatorEntity):
     @property
     def state(self) -> StateType:
         """Return the state of the entity."""
-        return self._state if self._attr_state is not None else STATE_OFF
+        return self._state if self._state is not None else STATE_OFF
 
     @property
     def device_info(self):

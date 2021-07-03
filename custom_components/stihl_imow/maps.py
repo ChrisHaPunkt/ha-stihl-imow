@@ -101,7 +101,7 @@ IMOW_SENSORS_MAP = {
     "gpsProtectionEnabled": {
         "type": None,
         "uom": None,
-        "icon": "mdi:shield-half-full",
+        "icon": "mdi:shield-check",
         "switch": True,
         "picture": False,
     },
@@ -164,7 +164,7 @@ IMOW_SENSORS_MAP = {
     "protectionLevel": {
         "type": "power",
         "uom": None,
-        "icon": "mdi:shield-half-full",
+        "icon": "mdi:shield-check",
         "switch": False,
         "picture": False,
     },
