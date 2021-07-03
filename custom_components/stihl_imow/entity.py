@@ -17,7 +17,7 @@ class ImowBaseEntity(CoordinatorEntity):
         self.key_device_infos = device
         self.property_name = mower_state_property
         self.cleaned_property_name = mower_state_property.replace("_", " ")
-        self._attr_state = self.sensor_data[self.property_name]
+        self._state = self.sensor_data[self.property_name]
 
         if (
             self.property_name in IMOW_SENSORS_MAP
@@ -31,7 +31,7 @@ class ImowBaseEntity(CoordinatorEntity):
     @property
     def state(self) -> StateType:
         """Return the state of the entity."""
-        return self._attr_state if self._attr_state is not None else STATE_OFF
+        return self._state if self._attr_state is not None else STATE_OFF
 
     @property
     def device_info(self):

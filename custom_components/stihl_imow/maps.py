@@ -102,7 +102,7 @@ IMOW_SENSORS_MAP = {
         "type": None,
         "uom": None,
         "icon": "mdi:shield-half-full",
-        "switch": False,
+        "switch": True,
         "picture": False,
     },
     "lastWeatherCheck": {
