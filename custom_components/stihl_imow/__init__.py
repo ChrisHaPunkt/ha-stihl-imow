@@ -9,7 +9,7 @@ from imow.common.mowerstate import MowerState
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from .const import DOMAIN
+from .const import DOMAIN, API_UPDATE_INTERVALL_SECONDS
 from .maps import ENTITY_STRIP_OUT_PROPERTIES
 from .services import async_setup_services
 
@@ -45,8 +45,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "mower": entry.data["mower"][0],
         "credentials": entry.data["user_input"],
         "api": imow_api,
-        "language": entry.data["language"],
-        "polling_interval": entry.data["polling_interval"],
+        "language": lang,
+        "polling_interval": entry.data["polling_interval"] if "polling_interval" in entry.data else API_UPDATE_INTERVALL_SECONDS
     }
     hass.config_entries.async_setup_platforms(entry, PLATFORMS)
     await async_setup_services(hass, entry)
