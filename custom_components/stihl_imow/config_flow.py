@@ -105,7 +105,7 @@ STEP_ADVANCED = vol.Schema(
         ),
         vol.Optional(
             "polling_interval", default=API_UPDATE_INTERVALL_SECONDS
-        ): vol.In([30, 60, 120, 300]),
+        ): vol.In([120, 300]),
     }
 )
 

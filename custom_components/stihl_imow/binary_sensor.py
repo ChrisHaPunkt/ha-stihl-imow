@@ -19,6 +19,7 @@ from . import extract_properties_by_type
 from .const import (
     CONF_MOWER,
     DOMAIN,
+    API_UPDATE_TIMEOUT,
 )
 from .entity import ImowBaseEntity
 from .maps import IMOW_SENSORS_MAP
@@ -50,7 +51,7 @@ async def async_setup_entry(
         try:
             # Note: asyncio.TimeoutError and aiohttp.ClientError are already
             # handled by the data update coordinator.
-            async with async_timeout.timeout(10):
+            async with async_timeout.timeout(API_UPDATE_TIMEOUT):
 
                 mower_state: MowerState = await imow.receive_mower_by_id(
                     mower_id
