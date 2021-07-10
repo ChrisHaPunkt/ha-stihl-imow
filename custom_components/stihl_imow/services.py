@@ -1,12 +1,13 @@
 """Services for the Plex integration."""
 import logging
 
-import voluptuous as vol
 from imow.api import IMowApi
 from imow.common.actions import IMowActions
 from imow.common.mowerstate import MowerState
+import voluptuous as vol
 
 from homeassistant.exceptions import HomeAssistantError
+
 from .const import DOMAIN
 
 IMOW_INTENT_SCHEMA = vol.Schema(
@@ -44,31 +45,21 @@ async def async_setup_services(hass, entry):
 async def intent_service(hass, entry, service_call):
     """Call correct iMow service."""
     service_data_mower_id = (
-        service_call.data["mower_id"]
-        if "mower_id" in service_call.data
-        else None
+        service_call.data["mower_id"] if "mower_id" in service_call.data else None
     )
     service_data_mower_name = (
-        service_call.data["mower_name"]
-        if "mower_name" in service_call.data
-        else None
+        service_call.data["mower_name"] if "mower_name" in service_call.data else None
     )
     service_data_mower_action_duration = (
-        service_call.data["duration"]
-        if "duration" in service_call.data
-        else None
+        service_call.data["duration"] if "duration" in service_call.data else None
     )
     service_data_mower_action_startpoint = (
-        service_call.data["startpoint"]
-        if "startpoint" in service_call.data
-        else None
+        service_call.data["startpoint"] if "startpoint" in service_call.data else None
     )
     api: IMowApi = hass.data[DOMAIN][entry.entry_id]["api"]
 
     if not service_data_mower_id and not service_data_mower_name:
-        raise HomeAssistantError(
-            "Failure: Need one of 'mower_id' or 'mower_name'"
-        )
+        raise HomeAssistantError("Failure: Need one of 'mower_id' or 'mower_name'")
 
     try:
         mower_state: MowerState
@@ -105,19 +96,14 @@ async def intent_service(hass, entry, service_call):
         ):
             await mower_state.intent(imow_action=service_data_mower_action)
 
-        if (
-            service_data_mower_action_startpoint
-            and service_data_mower_action_duration
-        ):
+        if service_data_mower_action_startpoint and service_data_mower_action_duration:
             await mower_state.intent(
                 imow_action=service_data_mower_action,
                 startpoint=service_data_mower_action_startpoint,
                 duration=service_data_mower_action_duration,
             )
 
-        _LOGGER.debug(
-            f"Doing {service_data_mower_action} with {mower_state.name}"
-        )
+        _LOGGER.debug(f"Doing {service_data_mower_action} with {mower_state.name}")
     except LookupError as e:
         _LOGGER.exception(e)
         raise HomeAssistantError(e)

@@ -5,16 +5,20 @@ import datetime
 import logging
 from typing import Any
 
+from imow.api import IMowApi
+from imow.common.exceptions import LoginError
 import voluptuous as vol
+
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from imow.api import IMowApi
-from imow.common.exceptions import LoginError
 import homeassistant.helpers.config_validation as cv
+
 from .const import (
+    API_DEFAULT_LANGUAGE,
+    API_UPDATE_INTERVALL_SECONDS,
     CONF_API_TOKEN,
     CONF_API_TOKEN_EXPIRE_TIME,
     CONF_ENTRY_TITLE,
@@ -26,8 +30,6 @@ from .const import (
     CONF_MOWER_VERSION,
     DOMAIN,
     LANGUAGES,
-    API_UPDATE_INTERVALL_SECONDS,
-    API_DEFAULT_LANGUAGE,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -36,9 +38,7 @@ _LOGGER = logging.getLogger(__name__)
 # TODO adjust the data schema to the data that you need
 
 
-async def validate_input(
-    hass: HomeAssistant, data: dict[str, Any]
-) -> dict[str, Any]:
+async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str, Any]:
     """Validate the user input allows us to connect.
 
     Data has the keys from STEP_USER_DATA_SCHEMA
@@ -103,9 +103,9 @@ STEP_ADVANCED = vol.Schema(
         vol.Optional("language", default=API_DEFAULT_LANGUAGE): vol.In(
             [e.value for e in LANGUAGES]
         ),
-        vol.Optional(
-            "polling_interval", default=API_UPDATE_INTERVALL_SECONDS
-        ): vol.In([120, 300]),
+        vol.Optional("polling_interval", default=API_UPDATE_INTERVALL_SECONDS): vol.In(
+            [20, 30, 60, 120, 300]
+        ),
     }
 )
 
@@ -166,9 +166,7 @@ class StihlImowConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> FlowResult:
         """Handle the initial step."""
         if user_input is None:
-            return self.async_show_form(
-                step_id="advanced", data_schema=STEP_ADVANCED
-            )
+            return self.async_show_form(step_id="advanced", data_schema=STEP_ADVANCED)
 
         errors = {}
 
@@ -186,9 +184,7 @@ class StihlImowConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         else:
             self.data["language"] = self.language
             self.data["polling_interval"] = self.polling_interval
-            return self.async_create_entry(
-                title=CONF_ENTRY_TITLE, data=self.data
-            )
+            return self.async_create_entry(title=CONF_ENTRY_TITLE, data=self.data)
 
         return self.async_show_form(
             step_id="advanced",
