@@ -3,7 +3,7 @@ from imow.common.mowerstate import MowerState
 
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN
+from .const import DOMAIN, ATTR_TYPE, ATTR_UOM, ATTR_PICTURE
 from .maps import IMOW_SENSORS_MAP
 
 
@@ -59,24 +59,23 @@ class ImowBaseEntity(CoordinatorEntity):
     @property
     def device_class(self):
         """Return the class of this device, from component DEVICE_CLASSES."""
-
         if self.property_name in IMOW_SENSORS_MAP:
-            if IMOW_SENSORS_MAP[self.property_name]["type"]:
-                return IMOW_SENSORS_MAP[self.property_name]["type"]
+            if IMOW_SENSORS_MAP[self.property_name][ATTR_TYPE]:
+                return IMOW_SENSORS_MAP[self.property_name][ATTR_TYPE]
 
     @property
     def unit_of_measurement(self):
         """Return the unit of measurement of this entity, if any."""
         if self.property_name in IMOW_SENSORS_MAP:
-            if IMOW_SENSORS_MAP[self.property_name]["uom"]:
-                return IMOW_SENSORS_MAP[self.property_name]["uom"]
+            if IMOW_SENSORS_MAP[self.property_name][ATTR_UOM]:
+                return IMOW_SENSORS_MAP[self.property_name][ATTR_UOM]
 
     @property
     def entity_picture(self):
         """Return the entity picture to use in the frontend, if any."""
         if (
             self.property_name in IMOW_SENSORS_MAP
-            and IMOW_SENSORS_MAP[self.property_name]["picture"]
+            and IMOW_SENSORS_MAP[self.property_name][ATTR_PICTURE]
         ):
             if self.mowerstate.mowerImageThumbnailUrl:
                 return self.mowerstate.mowerImageThumbnailUrl
