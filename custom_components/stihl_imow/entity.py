@@ -1,9 +1,20 @@
 """BaseEntity for iMow Sensors."""
 from imow.common.mowerstate import MowerState
 
+from homeassistant.const import ATTR_MANUFACTURER
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, ATTR_TYPE, ATTR_UOM, ATTR_PICTURE
+from .const import (
+    DOMAIN,
+    ATTR_TYPE,
+    ATTR_UOM,
+    ATTR_PICTURE,
+    ATTR_ICON,
+    ATTR_ID,
+    ATTR_NAME,
+    ATTR_SW_VERSION,
+    ATTR_MODEL,
+)
 from .maps import IMOW_SENSORS_MAP
 
 
@@ -41,19 +52,20 @@ class ImowBaseEntity(CoordinatorEntity):
     @property
     def device_info(self):
         """Provide info for device registration."""
+
         return {
             "identifiers": {
                 # Serial numbers are unique identifiers
                 # within a specific domain
                 (
                     DOMAIN,
-                    self.key_device_infos["id"],
+                    self.key_device_infos[ATTR_ID],
                 ),
             },
-            "name": self.key_device_infos["name"],
-            "manufacturer": self.key_device_infos["manufacturer"],
-            "model": self.key_device_infos["model"],
-            "sw_version": self.key_device_infos["sw_version"],
+            ATTR_NAME: self.key_device_infos[ATTR_NAME],
+            ATTR_MANUFACTURER: self.key_device_infos[ATTR_MANUFACTURER],
+            ATTR_MODEL: self.key_device_infos[ATTR_MODEL],
+            ATTR_SW_VERSION: self.key_device_infos[ATTR_SW_VERSION],
         }
 
     @property
@@ -83,16 +95,22 @@ class ImowBaseEntity(CoordinatorEntity):
     @property
     def name(self):
         """Return the name of the sensor."""
-        return f"{self.key_device_infos['name']} {self.cleaned_property_name}"
+        return (
+            f"{self.key_device_infos[ATTR_NAME]} {self.cleaned_property_name}"
+        )
 
     @property
     def unique_id(self):
         """Return the unique ID of the sensor."""
-        return f"{self.key_device_infos['id']}_{self.idx}_{self.property_name}"
+        return (
+            f"{self.key_device_infos[ATTR_ID]}_"
+            f"{self.idx}_"
+            f"{self.property_name}"
+        )
 
     @property
     def icon(self):
         """Icon of the entity."""
         if self.property_name in IMOW_SENSORS_MAP:
-            return IMOW_SENSORS_MAP[self.property_name]["icon"]
+            return IMOW_SENSORS_MAP[self.property_name][ATTR_ICON]
         return self._attr_icon

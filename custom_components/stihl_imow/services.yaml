@@ -27,10 +27,7 @@ intent:
       description: Mowing Duration in Minutes (only necessary if action is 'startMowingFromPoint')
       selector:
         select:
-          options:
-            - "30"
-            - "60"
-            - "90"
+          options: [30,60,90]
     startpoint:
       name: Starting point
       description: Mower defined Starting point (only necessary if action is 'startMowingFromPoint' and if the mower should not start from the Dock)
