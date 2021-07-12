@@ -22,7 +22,9 @@ IMOW_INTENT_SCHEMA = vol.All(
             vol.Optional("entity_id"): any,
             vol.Required("action"): str,
         },
-        cv.has_at_least_one_key("mower_id", "mower_external_id", "mower_name"),
+        cv.has_at_least_one_key(
+            "mower_id", "mower_external_id", "mower_name"
+        ),
     )
 )
 
@@ -67,10 +69,10 @@ async def intent_service(hass, entry, service_call):
         if "startpoint" in service_call.data
         else None
     )
-    mower_state: MowerState = hass.data[DOMAIN][entry.entry_id][
+    coordinator_mower_state: MowerState = hass.data[DOMAIN][entry.entry_id][
         ATTR_COORDINATOR
     ].data
-    api: IMowApi = mower_state.imow
+    api: IMowApi = coordinator_mower_state.imow
 
     if not service_data_mower_id and not service_data_mower_name:
         raise HomeAssistantError(
@@ -78,14 +80,13 @@ async def intent_service(hass, entry, service_call):
         )
 
     try:
-        mower_state: MowerState
         service_data_mower_action = IMowActions(service_call.data["action"])
         if service_data_mower_name:
-            mower_state: MowerState = await api.receive_mower_by_name(
-                service_data_mower_name
+            upstream_mower_state: MowerState = (
+                await api.receive_mower_by_name(service_data_mower_name)
             )
         if service_data_mower_id:
-            mower_state: MowerState = await api.receive_mower_by_id(
+            upstream_mower_state: MowerState = await api.receive_mower_by_id(
                 service_data_mower_id
             )
 
@@ -93,7 +94,7 @@ async def intent_service(hass, entry, service_call):
             service_data_mower_action_startpoint
             and not service_data_mower_action_duration
         ):
-            await mower_state.intent(
+            await upstream_mower_state.intent(
                 imow_action=service_data_mower_action,
                 startpoint=service_data_mower_action_startpoint,
             )
@@ -101,7 +102,7 @@ async def intent_service(hass, entry, service_call):
             not service_data_mower_action_startpoint
             and service_data_mower_action_duration
         ):
-            await mower_state.intent(
+            await upstream_mower_state.intent(
                 imow_action=service_data_mower_action,
                 duration=service_data_mower_action_duration,
             )
@@ -110,20 +111,32 @@ async def intent_service(hass, entry, service_call):
             not service_data_mower_action_startpoint
             and not service_data_mower_action_duration
         ):
-            await mower_state.intent(imow_action=service_data_mower_action)
+            await upstream_mower_state.intent(
+                imow_action=service_data_mower_action
+            )
 
         if (
             service_data_mower_action_startpoint
             and service_data_mower_action_duration
         ):
-            await mower_state.intent(
+            await upstream_mower_state.intent(
                 imow_action=service_data_mower_action,
                 startpoint=service_data_mower_action_startpoint,
                 duration=service_data_mower_action_duration,
             )
+        _LOGGER.info(
+            f"service_data_mower_action: {service_data_mower_action}"
+            f"service_data_mower_action_startpoint: "
+            f"{service_data_mower_action_startpoint} \n"
+            f"service_data_mower_action_duration: "
+            f"{service_data_mower_action_duration} \n"
+            f"service_data_mower_name: {service_data_mower_name}\n"
+            f"service_data_mower_id: {service_data_mower_id}\n"
+        )
 
         _LOGGER.debug(
-            f"Doing {service_data_mower_action} with {mower_state.name}"
+            f"Doing {service_data_mower_action} with "
+            f"{upstream_mower_state.name}"
         )
     except LookupError as e:
         _LOGGER.exception(e)
