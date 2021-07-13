@@ -8,6 +8,11 @@
 ## HomeAssistant custom component for STIHL iMow lawn mower
 A platform which allows you to interact with the STIHL iMow lawn mower.
 
+
+## Known Issues
+There is currently something leading to timeouts from the upstream STIHL server if Home Assistant in constantly pulling the data from the upstream STIHL server.  
+I reached out to STIHl about this issue, but I don't have a response yet. 
+
 ## Features
 This platform is using the [STIHL iMow API](https://app.imow.stihl.com/#) via the [unofficial STIHL iMow Python WebAPI wrapper](https://github.com/ChrisHaPunkt/stihl-imow-webapi) to 
 get the information from the mower via the upstream STIHL Server.  
