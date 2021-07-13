@@ -52,7 +52,6 @@ class ImowBaseEntity(CoordinatorEntity):
     @property
     def device_info(self):
         """Provide info for device registration."""
-
         return {
             "identifiers": {
                 # Serial numbers are unique identifiers
