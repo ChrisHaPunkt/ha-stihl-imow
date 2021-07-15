@@ -10,7 +10,7 @@ A platform which allows you to interact with the STIHL iMow lawn mower.
 
 
 ## Known Issues
-There is currently something leading to timeouts on the upstream STIHL server if Home Assistant in constantly pulling the data from the upstream STIHL server.  
+Beta v1.0.0: There is currently something leading to timeouts on the upstream STIHL server if Home Assistant in constantly pulling the data from the upstream STIHL server.  
 I reached out to STIHl about this issue, but I don't have a response yet. 
 This may lead to showing the mower as "offline" in the smartphone apps as well, even if the mower itself have a valid connection to the upstream servers.
 
