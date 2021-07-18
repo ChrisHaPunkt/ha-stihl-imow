@@ -2,7 +2,7 @@
 from typing import Any, Dict, List
 
 from homeassistant import config_entries, core
-from homeassistant.const import TIME_SECONDS, PERCENTAGE
+from homeassistant.const import PERCENTAGE, TIME_HOURS
 from homeassistant.helpers.aiohttp_client import (
     async_get_clientsession,
 )
@@ -40,9 +40,7 @@ async def async_setup_entry(
 
         entities.append(ImowStateEntity(imow, mower))
         entities.append(info_entity)
-        entities.append(
-            ImowInfoChildEntity("CoordinateLatitude", info_entity)
-        )
+        entities.append(ImowInfoChildEntity("CoordinateLatitude", info_entity))
         entities.append(ImowStatisticsEntity(imow, mower))
     async_add_entities(entities, update_before_add=True)
 
@@ -98,9 +96,7 @@ class ImowInfoEntity(ImowBaseEntity):
     def __init__(self, imow: IMowApi, mower: dict):
         """Initialize the sensor."""
         super().__init__(imow, mower)
-        self._name = (
-            f"iMow {self.mower_configflow['name']} " f"Battery Level"
-        )
+        self._name = f"iMow {self.mower_configflow['name']} " f"Battery Level"
 
     @property
     def name(self):
@@ -134,7 +130,7 @@ class ImowInfoEntity(ImowBaseEntity):
         mower_state_values = dict(mower_state.__dict__)
         self._state = mower_state_values["status"]["chargeLevel"]
 
-        del mower_state_values["state_message"]
+        del mower_state_values["stateMessage"]
         del mower_state_values["imow"]
         del mower_state_values["smartLogic"]
         del mower_state_values["status"]
@@ -198,11 +194,11 @@ class ImowStateEntity(ImowBaseEntity):
         mower_state: MowerState = await self.imow.receive_mower_by_id(
             self.mower_configflow[CONF_MOWER_IDENTIFIER]
         )
-        self._state = mower_state.state_message["short"]
+        self._state = mower_state.stateMessage["short"]
         self.attrs.update(mower_state.status)
-        self.attrs["message"] = mower_state.state_message["short"]
-        self.attrs["message_long"] = mower_state.state_message["long"]
-        self.attrs["state"] = mower_state.state_message
+        self.attrs["message"] = mower_state.stateMessage["short"]
+        self.attrs["message_long"] = mower_state.stateMessage["long"]
+        self.attrs["state"] = mower_state.stateMessage
 
 
 class ImowStatisticsEntity(ImowBaseEntity):
@@ -234,7 +230,7 @@ class ImowStatisticsEntity(ImowBaseEntity):
     @property
     def unit_of_measurement(self):
         """Return the unit of measurement."""
-        return TIME_SECONDS
+        return TIME_HOURS
 
     async def async_update(self):
         """Fetch new state data for the sensor.
@@ -245,5 +241,5 @@ class ImowStatisticsEntity(ImowBaseEntity):
         statistics: dict = await self.imow.receive_mower_statistics(
             self.mower_configflow[CONF_MOWER_IDENTIFIER]
         )
-        self._state = statistics["totalBladeOperatingTime"]
+        self._state = round(statistics["totalBladeOperatingTime"] / 60 / 60, 2)
         self.attrs.update(statistics)
