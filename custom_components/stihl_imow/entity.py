@@ -40,7 +40,7 @@ class ImowBaseEntity(CoordinatorEntity):
         return self.get_value_from_mowerstate()
 
     def get_value_from_mowerstate(self):
-        """Extract values based on property cmoplexity."""
+        """Extract values based on property complexity."""
         if "_" in self.property_name:  # Complex Entity
             return getattr(self.mowerstate, self.property_name.split("_")[0])[
                 self.property_name.split("_")[1]

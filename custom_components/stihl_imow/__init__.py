@@ -1,6 +1,7 @@
 """The STIHL iMow integration."""
 from __future__ import annotations
 
+import time
 from datetime import timedelta
 import typing
 
@@ -29,7 +30,7 @@ from .services import async_setup_services
 
 # TODO List the platforms that you want to support.
 # For your initial PR, limit it to 1 platform.
-PLATFORMS = ["sensor", "binary_sensor", "switch"]
+PLATFORMS = ["sensor", "binary_sensor"]  # , "switch"]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -88,6 +89,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 mower_state: MowerState = await imow_api.receive_mower_by_id(
                     mower_id
                 )
+                time.sleep(1)
                 mower_state.__dict__[
                     "statistics"
                 ] = await mower_state.get_statistics()

@@ -22,9 +22,7 @@ IMOW_INTENT_SCHEMA = vol.All(
             vol.Optional("entity_id"): any,
             vol.Required("action"): str,
         },
-        cv.has_at_least_one_key(
-            "mower_id", "mower_external_id", "mower_name"
-        ),
+        cv.has_at_least_one_key("mower_id", "mower_external_id", "mower_name"),
     )
 )
 
@@ -82,8 +80,8 @@ async def intent_service(hass, entry, service_call):
     try:
         service_data_mower_action = IMowActions(service_call.data["action"])
         if service_data_mower_name:
-            upstream_mower_state: MowerState = (
-                await api.receive_mower_by_name(service_data_mower_name)
+            upstream_mower_state: MowerState = await api.receive_mower_by_name(
+                service_data_mower_name
             )
         if service_data_mower_id:
             upstream_mower_state: MowerState = await api.receive_mower_by_id(
