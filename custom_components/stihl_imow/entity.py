@@ -1,4 +1,6 @@
 """BaseEntity for iMow Sensors."""
+import types
+
 from imow.common.mowerstate import MowerState
 
 from homeassistant.const import ATTR_MANUFACTURER
@@ -41,13 +43,38 @@ class ImowBaseEntity(CoordinatorEntity):
 
     def get_value_from_mowerstate(self):
         """Extract values based on property complexity."""
-        if "_" in self.property_name:  # Complex Entity
-            return getattr(self.mowerstate, self.property_name.split("_")[0])[
+
+        if self.property_name.startswith("state_message"):
+            if "state_message_legacy_message" == self.property_name:
+                return getattr(self.mowerstate, "state_message")[
+                    "legacy_message"
+                ]
+            else:
+                return getattr(self.mowerstate, "state_message")[
+                    self.property_name.split("_")[2]
+                ]
+
+        if self.property_name.startswith("smartLogic"):
+            return getattr(self.mowerstate, "smartLogic")[
                 self.property_name.split("_")[1]
             ]
 
-        else:
+        if self.property_name.startswith("status"):
+            return getattr(self.mowerstate, "status")[
+                self.property_name.split("_")[1]
+            ]
+
+        if self.property_name.startswith("statistics"):
+            return getattr(self.mowerstate, "statistics")[
+                self.property_name.split("_")[1]
+            ]
+
+        if type(getattr(self.mowerstate, self.property_name)) != dict:
             return getattr(self.mowerstate, self.property_name)
+        else:
+            return getattr(self.mowerstate, self.property_name.split("_")[0])[
+                self.property_name.split("_")[1]
+            ]
 
     @property
     def device_info(self):
@@ -85,8 +112,8 @@ class ImowBaseEntity(CoordinatorEntity):
     def entity_picture(self):
         """Return the entity picture to use in the frontend, if any."""
         if (
-            self.property_name in IMOW_SENSORS_MAP
-            and IMOW_SENSORS_MAP[self.property_name][ATTR_PICTURE]
+                self.property_name in IMOW_SENSORS_MAP
+                and IMOW_SENSORS_MAP[self.property_name][ATTR_PICTURE]
         ):
             if self.mowerstate.mowerImageThumbnailUrl:
                 return self.mowerstate.mowerImageThumbnailUrl
@@ -112,4 +139,3 @@ class ImowBaseEntity(CoordinatorEntity):
         """Icon of the entity."""
         if self.property_name in IMOW_SENSORS_MAP:
             return IMOW_SENSORS_MAP[self.property_name][ATTR_ICON]
-        return self._attr_icon
