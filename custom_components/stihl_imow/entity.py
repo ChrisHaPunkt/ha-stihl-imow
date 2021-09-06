@@ -43,38 +43,13 @@ class ImowBaseEntity(CoordinatorEntity):
 
     def get_value_from_mowerstate(self):
         """Extract values based on property complexity."""
-
-        if self.property_name.startswith("state_message"):
-            if "state_message_legacy_message" == self.property_name:
-                return getattr(self.mowerstate, "state_message")[
-                    "legacy_message"
-                ]
-            else:
-                return getattr(self.mowerstate, "state_message")[
-                    self.property_name.split("_")[2]
-                ]
-
-        if self.property_name.startswith("smartLogic"):
-            return getattr(self.mowerstate, "smartLogic")[
-                self.property_name.split("_")[1]
-            ]
-
-        if self.property_name.startswith("status"):
-            return getattr(self.mowerstate, "status")[
-                self.property_name.split("_")[1]
-            ]
-
-        if self.property_name.startswith("statistics"):
-            return getattr(self.mowerstate, "statistics")[
-                self.property_name.split("_")[1]
-            ]
-
-        if type(getattr(self.mowerstate, self.property_name)) != dict:
-            return getattr(self.mowerstate, self.property_name)
-        else:
+        if "_" in self.property_name:  # Complex Entity
             return getattr(self.mowerstate, self.property_name.split("_")[0])[
                 self.property_name.split("_")[1]
             ]
+
+        else:
+            return getattr(self.mowerstate, self.property_name)
 
     @property
     def device_info(self):

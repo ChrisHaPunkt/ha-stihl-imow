@@ -29,8 +29,8 @@ async def async_setup_entry(
     entities, device = extract_properties_by_type(mower_state, bool)
 
     for entity in entities:
-        #    if not IMOW_SENSORS_MAP[entity][ATTR_SWITCH]:
-        binary_sensor_entities[entity] = entities[entity]
+        if not IMOW_SENSORS_MAP[entity][ATTR_SWITCH]:
+            binary_sensor_entities[entity] = entities[entity]
     async_add_entities(
         ImowBinarySensorEntity(coordinator, device, idx, mower_state_property)
         for idx, mower_state_property in enumerate(binary_sensor_entities)

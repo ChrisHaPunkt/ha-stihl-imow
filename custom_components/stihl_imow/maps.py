@@ -37,7 +37,7 @@ IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
         ATTR_TYPE: None,
         ATTR_UOM: None,
         ATTR_ICON: "mdi:baby-carriage",
-        ATTR_SWITCH: False,
+        ATTR_SWITCH: True,
         ATTR_PICTURE: False,
     },
     "circumference": {
@@ -378,6 +378,8 @@ IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
     },
 }
 
+
+# Upstream attributes, which should not be exposesd to HA
 ENTITY_STRIP_OUT_PROPERTIES = [
     "status_extraStatus",
     "status_extraStatus1",
