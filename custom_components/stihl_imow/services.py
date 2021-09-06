@@ -16,8 +16,8 @@ IMOW_INTENT_SCHEMA = vol.All(
             vol.Optional("mower_id"): int,
             vol.Optional("mower_external_id"): str,
             vol.Optional("mower_name"): str,
+            vol.Optional("startpoint"): str,
             vol.Optional("duration"): str,
-            vol.Optional("startpoint"): int,
             vol.Optional("device_id"): any,
             vol.Optional("entity_id"): any,
             vol.Required("action"): str,
@@ -58,7 +58,7 @@ async def intent_service(hass, entry, service_call):
         else None
     )
     service_data_mower_action_duration = (
-        int(service_call.data["duration"])
+        service_call.data["duration"]
         if "duration" in service_call.data
         else None
     )
