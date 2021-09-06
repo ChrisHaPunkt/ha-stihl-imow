@@ -1,10 +1,8 @@
 """BaseEntity for iMow Sensors."""
-import types
-
-from imow.common.mowerstate import MowerState
 
 from homeassistant.const import ATTR_MANUFACTURER
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from imow.common.mowerstate import MowerState
 
 from .const import (
     DOMAIN,
@@ -87,8 +85,8 @@ class ImowBaseEntity(CoordinatorEntity):
     def entity_picture(self):
         """Return the entity picture to use in the frontend, if any."""
         if (
-                self.property_name in IMOW_SENSORS_MAP
-                and IMOW_SENSORS_MAP[self.property_name][ATTR_PICTURE]
+            self.property_name in IMOW_SENSORS_MAP
+            and IMOW_SENSORS_MAP[self.property_name][ATTR_PICTURE]
         ):
             if self.mowerstate.mowerImageThumbnailUrl:
                 return self.mowerstate.mowerImageThumbnailUrl
