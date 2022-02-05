@@ -89,7 +89,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 mower_state: MowerState = await imow_api.receive_mower_by_id(
                     mower_id
                 )
-                time.sleep(1)
+                asyncio.sleep(1)
                 mower_state.__dict__[
                     "statistics"
                 ] = await mower_state.get_statistics()
