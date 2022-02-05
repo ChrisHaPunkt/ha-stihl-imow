@@ -1,15 +1,11 @@
 """The STIHL iMow integration."""
 from __future__ import annotations
 
-import time
+import asyncio
 from datetime import timedelta
-import typing
 
 import async_timeout
-from imow.api import IMowApi
-from imow.common.exceptions import ApiMaintenanceError, LoginError
-from imow.common.mowerstate import MowerState
-
+import typing
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
@@ -18,6 +14,9 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
     UpdateFailed,
 )
+from imow.api import IMowApi
+from imow.common.exceptions import ApiMaintenanceError, LoginError
+from imow.common.mowerstate import MowerState
 
 from .const import (
     API_UPDATE_INTERVALL_SECONDS,
@@ -89,7 +88,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 mower_state: MowerState = await imow_api.receive_mower_by_id(
                     mower_id
                 )
-                asyncio.sleep(1)
+                await asyncio.sleep(1)
                 mower_state.__dict__[
                     "statistics"
                 ] = await mower_state.get_statistics()
