@@ -1,7 +1,7 @@
 {
   "name": "STIHL iMow",
   "iot_class": "Cloud Polling",
-  "homeassistant": "0.110.0",
+  "homeassistant": "2022.3.1",
   "hide_default_branch": true,
   "render_readme": true,
   "domains": [
