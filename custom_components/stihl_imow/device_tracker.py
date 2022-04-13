@@ -32,7 +32,7 @@ async def async_setup_entry(
     entities, device = extract_properties_by_type(mower_state, bool)
 
     async_add_entities(
-        ImowDeviceTrackerEntity(coordinator, device, 999, "lat_long")
+        [ImowDeviceTrackerEntity(coordinator, device, 999, "lat_long")]
     )
 
 
