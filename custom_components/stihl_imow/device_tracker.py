@@ -7,9 +7,6 @@ from homeassistant.components.device_tracker import (
 )
 from homeassistant.components.device_tracker.config_entry import TrackerEntity
 from homeassistant.components.device_tracker.const import SOURCE_TYPE_GPS
-from homeassistant.const import (
-    ATTR_DEVICE_ID,
-)
 from imow.common.mowerstate import MowerState
 
 from . import extract_properties_by_type
@@ -38,11 +35,6 @@ async def async_setup_entry(
 
 class ImowDeviceTrackerEntity(ImowBaseEntity, TrackerEntity):
     """Represent a tracked device."""
-
-    @property
-    def unique_id(self):
-        """Return the unique ID."""
-        return self._entry.data[ATTR_DEVICE_ID]
 
     @property
     def location_accuracy(self):
