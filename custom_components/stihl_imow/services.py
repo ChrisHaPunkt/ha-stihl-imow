@@ -86,8 +86,8 @@ async def intent_service(hass, entry, service_call, device_registry):
     try:
         service_data_mower_action = IMowActions(service_call.data["action"])
         if service_data_mower_name:
-            upstream_mower_state: MowerState = await api.receive_mower_by_name(
-                service_data_mower_name
+            upstream_mower_state: MowerState = (
+                await api.receive_mower_by_name(service_data_mower_name)
             )
 
         if (
