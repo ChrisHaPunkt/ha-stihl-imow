@@ -2,9 +2,7 @@
 import logging
 
 from homeassistant import config_entries, core
-from homeassistant.components.device_tracker import (
-    ATTR_GPS_ACCURACY,
-)
+
 from homeassistant.components.device_tracker.config_entry import TrackerEntity
 from homeassistant.components.device_tracker.const import SOURCE_TYPE_GPS
 from imow.common.mowerstate import MowerState
@@ -37,9 +35,9 @@ class ImowDeviceTrackerEntity(ImowBaseEntity, TrackerEntity):
     """Represent a tracked device."""
 
     @property
-    def location_accuracy(self):
-        """Return the gps accuracy of the device."""
-        return self._data.get(ATTR_GPS_ACCURACY)
+    def state(self):
+        """Return the state of the sensor."""
+        return None
 
     @property
     def latitude(self):
