@@ -108,9 +108,9 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
 )
 STEP_ADVANCED = vol.Schema(
     {
-        vol.Optional(CONF_ATTR_LANGUAGE, default=API_DEFAULT_LANGUAGE): vol.In(
-            [e.value for e in LANGUAGES]
-        ),
+        vol.Optional(
+            CONF_ATTR_LANGUAGE, default=API_DEFAULT_LANGUAGE
+        ): vol.In([e.value for e in LANGUAGES]),
         vol.Optional(
             CONF_ATTR_POLLING_INTERVALL, default=API_UPDATE_INTERVALL_SECONDS
         ): vol.In([20, 30, 60, 120, 300]),
