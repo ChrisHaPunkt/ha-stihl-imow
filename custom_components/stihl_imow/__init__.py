@@ -134,8 +134,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # coordinator.async_refresh() instead
     #
     await coordinator.async_config_entry_first_refresh()
-
-    hass.config_entries.async_setup_platforms(entry, PLATFORMS)
+    
+    hass.async_create_task(
+        hass.config_entries.async_forward_entry_setups(
+            entry, PLATFORMS
+        )
+    )
 
     await async_setup_services(hass, entry)
 
