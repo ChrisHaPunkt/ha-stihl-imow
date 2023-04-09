@@ -1,6 +1,7 @@
 """Platform for sensor integration."""
 import logging
 
+from homeassistant.core import callback
 from imow.common.mowerstate import MowerState
 
 from homeassistant import config_entries, core
@@ -16,9 +17,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
-    hass: core.HomeAssistant,
-    config_entry: config_entries.ConfigEntry,
-    async_add_entities,
+        hass: core.HomeAssistant,
+        config_entry: config_entries.ConfigEntry,
+        async_add_entities,
 ):
     """Add sensors for passed config_entry in HA."""
     config = hass.data[DOMAIN][config_entry.entry_id]

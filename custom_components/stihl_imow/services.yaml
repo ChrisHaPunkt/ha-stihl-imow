@@ -2,12 +2,13 @@ intent:
   name: Intiate an iMow Action to a Mower
   description: Intiate an iMow Action to a Mower
   fields:
-    mower_name:
+    mower_device:
       name: Mower
       description: Name of the mower
       required: true
       selector:
-        text:
+        device:
+          integration: stihl_imow
     action:
       name: iMow Action
       description: The action the targeted mower should do
@@ -33,6 +34,22 @@ intent:
             - "90"
     startpoint:
       name: Starting point
+      description: Mower defined Starting point (only necessary if action is 'startMowingFromPoint' and if the mower should not start from the Dock)
+      selector:
+        number:
+          min: 1
+          max: 4
+
+    starttime:
+      name: Time to Start
+      description: Mower defined Starting point (only necessary if action is 'startMowingFromPoint' and if the mower should not start from the Dock)
+      selector:
+        number:
+          min: 1
+          max: 4
+
+    endtime:
+      name: Time to End
       description: Mower defined Starting point (only necessary if action is 'startMowingFromPoint' and if the mower should not start from the Dock)
       selector:
         number:

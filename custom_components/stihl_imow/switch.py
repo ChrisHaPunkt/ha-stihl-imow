@@ -1,6 +1,8 @@
 """Platform for sensor integration."""
 import logging
 
+from homeassistant.core import callback
+from homeassistant.helpers.update_coordinator import UpdateFailed
 from imow.common.mowerstate import MowerState
 
 from homeassistant import config_entries, core
@@ -8,7 +10,7 @@ from homeassistant.components.switch import SwitchEntity
 from homeassistant.const import STATE_OFF, STATE_ON
 
 from . import extract_properties_by_type
-from .const import DOMAIN, ATTR_COORDINATOR, ATTR_SWITCH, ATTR_ID
+from .const import DOMAIN, ATTR_COORDINATOR, ATTR_SWITCH, ATTR_ID, LOGGER
 from .entity import ImowBaseEntity
 from .maps import IMOW_SENSORS_MAP
 
@@ -16,9 +18,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
-    hass: core.HomeAssistant,
-    config_entry: config_entries.ConfigEntry,
-    async_add_entities,
+        hass: core.HomeAssistant,
+        config_entry: config_entries.ConfigEntry,
+        async_add_entities,
 ):
     """Add sensors for passed config_entry in HA."""
     config = hass.data[DOMAIN][config_entry.entry_id]
@@ -60,17 +62,26 @@ class ImowSwitchSensorEntity(ImowBaseEntity, SwitchEntity):
 
     async def async_turn_on(self, **kwargs):
         """Turn the entity on."""
-        new_mower_state: MowerState = await self.api.update_setting(
-            self.key_device_infos["id"], self.property_name, True
-        )
-        self._attr_is_on = new_mower_state.__dict__[self.property_name]
-        self._attr_state = STATE_ON if self.is_on else STATE_OFF
+        try:
+            new_mower_state: MowerState = await self.api.update_setting(
+                self.key_device_infos["id"], self.property_name, True
+            )
+            self._attr_is_on = True
+            self._attr_state = STATE_ON
+            await self.coordinator.async_request_refresh()
+
+        except Exception as err:
+            raise UpdateFailed(f"Error communicating with API: {err}")
 
     async def async_turn_off(self, **kwargs):
         """Turn the entity off."""
-        new_mower_state: MowerState = await self.api.update_setting(
-            self.key_device_infos[ATTR_ID], self.property_name, False
-        )
+        try:
+            new_mower_state: MowerState = await self.api.update_setting(
+                self.key_device_infos[ATTR_ID], self.property_name, False
+            )
 
-        self._attr_is_on = new_mower_state.__dict__[self.property_name]
-        self._attr_state = STATE_ON if self.is_on else STATE_OFF
+            self._attr_is_on = False
+            self._attr_state = STATE_OFF
+            await self.coordinator.async_request_refresh()
+        except Exception as err:
+            raise UpdateFailed(f"Error communicating with API: {err}")

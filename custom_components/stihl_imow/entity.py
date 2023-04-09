@@ -1,6 +1,7 @@
 """BaseEntity for iMow Sensors."""
 
 from homeassistant.const import ATTR_MANUFACTURER
+from homeassistant.core import callback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from imow.common.mowerstate import MowerState
 
@@ -28,6 +29,12 @@ class ImowBaseEntity(CoordinatorEntity):
         self.key_device_infos = device
         self.property_name = mower_state_property
         self.cleaned_property_name = mower_state_property.replace("_", " ")
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle updated data from the coordinator."""
+        #self._attr_is_on = self.get_value_from_mowerstate()
+        self.async_write_ha_state()
 
     @property
     def mowerstate(self) -> MowerState:

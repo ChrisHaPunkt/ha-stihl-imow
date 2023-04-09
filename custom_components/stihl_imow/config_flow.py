@@ -91,7 +91,7 @@ async def validate_input(
                 CONF_MOWER_STATE: mowers_state,
             }
         )
-    await imow.close()
+    #await imow.close()
     return {
         CONF_API_TOKEN: token,
         CONF_API_TOKEN_EXPIRE_TIME: datetime.datetime.timestamp(expire_time),
