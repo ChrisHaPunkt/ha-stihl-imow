@@ -4,25 +4,25 @@ import logging
 import voluptuous as vol
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import device_registry as dr
 from imow.api import IMowApi
 from imow.common.actions import IMowActions
 from imow.common.mowerstate import MowerState
 
-from .const import DOMAIN, CONF_MOWER_IDENTIFIER, ATTR_COORDINATOR
+from .const import DOMAIN, CONF_MOWER_IDENTIFIER, ATTR_COORDINATOR, LOGGER
 
 IMOW_INTENT_SCHEMA = vol.All(
     vol.Schema(
         {
-            vol.Optional("mower_id"): int,
-            vol.Optional("mower_external_id"): str,
+            vol.Optional("mower_device"): str,
             vol.Optional("mower_name"): str,
-            vol.Optional("startpoint"): str,
-            vol.Optional("duration"): str,
-            vol.Optional("device_id"): any,
-            vol.Optional("entity_id"): any,
+            vol.Optional("startpoint"): int,
+            vol.Optional("starttime"): str,
+            vol.Optional("endtime"): str,
+            vol.Optional("duration"): int,
             vol.Required("action"): str,
         },
-        cv.has_at_least_one_key("mower_id", "mower_external_id", "mower_name"),
+        cv.has_at_least_one_key("mower_device", "mower_name"),
     )
 )
 
@@ -33,7 +33,7 @@ async def async_setup_services(hass, entry):
     """Set up services for the iMow component."""
 
     async def async_call_intent_service(service_call):
-        await intent_service(hass, entry, service_call)
+        await intent_service(hass, entry, service_call, device_registry)
 
     hass.services.async_register(
         DOMAIN,
@@ -41,22 +41,21 @@ async def async_setup_services(hass, entry):
         async_call_intent_service,
         schema=IMOW_INTENT_SCHEMA,
     )
-
+    device_registry = dr.async_get(hass)
     return True
 
 
-async def intent_service(hass, entry, service_call):
+async def intent_service(hass, entry, service_call, device_registry):
     """Call correct iMow service."""
-    service_data_mower_id = (
-        service_call.data[CONF_MOWER_IDENTIFIER]
-        if CONF_MOWER_IDENTIFIER in service_call.data
-        else None
-    )
-    service_data_mower_name = (
-        service_call.data["mower_name"]
-        if "mower_name" in service_call.data
-        else None
-    )
+    if "mower_device" not in service_call.data:
+        service_data_mower_name = (
+            service_call.data["mower_name"]
+            if "mower_name" in service_call.data
+            else None
+        )
+    else:
+        service_data_mower_name = device_registry.async_get(device_id=service_call.data["mower_device"]).name
+
     service_data_mower_action_duration = (
         service_call.data["duration"]
         if "duration" in service_call.data
@@ -67,25 +66,26 @@ async def intent_service(hass, entry, service_call):
         if "startpoint" in service_call.data
         else None
     )
+    service_data_mower_action_starttime = (
+        service_call.data["starttime"]
+        if "starttime" in service_call.data
+        else None
+    )
+    service_data_mower_action_endtime = (
+        service_call.data["endtime"]
+        if "endtime" in service_call.data
+        else None
+    )
     coordinator_mower_state: MowerState = hass.data[DOMAIN][entry.entry_id][
         ATTR_COORDINATOR
     ].data
     api: IMowApi = coordinator_mower_state.imow
-
-    if not service_data_mower_id and not service_data_mower_name:
-        raise HomeAssistantError(
-            "Failure: Need one of 'mower_id' or 'mower_name'"
-        )
 
     try:
         service_data_mower_action = IMowActions(service_call.data["action"])
         if service_data_mower_name:
             upstream_mower_state: MowerState = await api.receive_mower_by_name(
                 service_data_mower_name
-            )
-        if service_data_mower_id:
-            upstream_mower_state: MowerState = await api.receive_mower_by_id(
-                service_data_mower_id
             )
 
         if (
@@ -129,7 +129,6 @@ async def intent_service(hass, entry, service_call):
             f"service_data_mower_action_duration: "
             f"{service_data_mower_action_duration} \n"
             f"service_data_mower_name: {service_data_mower_name}\n"
-            f"service_data_mower_id: {service_data_mower_id}\n"
         )
 
         _LOGGER.debug(

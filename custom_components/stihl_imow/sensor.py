@@ -1,6 +1,7 @@
 """Platform for sensor integration."""
 import logging
 
+from homeassistant.core import callback
 from imow.common.mowerstate import MowerState
 
 from homeassistant import config_entries, core
