@@ -6,15 +6,15 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from imow.common.mowerstate import MowerState
 
 from .const import (
-    DOMAIN,
-    ATTR_TYPE,
-    ATTR_UOM,
-    ATTR_PICTURE,
     ATTR_ICON,
     ATTR_ID,
-    ATTR_NAME,
-    ATTR_SW_VERSION,
     ATTR_MODEL,
+    ATTR_NAME,
+    ATTR_PICTURE,
+    ATTR_SW_VERSION,
+    ATTR_TYPE,
+    ATTR_UOM,
+    DOMAIN,
 )
 from .maps import IMOW_SENSORS_MAP
 
@@ -33,7 +33,7 @@ class ImowBaseEntity(CoordinatorEntity):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        #self._attr_is_on = self.get_value_from_mowerstate()
+        # self._attr_is_on = self.get_value_from_mowerstate()
         self.async_write_ha_state()
 
     @property
@@ -53,8 +53,7 @@ class ImowBaseEntity(CoordinatorEntity):
                 self.property_name.split("_")[1]
             ]
 
-        else:
-            return getattr(self.mowerstate, self.property_name)
+        return getattr(self.mowerstate, self.property_name)
 
     @property
     def device_info(self):

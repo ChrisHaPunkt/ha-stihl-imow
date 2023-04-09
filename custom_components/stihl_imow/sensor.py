@@ -1,15 +1,13 @@
 """Platform for sensor integration."""
 import logging
 
-from homeassistant.core import callback
-from imow.common.mowerstate import MowerState
-
 from homeassistant import config_entries, core
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.const import STATE_OFF
+from imow.common.mowerstate import MowerState
 
 from . import extract_properties_by_type
-from .const import DOMAIN, ATTR_COORDINATOR, ATTR_SHORT, ATTR_LONG
+from .const import ATTR_COORDINATOR, ATTR_LONG, ATTR_SHORT, DOMAIN
 from .entity import ImowBaseEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -47,7 +45,6 @@ class ImowSensorEntity(ImowBaseEntity, SensorEntity):
     def extra_state_attributes(self):
         """Return the state attributes of the device."""
         if self.property_name == "machineState":
-
             return {
                 ATTR_SHORT: self.mowerstate.stateMessage[ATTR_SHORT],
                 ATTR_LONG: self.mowerstate.stateMessage[ATTR_LONG],

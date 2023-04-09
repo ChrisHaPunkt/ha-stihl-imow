@@ -5,22 +5,26 @@ import datetime
 import logging
 from typing import Any
 
-from imow.api import IMowApi
-from imow.common.exceptions import LoginError
+import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-import homeassistant.helpers.config_validation as cv
+from imow.api import IMowApi
+from imow.common.exceptions import LoginError
 
 from .const import (
     API_DEFAULT_LANGUAGE,
     API_UPDATE_INTERVALL_SECONDS,
+    ATTR_IMOW,
     CONF_API_TOKEN,
     CONF_API_TOKEN_EXPIRE_TIME,
+    CONF_ATTR_EMAIL,
+    CONF_ATTR_LANGUAGE,
+    CONF_ATTR_PASSWORD,
+    CONF_ATTR_POLLING_INTERVALL,
     CONF_ENTRY_TITLE,
     CONF_MOWER,
     CONF_MOWER_IDENTIFIER,
@@ -28,13 +32,8 @@ from .const import (
     CONF_MOWER_NAME,
     CONF_MOWER_STATE,
     CONF_MOWER_VERSION,
-    DOMAIN,
     CONF_USER_INPUT,
-    CONF_ATTR_EMAIL,
-    CONF_ATTR_PASSWORD,
-    ATTR_IMOW,
-    CONF_ATTR_LANGUAGE,
-    CONF_ATTR_POLLING_INTERVALL,
+    DOMAIN,
 )
 from .maps import LANGUAGES
 
@@ -91,7 +90,7 @@ async def validate_input(
                 CONF_MOWER_STATE: mowers_state,
             }
         )
-    #await imow.close()
+    # await imow.close()
     return {
         CONF_API_TOKEN: token,
         CONF_API_TOKEN_EXPIRE_TIME: datetime.datetime.timestamp(expire_time),
@@ -159,7 +158,6 @@ class StihlImowConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             _LOGGER.exception("Unexpected exception")
             errors["base"] = "unknown"
         else:
-
             return await self.async_step_advanced()
 
         return self.async_show_form(
