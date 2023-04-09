@@ -9,7 +9,7 @@ from imow.api import IMowApi
 from imow.common.actions import IMowActions
 from imow.common.mowerstate import MowerState
 
-from .const import DOMAIN, CONF_MOWER_IDENTIFIER, ATTR_COORDINATOR, LOGGER
+from .const import ATTR_COORDINATOR, DOMAIN
 
 IMOW_INTENT_SCHEMA = vol.All(
     vol.Schema(
@@ -54,7 +54,9 @@ async def intent_service(hass, entry, service_call, device_registry):
             else None
         )
     else:
-        service_data_mower_name = device_registry.async_get(device_id=service_call.data["mower_device"]).name
+        service_data_mower_name = device_registry.async_get(
+            device_id=service_call.data["mower_device"]
+        ).name
 
     service_data_mower_action_duration = (
         service_call.data["duration"]
@@ -66,16 +68,16 @@ async def intent_service(hass, entry, service_call, device_registry):
         if "startpoint" in service_call.data
         else None
     )
-    service_data_mower_action_starttime = (
-        service_call.data["starttime"]
-        if "starttime" in service_call.data
-        else None
-    )
-    service_data_mower_action_endtime = (
-        service_call.data["endtime"]
-        if "endtime" in service_call.data
-        else None
-    )
+    # service_data_mower_action_starttime = (
+    #     service_call.data["starttime"]
+    #     if "starttime" in service_call.data
+    #     else None
+    # )
+    # service_data_mower_action_endtime = (
+    #     service_call.data["endtime"]
+    #     if "endtime" in service_call.data
+    #     else None
+    # )
     coordinator_mower_state: MowerState = hass.data[DOMAIN][entry.entry_id][
         ATTR_COORDINATOR
     ].data

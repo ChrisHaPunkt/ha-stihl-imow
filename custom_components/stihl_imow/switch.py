@@ -1,16 +1,14 @@
 """Platform for sensor integration."""
 import logging
 
-from homeassistant.core import callback
-from homeassistant.helpers.update_coordinator import UpdateFailed
-from imow.common.mowerstate import MowerState
-
 from homeassistant import config_entries, core
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.const import STATE_OFF, STATE_ON
+from homeassistant.helpers.update_coordinator import UpdateFailed
+from imow.common.mowerstate import MowerState
 
 from . import extract_properties_by_type
-from .const import DOMAIN, ATTR_COORDINATOR, ATTR_SWITCH, ATTR_ID, LOGGER
+from .const import ATTR_COORDINATOR, ATTR_ID, ATTR_SWITCH, DOMAIN
 from .entity import ImowBaseEntity
 from .maps import IMOW_SENSORS_MAP
 
@@ -18,9 +16,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
-        hass: core.HomeAssistant,
-        config_entry: config_entries.ConfigEntry,
-        async_add_entities,
+    hass: core.HomeAssistant,
+    config_entry: config_entries.ConfigEntry,
+    async_add_entities,
 ):
     """Add sensors for passed config_entry in HA."""
     config = hass.data[DOMAIN][config_entry.entry_id]
@@ -56,14 +54,12 @@ class ImowSwitchSensorEntity(ImowBaseEntity, SwitchEntity):
     @property
     def state(self):
         """Return the state of the sensor."""
-        return (
-            STATE_ON if bool(self.get_value_from_mowerstate()) else STATE_OFF
-        )
+        return STATE_ON if bool(self.get_value_from_mowerstate()) else STATE_OFF
 
     async def async_turn_on(self, **kwargs):
         """Turn the entity on."""
         try:
-            new_mower_state: MowerState = await self.api.update_setting(
+            await self.api.update_setting(
                 self.key_device_infos["id"], self.property_name, True
             )
             self._attr_is_on = True
@@ -76,7 +72,7 @@ class ImowSwitchSensorEntity(ImowBaseEntity, SwitchEntity):
     async def async_turn_off(self, **kwargs):
         """Turn the entity off."""
         try:
-            new_mower_state: MowerState = await self.api.update_setting(
+            await self.api.update_setting(
                 self.key_device_infos[ATTR_ID], self.property_name, False
             )
 

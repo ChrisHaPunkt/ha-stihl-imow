@@ -16,7 +16,8 @@ from homeassistant.const import (
     TIME_HOURS,
     TIME_SECONDS,
 )
-from .const import ATTR_TYPE, ATTR_UOM, ATTR_ICON, ATTR_SWITCH, ATTR_PICTURE
+
+from .const import ATTR_ICON, ATTR_PICTURE, ATTR_SWITCH, ATTR_TYPE, ATTR_UOM
 
 IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
     "asmEnabled": {

@@ -2,10 +2,10 @@
 from __future__ import annotations
 
 import asyncio
+import typing
 from datetime import timedelta
 
 import async_timeout
-import typing
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
@@ -57,7 +57,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         await imow_api.get_token(force_reauth=True)
 
     except LoginError as err:
-
         # Raising ConfigEntryAuthFailed will cancel future updates
         # and start a config flow with SOURCE_REAUTH (async_step_reauth)
         raise ConfigEntryAuthFailed from err
@@ -84,7 +83,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             # Note: asyncio.TimeoutError and aiohttp.ClientError are already
             # handled by the data update coordinator.
             async with async_timeout.timeout(API_UPDATE_TIMEOUT):
-
                 mower_state: MowerState = await imow_api.receive_mower_by_id(
                     mower_id
                 )
@@ -97,7 +95,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 return mower_state
 
         except LoginError as err:
-
             # Raising ConfigEntryAuthFailed will cancel future updates
             # and start a config flow with SOURCE_REAUTH (async_step_reauth)
             raise ConfigEntryAuthFailed from err
@@ -136,9 +133,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await coordinator.async_config_entry_first_refresh()
 
     hass.async_create_task(
-        hass.config_entries.async_forward_entry_setups(
-            entry, PLATFORMS
-        )
+        hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     )
 
     await async_setup_services(hass, entry)
@@ -171,7 +166,6 @@ def extract_properties_by_type(
         else:
             if mower_state_property not in ENTITY_STRIP_OUT_PROPERTIES:
                 if not negotiate:
-
                     if (
                         type(mower_state.__dict__[mower_state_property])
                         is property_python_type
