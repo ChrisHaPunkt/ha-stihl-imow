@@ -1,0 +1,24 @@
+---
+name: Validate actions via cron
+
+on:  # yamllint disable-line rule:truthy
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  validate:
+    runs-on: "ubuntu-latest"
+    name: Validate
+    steps:
+      - uses: "actions/checkout@v2"
+
+      - name: HACS validation
+        uses: "hacs/integration/action@master"
+        env:
+          SKIP_BRANDS_CHECK: "True"
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CATEGORY: "integration"
+
+      - name: Hassfest validation
+        uses: "home-assistant/actions/hassfest@master"
