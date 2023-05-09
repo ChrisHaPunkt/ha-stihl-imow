@@ -122,7 +122,6 @@ class StihlImowConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             _LOGGER.exception("Unexpected exception")
             errors["base"] = "unknown"
         else:
-
             return self.async_create_entry(
                 title=CONF_ENTRY_TITLE, data=self.data
             )
