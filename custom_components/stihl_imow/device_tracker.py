@@ -29,25 +29,32 @@ async def async_setup_entry(
     coordinator = hass.data[DOMAIN][config_entry.entry_id][ATTR_COORDINATOR]
 
     mower_state: MowerState = config[ATTR_COORDINATOR].data
-    entities, device = extract_properties_by_type(mower_state, bool)
+
+    device = {
+        "name": mower_state.name,
+        "id": mower_state.id,
+        "externalId": mower_state.externalId,
+        "manufacturer": "STIHL",
+        "model": mower_state.deviceTypeDescription,
+        "sw_version": mower_state.softwarePacket,
+    }
 
     async_add_entities(
-        ImowDeviceTrackerEntity(coordinator, device, 999, "lat_long")
+        [ImowDeviceTrackerEntity(coordinator, device, 99999, "")]
     )
 
 
-class ImowDeviceTrackerEntity(ImowBaseEntity, TrackerEntity):
+class ImowDeviceTrackerEntity(TrackerEntity, ImowBaseEntity):
     """Represent a tracked device."""
 
-    @property
-    def unique_id(self):
-        """Return the unique ID."""
-        return self._entry.data[ATTR_DEVICE_ID]
+    def __init__(self, coordinator, device_info, idx, mower_state_property):
+        """Override the BaseEntity with DeviceTracker Sensor content."""
+        super().__init__(coordinator, device_info, idx, mower_state_property)
 
     @property
-    def location_accuracy(self):
+    def source_type(self):
         """Return the gps accuracy of the device."""
-        return self._data.get(ATTR_GPS_ACCURACY)
+        return SOURCE_TYPE_GPS
 
     @property
     def latitude(self):
@@ -71,8 +78,3 @@ class ImowDeviceTrackerEntity(ImowBaseEntity, TrackerEntity):
     def name(self):
         """Return the name of the device."""
         return self.key_device_infos[ATTR_NAME]
-
-    @property
-    def source_type(self):
-        """Return the source type, eg gps or router, of the device."""
-        return SOURCE_TYPE_GPS
