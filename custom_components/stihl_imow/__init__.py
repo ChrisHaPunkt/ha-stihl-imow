@@ -29,13 +29,11 @@ from .services import async_setup_services
 
 # TODO List the platforms that you want to support.
 # For your initial PR, limit it to 1 platform.
-PLATFORMS = ["sensor", "binary_sensor", "switch"]
+PLATFORMS = ["sensor", "binary_sensor", "switch", "device_tracker"]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up STIHL iMow from a config entry."""
-    # TODO Store an API object for your platforms to access
-
     session = async_get_clientsession(hass)
     if "language" in entry.data:
         lang = entry.data["language"]
