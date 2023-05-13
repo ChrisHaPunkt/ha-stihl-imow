@@ -34,7 +34,6 @@ PLATFORMS = ["sensor", "binary_sensor", "switch", "device_tracker"]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up STIHL iMow from a config entry."""
-
     session = async_get_clientsession(hass)
     if "language" in entry.data:
         lang = entry.data["language"]
