@@ -54,7 +54,9 @@ class ImowSwitchSensorEntity(ImowBaseEntity, SwitchEntity):
     @property
     def state(self):
         """Return the state of the sensor."""
-        return STATE_ON if bool(self.get_value_from_mowerstate()) else STATE_OFF
+        return (
+            STATE_ON if bool(self.get_value_from_mowerstate()) else STATE_OFF
+        )
 
     async def async_turn_on(self, **kwargs):
         """Turn the entity on."""
