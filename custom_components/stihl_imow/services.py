@@ -22,7 +22,7 @@ IMOW_INTENT_SCHEMA = vol.All(
             vol.Optional("duration"): int,
             vol.Required("action"): str,
         },
-        cv.has_at_least_one_key("mower_device", "mower_name"),
+        cv.has_at_least_one_key("mower_id", "mower_external_id", "mower_name"),
     )
 )
 
