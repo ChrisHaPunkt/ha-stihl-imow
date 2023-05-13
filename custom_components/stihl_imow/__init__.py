@@ -27,8 +27,6 @@ from .const import (
 from .maps import ENTITY_STRIP_OUT_PROPERTIES
 from .services import async_setup_services
 
-# TODO List the platforms that you want to support.
-# For your initial PR, limit it to 1 platform.
 PLATFORMS = ["sensor", "binary_sensor", "switch", "device_tracker"]
 
 
@@ -59,7 +57,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         # and start a config flow with SOURCE_REAUTH (async_step_reauth)
         raise ConfigEntryAuthFailed from err
     except ApiMaintenanceError as err:
-        raise UpdateFailed(f"Error communicating with API: {err}")
+        raise UpdateFailed(f"Error communicating with API: {err}") from err
 
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = {}
@@ -97,7 +95,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             # and start a config flow with SOURCE_REAUTH (async_step_reauth)
             raise ConfigEntryAuthFailed from err
         except ApiMaintenanceError as err:
-            raise UpdateFailed(f"Error communicating with API: {err}")
+            raise UpdateFailed(f"Error communicating with API: {err}") from err
 
     hass.data[DOMAIN][entry.entry_id][
         "coordinator"

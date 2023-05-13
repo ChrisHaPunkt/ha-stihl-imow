@@ -1,4 +1,4 @@
-"""Services for the Plex integration."""
+"""Services for the STIHL iMow integration."""
 import logging
 
 import voluptuous as vol
@@ -16,13 +16,11 @@ IMOW_INTENT_SCHEMA = vol.All(
         {
             vol.Optional("mower_device"): str,
             vol.Optional("mower_name"): str,
-            vol.Optional("startpoint"): int,
-            vol.Optional("starttime"): str,
-            vol.Optional("endtime"): str,
-            vol.Optional("duration"): int,
+            vol.Optional("startpoint"): any,
+            vol.Optional("duration"): any,
             vol.Required("action"): str,
         },
-        cv.has_at_least_one_key("mower_id", "mower_external_id", "mower_name"),
+        cv.has_at_least_one_key("mower_device", "mower_name"),
     )
 )
 
@@ -59,12 +57,12 @@ async def intent_service(hass, entry, service_call, device_registry):
         ).name
 
     service_data_mower_action_duration = (
-        service_call.data["duration"]
+        int(service_call.data["duration"])
         if "duration" in service_call.data
         else None
     )
     service_data_mower_action_startpoint = (
-        service_call.data["startpoint"]
+        int(service_call.data["startpoint"])
         if "startpoint" in service_call.data
         else None
     )
@@ -137,11 +135,11 @@ async def intent_service(hass, entry, service_call, device_registry):
             f"Doing {service_data_mower_action} with "
             f"{upstream_mower_state.name}"
         )
-    except LookupError as e:
-        _LOGGER.exception(e)
-        raise HomeAssistantError(e)
-    except ValueError as e:
-        _LOGGER.exception(e)
-        raise HomeAssistantError(e)
+    except LookupError as err:
+        _LOGGER.exception(err)
+        raise HomeAssistantError(err) from err
+    except ValueError as err:
+        _LOGGER.exception(err)
+        raise HomeAssistantError(err) from err
 
     return True
