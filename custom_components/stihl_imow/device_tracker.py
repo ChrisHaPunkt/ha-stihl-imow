@@ -2,17 +2,10 @@
 import logging
 
 from homeassistant import config_entries, core
-from homeassistant.components.device_tracker import (
-    ATTR_GPS_ACCURACY,
-)
 from homeassistant.components.device_tracker.config_entry import TrackerEntity
 from homeassistant.components.device_tracker.const import SOURCE_TYPE_GPS
-from homeassistant.const import (
-    ATTR_DEVICE_ID,
-)
 from imow.common.mowerstate import MowerState
 
-from . import extract_properties_by_type
 from .const import DOMAIN, ATTR_COORDINATOR, ATTR_NAME
 from .entity import ImowBaseEntity
 
