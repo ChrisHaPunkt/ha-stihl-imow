@@ -4,12 +4,12 @@ from __future__ import annotations
 import asyncio
 import typing
 from datetime import timedelta
+import aiohttp
 
 import async_timeout
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
     UpdateFailed,
@@ -34,9 +34,6 @@ PLATFORMS = ["sensor", "binary_sensor", "switch"]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up STIHL iMow from a config entry."""
-    # TODO Store an API object for your platforms to access
-
-    session = async_get_clientsession(hass)
     if "language" in entry.data:
         lang = entry.data["language"]
     else:
@@ -48,7 +45,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         else entry.data["user_input"]["username"]
     )
     imow_api = IMowApi(
-        aiohttp_session=session,
+        aiohttp_session=aiohttp.ClientSession(),
         email=config_email,
         password=entry.data["user_input"]["password"],
         lang=lang,
