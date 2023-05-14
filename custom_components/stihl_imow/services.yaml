@@ -36,22 +36,9 @@ intent:
       name: Starting point
       description: Mower defined Starting point (only necessary if action is 'startMowingFromPoint' and if the mower should not start from the Dock)
       selector:
-        number:
-          min: 1
-          max: 4
-
-    starttime:
-      name: Time to Start
-      description: Mower defined Starting point (only necessary if action is 'startMowingFromPoint' and if the mower should not start from the Dock)
-      selector:
-        number:
-          min: 1
-          max: 4
-
-    endtime:
-      name: Time to End
-      description: Mower defined Starting point (only necessary if action is 'startMowingFromPoint' and if the mower should not start from the Dock)
-      selector:
-        number:
-          min: 1
-          max: 4
+        select:
+          options:
+            - "1"
+            - "2"
+            - "3"
+            - "4"
