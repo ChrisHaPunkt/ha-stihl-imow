@@ -9,7 +9,7 @@ from imow.api import IMowApi
 from imow.common.actions import IMowActions
 from imow.common.mowerstate import MowerState
 
-from .const import DOMAIN, CONF_MOWER_IDENTIFIER, ATTR_COORDINATOR, LOGGER
+from .const import DOMAIN, ATTR_COORDINATOR
 
 IMOW_INTENT_SCHEMA = vol.All(
     vol.Schema(
@@ -106,10 +106,10 @@ async def intent_service(hass, entry, service_call, device_registry):
                 f"service_data_mower_name: {service_data_mower_name}\n"
             )
 
-        _LOGGER.debug(
-            f"Doing {service_data_mower_action} with "
-            f"{upstream_mower_state.name}"
-        )
+            _LOGGER.debug(
+                f"Doing {service_data_mower_action} with "
+                f"{upstream_mower_state.name}"
+            )
     except LookupError as e:
         _LOGGER.exception(e)
         raise HomeAssistantError(e)
