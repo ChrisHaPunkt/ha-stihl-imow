@@ -4,7 +4,7 @@ intent:
   fields:
     mower_device:
       name: Mower
-      description: Name of the mower
+      description: The mower to call for action
       required: true
       selector:
         device:
@@ -23,8 +23,9 @@ intent:
             - "edgeMowing"
             - "toDocking"
             - "startMowingFromPoint"
+            - "startMowing"
     duration:
-      name: Mowing Duration in Minutes
+      name: (startMowingFromPoint) Mowing Duration in Minutes
       description: Mowing Duration in Minutes (only necessary if action is 'startMowingFromPoint')
       selector:
         select:
@@ -33,12 +34,21 @@ intent:
             - "60"
             - "90"
     startpoint:
-      name: Starting point
+      name: (startMowingFromPoint) Starting point
       description: Mower defined Starting point (only necessary if action is 'startMowingFromPoint' and if the mower should not start from the Dock)
       selector:
-        select:
-          options:
-            - "1"
-            - "2"
-            - "3"
-            - "4"
+        number:
+          min: 1
+          max: 4
+
+    starttime:
+      name: (startMowing) Time to Start
+      description: Time when the mower should start the mowing action (only necessary if action is 'startMowing')
+      selector:
+        datetime:
+
+    endtime:
+      name: (startMowing) Time to End
+      description: Time when the mower should end the mowing action (only necessary if action is 'startMowing')
+      selector:
+        datetime:

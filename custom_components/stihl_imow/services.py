@@ -9,15 +9,17 @@ from imow.api import IMowApi
 from imow.common.actions import IMowActions
 from imow.common.mowerstate import MowerState
 
-from .const import ATTR_COORDINATOR, DOMAIN
+from .const import DOMAIN, CONF_MOWER_IDENTIFIER, ATTR_COORDINATOR, LOGGER
 
 IMOW_INTENT_SCHEMA = vol.All(
     vol.Schema(
         {
             vol.Optional("mower_device"): str,
             vol.Optional("mower_name"): str,
-            vol.Optional("startpoint"): str,
-            vol.Optional("duration"): str,
+            vol.Optional("startpoint"): int,
+            vol.Optional("starttime"): str,
+            vol.Optional("endtime"): str,
+            vol.Optional("duration"): int,
             vol.Required("action"): str,
         },
         cv.has_at_least_one_key("mower_device", "mower_name"),
@@ -66,16 +68,16 @@ async def intent_service(hass, entry, service_call, device_registry):
         if "startpoint" in service_call.data
         else None
     )
-    # service_data_mower_action_starttime = (
-    #     service_call.data["starttime"]
-    #     if "starttime" in service_call.data
-    #     else None
-    # )
-    # service_data_mower_action_endtime = (
-    #     service_call.data["endtime"]
-    #     if "endtime" in service_call.data
-    #     else None
-    # )
+    service_data_mower_action_starttime = (
+        service_call.data["starttime"]
+        if "starttime" in service_call.data
+        else None
+    )
+    service_data_mower_action_endtime = (
+        service_call.data["endtime"]
+        if "endtime" in service_call.data
+        else None
+    )
     coordinator_mower_state: MowerState = hass.data[DOMAIN][entry.entry_id][
         ATTR_COORDINATOR
     ].data
@@ -88,58 +90,31 @@ async def intent_service(hass, entry, service_call, device_registry):
                 service_data_mower_name
             )
 
-        if (
-            service_data_mower_action_startpoint
-            and not service_data_mower_action_duration
-        ):
-            await upstream_mower_state.intent(
-                imow_action=service_data_mower_action,
-                startpoint=service_data_mower_action_startpoint,
-            )
-        if (
-            not service_data_mower_action_startpoint
-            and service_data_mower_action_duration
-        ):
-            await upstream_mower_state.intent(
-                imow_action=service_data_mower_action,
-                duration=service_data_mower_action_duration,
-            )
-
-        if (
-            not service_data_mower_action_startpoint
-            and not service_data_mower_action_duration
-        ):
-            await upstream_mower_state.intent(
-                imow_action=service_data_mower_action
-            )
-
-        if (
-            service_data_mower_action_startpoint
-            and service_data_mower_action_duration
-        ):
             await upstream_mower_state.intent(
                 imow_action=service_data_mower_action,
                 startpoint=service_data_mower_action_startpoint,
                 duration=service_data_mower_action_duration,
+                starttime=service_data_mower_action_starttime,
+                endtime=service_data_mower_action_endtime
             )
-        _LOGGER.info(
-            f"service_data_mower_action: {service_data_mower_action}"
-            f"service_data_mower_action_startpoint: "
-            f"{service_data_mower_action_startpoint} \n"
-            f"service_data_mower_action_duration: "
-            f"{service_data_mower_action_duration} \n"
-            f"service_data_mower_name: {service_data_mower_name}\n"
-        )
+            _LOGGER.info(
+                f"service_data_mower_action: {service_data_mower_action}"
+                f"service_data_mower_action_startpoint: "
+                f"{service_data_mower_action_startpoint} \n"
+                f"service_data_mower_action_duration: "
+                f"{service_data_mower_action_duration} \n"
+                f"service_data_mower_name: {service_data_mower_name}\n"
+            )
 
         _LOGGER.debug(
             f"Doing {service_data_mower_action} with "
             f"{upstream_mower_state.name}"
         )
-    except LookupError as err:
-        _LOGGER.exception(err)
-        raise HomeAssistantError(err) from err
-    except ValueError as err:
-        _LOGGER.exception(err)
-        raise HomeAssistantError(err) from err
+    except LookupError as e:
+        _LOGGER.exception(e)
+        raise HomeAssistantError(e)
+    except ValueError as e:
+        _LOGGER.exception(e)
+        raise HomeAssistantError(e)
 
     return True
