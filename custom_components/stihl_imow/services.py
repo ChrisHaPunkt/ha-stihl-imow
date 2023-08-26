@@ -16,10 +16,10 @@ IMOW_INTENT_SCHEMA = vol.All(
         {
             vol.Optional("mower_device"): str,
             vol.Optional("mower_name"): str,
-            vol.Optional("startpoint"): int,
+            vol.Optional("startpoint"): vol.Any(str, int),
             vol.Optional("starttime"): str,
             vol.Optional("endtime"): str,
-            vol.Optional("duration"): int,
+            vol.Optional("duration"): vol.Any(str, int),
             vol.Required("action"): str,
         },
         cv.has_at_least_one_key("mower_device", "mower_name"),
