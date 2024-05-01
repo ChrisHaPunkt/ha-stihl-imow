@@ -1,9 +1,10 @@
 """Device tracker platform that adds support for OwnTracks over MQTT."""
+
 import logging
 
 from homeassistant import config_entries, core
 from homeassistant.components.device_tracker.config_entry import TrackerEntity
-from homeassistant.components.device_tracker.const import SOURCE_TYPE_GPS
+from homeassistant.components.device_tracker import SourceType
 from imow.common.mowerstate import MowerState
 
 from .const import DOMAIN, ATTR_COORDINATOR, ATTR_NAME
@@ -47,7 +48,7 @@ class ImowDeviceTrackerEntity(TrackerEntity, ImowBaseEntity):
     @property
     def source_type(self):
         """Return the gps accuracy of the device."""
-        return SOURCE_TYPE_GPS
+        return SourceType.GPS
 
     @property
     def latitude(self):

@@ -3,20 +3,16 @@ Module helps to strip aut unneeded properties.
 
 map icons and classes to properties.
 """
+
 import typing
 from enum import Enum
 
 from homeassistant.const import (
-    DEVICE_CLASS_BATTERY,
-    DEVICE_CLASS_ENERGY,
-    DEVICE_CLASS_TIMESTAMP,
-    LENGTH_FEET,
-    LENGTH_METERS,
+    UnitOfLength,
+    UnitOfTime,
     PERCENTAGE,
-    TIME_HOURS,
-    TIME_SECONDS,
 )
-
+from homeassistant.components.sensor import SensorDeviceClass
 from .const import ATTR_ICON, ATTR_PICTURE, ATTR_SWITCH, ATTR_TYPE, ATTR_UOM
 
 IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
@@ -43,7 +39,7 @@ IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
     },
     "circumference": {
         ATTR_TYPE: None,
-        ATTR_UOM: LENGTH_METERS,
+        ATTR_UOM: UnitOfLength.METERS,
         ATTR_ICON: "mdi:go-kart-track",
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
@@ -91,7 +87,7 @@ IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
         ATTR_PICTURE: False,
     },
     "energyMode": {
-        ATTR_TYPE: DEVICE_CLASS_ENERGY,
+        ATTR_TYPE: SensorDeviceClass.ENERGY,
         ATTR_UOM: None,
         ATTR_ICON: None,
         ATTR_SWITCH: False,
@@ -112,7 +108,7 @@ IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
         ATTR_PICTURE: False,
     },
     "lastWeatherCheck": {
-        ATTR_TYPE: DEVICE_CLASS_TIMESTAMP,
+        ATTR_TYPE: SensorDeviceClass.TIMESTAMP,
         ATTR_UOM: None,
         ATTR_ICON: None,
         ATTR_SWITCH: False,
@@ -190,14 +186,14 @@ IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
     },
     "smartLogic_mowingAreaInMeter": {
         ATTR_TYPE: None,
-        ATTR_UOM: LENGTH_METERS,
+        ATTR_UOM: UnitOfLength.METERS,
         ATTR_ICON: "mdi:lightbulb-on-outline",
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
     },
     "smartLogic_mowingAreaInFeet": {
         ATTR_TYPE: None,
-        ATTR_UOM: LENGTH_FEET,
+        ATTR_UOM: UnitOfLength.FEET,
         ATTR_ICON: "mdi:lightbulb-on-outline",
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
@@ -211,7 +207,7 @@ IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
     },
     "smartLogic_mowingTime": {
         ATTR_TYPE: None,
-        ATTR_UOM: TIME_HOURS,
+        ATTR_UOM: UnitOfTime.HOURS,
         ATTR_ICON: "mdi:watch",
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
@@ -225,7 +221,7 @@ IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
     },
     "smartLogic_performedActivityTime": {
         ATTR_TYPE: None,
-        ATTR_UOM: TIME_HOURS,
+        ATTR_UOM: UnitOfTime.HOURS,
         ATTR_ICON: "mdi:watch",
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
@@ -288,21 +284,21 @@ IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
     },
     "statistics_totalBladeOperatingTime": {
         ATTR_TYPE: None,
-        ATTR_UOM: TIME_SECONDS,
+        ATTR_UOM: UnitOfTime.SECONDS,
         ATTR_ICON: "mdi:watch",
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
     },
     "statistics_totalDistanceTravelled": {
         ATTR_TYPE: None,
-        ATTR_UOM: LENGTH_METERS,
+        ATTR_UOM: UnitOfLength.METERS,
         ATTR_ICON: "mdi:map-marker-distance",
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
     },
     "statistics_totalOperatingTime": {
         ATTR_TYPE: None,
-        ATTR_UOM: TIME_SECONDS,
+        ATTR_UOM: UnitOfTime.SECONDS,
         ATTR_ICON: "mdi:watch",
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
@@ -315,21 +311,21 @@ IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
         ATTR_PICTURE: False,
     },
     "status_chargeLevel": {
-        ATTR_TYPE: DEVICE_CLASS_BATTERY,
+        ATTR_TYPE: SensorDeviceClass.BATTERY,
         ATTR_UOM: PERCENTAGE,
         ATTR_ICON: None,
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
     },
     "status_lastGeoPositionDate": {
-        ATTR_TYPE: DEVICE_CLASS_TIMESTAMP,
+        ATTR_TYPE: SensorDeviceClass.TIMESTAMP,
         ATTR_UOM: None,
         ATTR_ICON: None,
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
     },
     "status_lastSeenDate": {
-        ATTR_TYPE: DEVICE_CLASS_TIMESTAMP,
+        ATTR_TYPE: SensorDeviceClass.TIMESTAMP,
         ATTR_UOM: None,
         ATTR_ICON: None,
         ATTR_SWITCH: False,
