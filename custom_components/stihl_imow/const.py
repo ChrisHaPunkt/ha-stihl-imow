@@ -1,4 +1,5 @@
 """Constants for the STIHL iMow integration."""
+
 import logging
 from typing import Final
 
