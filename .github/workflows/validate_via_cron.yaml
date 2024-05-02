@@ -10,10 +10,10 @@ jobs:
     runs-on: "ubuntu-latest"
     name: Validate
     steps:
-      - uses: "actions/checkout@master"
+      - uses: "actions/checkout@v4"
 
       - name: HACS validation
-        uses: "hacs/integration/action@master"
+        uses: "hacs/integration/action@main"
         env:
           SKIP_BRANDS_CHECK: "True"
         with:
@@ -21,4 +21,4 @@ jobs:
           CATEGORY: "integration"
 
       - name: Hassfest validation
-        uses: "home-assistant/actions/hassfest@master"
+        uses: "home-assistant/actions/hassfest@main"

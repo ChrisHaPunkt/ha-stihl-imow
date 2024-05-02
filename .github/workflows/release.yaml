@@ -10,11 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout the repository
-        uses: "actions/checkout@v4.1.0"
+        uses: "actions/checkout@v4"
 
       - name: 🔢 Get release version
         id: version
-        uses: home-assistant/actions/helpers/version@master
+        uses: home-assistant/actions/helpers/version@main
 
       - name: ℹ️ Get integration information
         id: information
