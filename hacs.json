@@ -1,6 +1,6 @@
 {
   "name": "STIHL iMow",
-  "homeassistant": "2022.3.1",
+  "homeassistant": "2024.4.0",
   "hide_default_branch": true,
   "render_readme": true
 }
