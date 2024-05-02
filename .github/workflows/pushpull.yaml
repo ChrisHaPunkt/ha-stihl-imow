@@ -13,7 +13,7 @@ jobs:
     name: HACS Action
     runs-on: "ubuntu-latest"
     steps:
-      - uses: "actions/checkout@v4.1.0"
+      - uses: "actions/checkout@v4"
       - name: HACS Action
         uses: "hacs/action@main"
         with:
@@ -23,7 +23,7 @@ jobs:
     runs-on: "ubuntu-latest"
     name: Validate
     steps:
-      - uses: "actions/checkout@v4.1.0"
+      - uses: "actions/checkout@v4"
       - name: Hassfest validation
         uses: "home-assistant/actions/hassfest@master"
 
@@ -31,8 +31,8 @@ jobs:
     runs-on: "ubuntu-latest"
     name: Check style formatting
     steps:
-      - uses: "actions/checkout@v4.1.0"
-      - uses: "actions/setup-python@v4.7.1"
+      - uses: "actions/checkout@v4"
+      - uses: "actions/setup-python@v5"
         with:
           python-version: "3.x"
       - run: python3 -m pip install black
