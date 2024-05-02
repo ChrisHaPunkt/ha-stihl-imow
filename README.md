@@ -10,7 +10,7 @@ A platform which allows you to interact with the STIHL iMow lawn mower.
 
 
 ## Known Issues
-- [25](https://github.com/ChrisHaPunkt/ha-stihl-imow/issues/25) Version v1.0.0: There is currently something leading to timeouts on the upstream STIHL server. This causes some HomeAssistant log entries stating a timeout. Everything is nevertheless working as expected.
+- [#25](https://github.com/ChrisHaPunkt/ha-stihl-imow/issues/25) Version v1.0.0: There is currently something leading to timeouts on the upstream STIHL server. This causes some HomeAssistant log entries stating a timeout. Everything is nevertheless working as expected.
 
 ## Features
 This platform is using the [STIHL iMow API](https://app.imow.stihl.com/#) via the [unofficial STIHL iMow Python WebAPI wrapper](https://github.com/ChrisHaPunkt/stihl-imow-webapi) to
