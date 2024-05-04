@@ -10,15 +10,13 @@ jobs:
     runs-on: "ubuntu-latest"
     name: Validate
     steps:
-      - uses: "actions/checkout@v4"
+      - uses: "actions/checkout@v2"
 
       - name: HACS validation
-        uses: "hacs/integration/action@main"
-        env:
-          SKIP_BRANDS_CHECK: "True"
+        uses: "hacs/action@main"
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CATEGORY: "integration"
+          category: "integration"
+          ignore: brands
 
       - name: Hassfest validation
         uses: "home-assistant/actions/hassfest@master"
