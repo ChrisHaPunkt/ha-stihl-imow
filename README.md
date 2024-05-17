@@ -8,6 +8,9 @@
 ## HomeAssistant custom component for STIHL iMow lawn mower
 A platform which allows you to interact with the STIHL iMow lawn mower.
 
+# Limitations
+This integration is only compatible to STIHL iMow Generation up to 4. For alle mowers who are using the https://app.imow.stihl.com/#/ ui.
+See https://github.com/ChrisHaPunkt/stihl-imow-webapi/issues/13 
 
 ## Known Issues
 - [#25](https://github.com/ChrisHaPunkt/ha-stihl-imow/issues/25) Version v1.0.3: There is currently something leading to timeouts on the upstream STIHL server. This causes some HomeAssistant log entries stating a timeout. Everything is nevertheless working as expected.
