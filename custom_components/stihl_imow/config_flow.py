@@ -17,14 +17,14 @@ from imow.common.exceptions import LoginError
 
 from .const import (
     API_DEFAULT_LANGUAGE,
-    API_UPDATE_INTERVALL_SECONDS,
+    API_UPDATE_INTERVAL_SECONDS,
     ATTR_IMOW,
     CONF_API_TOKEN,
     CONF_API_TOKEN_EXPIRE_TIME,
     CONF_ATTR_EMAIL,
     CONF_ATTR_LANGUAGE,
     CONF_ATTR_PASSWORD,
-    CONF_ATTR_POLLING_INTERVALL,
+    CONF_ATTR_POLLING_INTERVAL,
     CONF_ENTRY_TITLE,
     CONF_MOWER,
     CONF_MOWER_IDENTIFIER,
@@ -48,13 +48,9 @@ async def validate_input(
 ) -> dict[str, Any]:
     """Validate the user input allows us to connect.
 
-    Data has the keys from STEP_USER_DATA_SCHEMA
-    with values provided by the user.
+    Data has the keys from STEP_USER_DATA_SCHEMA with values provided by the user.
+    Returns token, expiry, mower list, and original input for re-auth use.
     """
-    # TODO validate the data can be used to set up a connection.
-
-    # If your PyPI package is not built with async, pass your methods
-    # to the executor:
     session = async_get_clientsession(hass)
 
     imow = IMowApi(
@@ -71,12 +67,7 @@ async def validate_input(
         _LOGGER.exception(e)
         raise InvalidAuth
 
-    # If you cannot connect:
-    # throw CannotConnect
-    # If the authentication is wrong:
-    # InvalidAuth
-
-    # Return info that you want to store in the config entry.
+    # await imow.close()
     mowers = []
     for mower in await imow.receive_mowers():
         mowers_state = dict(mower.__dict__)
@@ -111,7 +102,7 @@ STEP_ADVANCED = vol.Schema(
             [e.value for e in LANGUAGES]
         ),
         vol.Optional(
-            CONF_ATTR_POLLING_INTERVALL, default=API_UPDATE_INTERVALL_SECONDS
+            CONF_ATTR_POLLING_INTERVAL, default=API_UPDATE_INTERVAL_SECONDS
         ): vol.In([20, 30, 60, 120, 300]),
     }
 )
@@ -180,7 +171,7 @@ class StihlImowConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         try:
             self.language = LANGUAGES(user_input[CONF_ATTR_LANGUAGE]).name
-            self.polling_interval = user_input[CONF_ATTR_POLLING_INTERVALL]
+            self.polling_interval = user_input[CONF_ATTR_POLLING_INTERVAL]
 
         except CannotConnect:
             errors["base"] = "cannot_connect"
@@ -191,7 +182,7 @@ class StihlImowConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors["base"] = "unknown"
         else:
             self.data[CONF_ATTR_LANGUAGE] = self.language
-            self.data[CONF_ATTR_POLLING_INTERVALL] = self.polling_interval
+            self.data[CONF_ATTR_POLLING_INTERVAL] = self.polling_interval
             return self.async_create_entry(
                 title=CONF_ENTRY_TITLE, data=self.data
             )
@@ -201,6 +192,12 @@ class StihlImowConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema=STEP_ADVANCED,
             errors=errors,
         )
+
+    async def async_step_reauth(
+        self, entry_data: dict[str, Any]
+    ) -> FlowResult:
+        """Handle re-authentication when the stored token is no longer valid."""
+        return await self.async_step_user()
 
 
 class CannotConnect(HomeAssistantError):
