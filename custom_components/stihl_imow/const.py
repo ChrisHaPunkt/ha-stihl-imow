@@ -3,7 +3,9 @@
 import logging
 from typing import Final
 
-API_UPDATE_INTERVALL_SECONDS = 30
+API_UPDATE_INTERVAL_SECONDS = 30
+# Keep old name for backwards compatibility with stored config entries
+API_UPDATE_INTERVALL_SECONDS = API_UPDATE_INTERVAL_SECONDS
 API_DEFAULT_LANGUAGE = "English"
 API_UPDATE_TIMEOUT = 10
 
@@ -40,7 +42,9 @@ CONF_MOWER_STATE = "mower_state"
 CONF_ATTR_EMAIL = "email"
 CONF_ATTR_PASSWORD = "password"
 CONF_ATTR_LANGUAGE = "language"
-CONF_ATTR_POLLING_INTERVALL = "polling_interval"
+CONF_ATTR_POLLING_INTERVAL = "polling_interval"
+# Keep old name for backwards compatibility
+CONF_ATTR_POLLING_INTERVALL = CONF_ATTR_POLLING_INTERVAL
 
 # SENSOR
 NAME_PREFIX = "imow"
