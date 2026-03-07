@@ -1,4 +1,4 @@
-"""Device tracker platform that adds support for OwnTracks over MQTT."""
+"""Device tracker platform for STIHL iMow GPS position."""
 
 import logging
 
