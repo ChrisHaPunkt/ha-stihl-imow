@@ -4,8 +4,6 @@ from __future__ import annotations
 import asyncio
 import typing
 from datetime import timedelta
-
-import async_timeout
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
@@ -78,7 +76,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         try:
             # Note: asyncio.TimeoutError and aiohttp.ClientError are already
             # handled by the data update coordinator.
-            async with async_timeout.timeout(API_UPDATE_TIMEOUT):
+            async with asyncio.timeout(API_UPDATE_TIMEOUT):
                 mower_state: MowerState = await imow_api.receive_mower_by_id(
                     mower_id
                 )
@@ -127,9 +125,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # coordinator.async_refresh() instead
     #
     await coordinator.async_config_entry_first_refresh()
-    hass.async_create_task(
-        hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
-    )
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     await async_setup_services(hass, entry)
 
