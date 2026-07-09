@@ -3,7 +3,8 @@
     "abort": {
       "already_configured": "Zařízení je již nakonfigurováno",
       "reauth_successful": "Opětovné ověření bylo úspěšné",
-      "wrong_account": "Opětovné ověření musí používat stejný účet STIHL a stejnou sekačku."
+      "wrong_account": "Opětovné ověření musí používat stejný účet STIHL.",
+      "reconfigure_successful": "Rekonfigurace byla úspěšná"
     },
     "error": {
       "cannot_connect": "Připojení se nezdařilo",
@@ -25,6 +26,15 @@
         "description": "Integrace STIHL iMow musí znovu ověřit účet {email}.",
         "data": {
           "password": "Heslo"
+        }
+      },
+      "reconfigure": {
+        "title": "Znovu nakonfigurovat STIHL iMow",
+        "description": "Aktualizujte přihlašovací údaje k účtu STIHL iMow.",
+        "data": {
+          "email": "E-mailová adresa",
+          "password": "Heslo",
+          "language": "Jazyk stavových zpráv"
         }
       }
     }
@@ -187,6 +197,23 @@
           "description": "Čas, kdy má sekačka přestat sekat. Použije se pouze, když je akcí 'Zahájit sekání'."
         }
       }
+    }
+  },
+  "exceptions": {
+    "update_setting_failed": {
+      "message": "Aktualizace nastavení sekačky se nezdařila: {error}"
+    },
+    "entry_not_loaded": {
+      "message": "STIHL iMow není nastaven."
+    },
+    "no_mower_specified": {
+      "message": "Pro akci nebyla určena žádná sekačka."
+    },
+    "mower_action_failed": {
+      "message": "Akce sekačky se nezdařila: {error}"
+    },
+    "invalid_action_value": {
+      "message": "Neplatná hodnota akce: {error}"
     }
   }
 }

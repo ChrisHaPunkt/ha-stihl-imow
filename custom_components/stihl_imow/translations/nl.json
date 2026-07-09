@@ -3,7 +3,8 @@
     "abort": {
       "already_configured": "Apparaat is al geconfigureerd",
       "reauth_successful": "Herauthenticatie geslaagd",
-      "wrong_account": "Herauthenticatie moet hetzelfde STIHL-account en dezelfde maaier gebruiken."
+      "wrong_account": "Herauthenticatie moet hetzelfde STIHL-account gebruiken.",
+      "reconfigure_successful": "Herconfiguratie geslaagd"
     },
     "error": {
       "cannot_connect": "Verbinding mislukt",
@@ -25,6 +26,15 @@
         "description": "De STIHL iMow-integratie moet het account {email} opnieuw authenticeren.",
         "data": {
           "password": "Wachtwoord"
+        }
+      },
+      "reconfigure": {
+        "title": "STIHL iMow opnieuw configureren",
+        "description": "Werk je STIHL iMow-accountgegevens bij.",
+        "data": {
+          "email": "E-mailadres",
+          "password": "Wachtwoord",
+          "language": "Taal voor statusberichten"
         }
       }
     }
@@ -187,6 +197,23 @@
           "description": "Tijdstip waarop de maaier moet stoppen met maaien. Alleen gebruikt wanneer de actie 'Maaien starten' is."
         }
       }
+    }
+  },
+  "exceptions": {
+    "update_setting_failed": {
+      "message": "Bijwerken van de maaierinstelling mislukt: {error}"
+    },
+    "entry_not_loaded": {
+      "message": "STIHL iMow is niet ingesteld."
+    },
+    "no_mower_specified": {
+      "message": "Er is geen maaier opgegeven voor de actie."
+    },
+    "mower_action_failed": {
+      "message": "De maaieractie is mislukt: {error}"
+    },
+    "invalid_action_value": {
+      "message": "Ongeldige actiewaarde: {error}"
     }
   }
 }

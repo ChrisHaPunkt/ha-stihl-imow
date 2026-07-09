@@ -3,7 +3,8 @@
     "abort": {
       "already_configured": "Enheten er allerede konfigurert",
       "reauth_successful": "Ny autentisering var vellykket",
-      "wrong_account": "Ny autentisering må bruke samme STIHL-konto og samme gressklipper."
+      "wrong_account": "Ny autentisering må bruke samme STIHL-konto.",
+      "reconfigure_successful": "Rekonfigurasjonen var vellykket"
     },
     "error": {
       "cannot_connect": "Kunne ikke koble til",
@@ -25,6 +26,15 @@
         "description": "STIHL iMow-integrasjonen må autentisere kontoen {email} på nytt.",
         "data": {
           "password": "Passord"
+        }
+      },
+      "reconfigure": {
+        "title": "Konfigurer STIHL iMow på nytt",
+        "description": "Oppdater påloggingsinformasjonen for STIHL iMow-kontoen din.",
+        "data": {
+          "email": "E-postadresse",
+          "password": "Passord",
+          "language": "Språk for statusmeldinger"
         }
       }
     }
@@ -187,6 +197,23 @@
           "description": "Tidspunkt når gressklipperen skal slutte å klippe. Brukes bare når handlingen er 'Start klipping'."
         }
       }
+    }
+  },
+  "exceptions": {
+    "update_setting_failed": {
+      "message": "Kunne ikke oppdatere gressklipperinnstillingen: {error}"
+    },
+    "entry_not_loaded": {
+      "message": "STIHL iMow er ikke konfigurert."
+    },
+    "no_mower_specified": {
+      "message": "Ingen gressklipper ble angitt for handlingen."
+    },
+    "mower_action_failed": {
+      "message": "Gressklipperhandlingen mislyktes: {error}"
+    },
+    "invalid_action_value": {
+      "message": "Ugyldig handlingsverdi: {error}"
     }
   }
 }

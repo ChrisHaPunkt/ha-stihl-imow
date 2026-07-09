@@ -25,7 +25,7 @@ from .const import (
     ATTR_UOM,
 )
 
-IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
+IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict[str, typing.Any]] = {
     "asmEnabled": {
         ATTR_TYPE: None,
         ATTR_UOM: None,
@@ -435,6 +435,27 @@ ENTITY_STRIP_OUT_PROPERTIES = [
     "status_lastNoErrorMainState",
     "imow",
 ]
+
+
+# Properties representing the mower's primary function; these get no entity
+# category (shown prominently rather than grouped under "Diagnostic").
+PRIMARY_PROPERTIES = {
+    "machineState",
+    "status_chargeLevel",
+    "stateMessage_short",
+}
+
+# Properties created but disabled in the entity registry by default (niche or
+# redundant readouts the user can enable on demand).
+DISABLED_BY_DEFAULT_PROPERTIES = {
+    "smartLogic_mowingAreaInFeet",
+    "circumference",
+    "timeZone",
+    "lastWeatherCheck",
+    "status_lastGeoPositionDate",
+    "demoModeEnabled",
+    "teamable",
+}
 
 
 class LANGUAGES(Enum):

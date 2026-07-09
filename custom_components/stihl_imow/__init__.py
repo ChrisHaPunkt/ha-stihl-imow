@@ -11,6 +11,7 @@ from homeassistant.exceptions import (
     ConfigEntryNotReady,
 )
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.typing import ConfigType
@@ -24,11 +25,6 @@ from .const import (
     CONF_ATTR_EMAIL,
     CONF_ATTR_LANGUAGE,
     CONF_ATTR_PASSWORD,
-    CONF_MOWER,
-    CONF_MOWER_IDENTIFIER,
-    CONF_MOWER_MODEL,
-    CONF_MOWER_NAME,
-    CONF_MOWER_VERSION,
     CONF_USER_INPUT,
     DOMAIN,
 )
@@ -80,9 +76,7 @@ async def async_setup_entry(
             f"STIHL iMow API is unavailable: {err}"
         ) from err
 
-    coordinator = ImowDataUpdateCoordinator(
-        hass, entry, imow_api, entry.data[CONF_MOWER_IDENTIFIER]
-    )
+    coordinator = ImowDataUpdateCoordinator(hass, entry, imow_api)
     await coordinator.async_config_entry_first_refresh()
 
     # Persist a refreshed token so restarts don't force a fresh login.
@@ -90,7 +84,17 @@ async def async_setup_entry(
 
     entry.runtime_data = coordinator
 
-    await _migrate_entity_unique_ids(hass, entry)
+    # The stable account id (not the mutable e-mail) is the entry's unique id.
+    # Entries created/migrated before this was known are reconciled here, where
+    # the account id is available from the fetched mower state.
+    account_id = next(
+        (str(state.accountId) for state in coordinator.data.values()),
+        None,
+    )
+    if account_id and entry.unique_id != account_id:
+        hass.config_entries.async_update_entry(entry, unique_id=account_id)
+
+    await _migrate_entity_unique_ids(hass, entry, set(coordinator.data))
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
@@ -103,63 +107,75 @@ async def async_unload_entry(
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
 
+async def async_remove_config_entry_device(
+    hass: HomeAssistant,
+    config_entry: ImowConfigEntry,
+    device_entry: dr.DeviceEntry,
+) -> bool:
+    """Allow removing a device only when its mower left the account."""
+    coordinator = config_entry.runtime_data
+    return not any(
+        domain == DOMAIN and identifier in coordinator.data
+        for domain, identifier in device_entry.identifiers
+    )
+
+
 async def async_migrate_entry(
     hass: HomeAssistant, entry: ImowConfigEntry
 ) -> bool:
-    """Migrate old config entries to the slimmer v2 schema."""
-    if entry.version > 2:
+    """Migrate old config entries to the account-based v3 schema."""
+    if entry.version > 3:
         return False
 
-    if entry.version == 1:
+    if entry.version in (1, 2):
         old = entry.data
-        user_input = old.get(CONF_USER_INPUT, {})
-        email = user_input.get("email") or user_input.get("username")
-        mowers = old.get(CONF_MOWER) or [{}]
-        mower = mowers[0]
+        if entry.version == 1:
+            user_input = old.get(CONF_USER_INPUT, {})
+            email = user_input.get("email") or user_input.get("username")
+            password = user_input.get("password")
+        else:
+            email = old.get(CONF_ATTR_EMAIL)
+            password = old.get(CONF_ATTR_PASSWORD)
         new_data = {
             CONF_ATTR_EMAIL: email,
-            CONF_ATTR_PASSWORD: user_input.get("password"),
+            CONF_ATTR_PASSWORD: password,
             CONF_API_TOKEN: old.get(CONF_API_TOKEN),
             CONF_API_TOKEN_EXPIRE_TIME: old.get(CONF_API_TOKEN_EXPIRE_TIME),
-            CONF_MOWER_IDENTIFIER: mower.get(CONF_MOWER_IDENTIFIER),
-            CONF_MOWER_NAME: mower.get(CONF_MOWER_NAME),
-            CONF_MOWER_MODEL: mower.get(CONF_MOWER_MODEL),
-            CONF_MOWER_VERSION: mower.get(CONF_MOWER_VERSION),
             CONF_ATTR_LANGUAGE: old.get(CONF_ATTR_LANGUAGE, "en"),
         }
-        mower_id = new_data[CONF_MOWER_IDENTIFIER]
         hass.config_entries.async_update_entry(
             entry,
             data=new_data,
-            version=2,
-            unique_id=str(mower_id) if mower_id is not None else None,
+            version=3,
         )
 
     return True
 
 
 async def _migrate_entity_unique_ids(
-    hass: HomeAssistant, entry: ImowConfigEntry
+    hass: HomeAssistant, entry: ImowConfigEntry, mower_ids: set[str]
 ) -> None:
     """Migrate legacy entity unique ids to the stable scheme.
 
     Old: ``{mower_id}_{idx}_{property}`` (index-dependent, unstable).
     New: ``{mower_id}_{property}`` (``{mower_id}_tracker`` for the tracker).
-    Idempotent: already-migrated ids are left untouched.
+    Idempotent: already-migrated ids are left untouched. Handles every mower
+    on the account.
     """
-    mower_id = str(entry.data[CONF_MOWER_IDENTIFIER])
-    prefix = f"{mower_id}_"
+    prefixes = {str(mower_id): f"{mower_id}_" for mower_id in mower_ids}
 
     @callback
     def _migrate(reg_entry: er.RegistryEntry) -> dict[str, str] | None:
-        if not reg_entry.unique_id.startswith(prefix):
-            return None
-        rest = reg_entry.unique_id.removeprefix(prefix)
-        head, _, tail = rest.partition("_")
-        if not head.isdigit():
-            return None  # already the new scheme
-        suffix = tail if tail else "tracker"
-        return {"new_unique_id": f"{mower_id}_{suffix}"}
+        for mower_id, prefix in prefixes.items():
+            if not reg_entry.unique_id.startswith(prefix):
+                continue
+            rest = reg_entry.unique_id.removeprefix(prefix)
+            head, _, tail = rest.partition("_")
+            if not head.isdigit():
+                return None  # already the new scheme
+            suffix = tail if tail else "tracker"
+            return {"new_unique_id": f"{mower_id}_{suffix}"}
+        return None
 
     await er.async_migrate_entries(hass, entry.entry_id, _migrate)
 
@@ -188,11 +204,13 @@ def _persist_token(
 
 
 def extract_properties_by_type(
-    mower_state: MowerState, property_python_type: typing.Any, negotiate=False
-) -> typing.Tuple[dict, dict]:
+    mower_state: MowerState,
+    property_python_type: type,
+    negotiate: bool = False,
+) -> tuple[dict[str, typing.Any], dict[str, typing.Any]]:
     """Extract Properties used by different Sensors."""
-    complex_entities: dict = {}
-    entities = {}
+    complex_entities: dict[str, typing.Any] = {}
+    entities: dict[str, typing.Any] = {}
     for mower_state_property in mower_state.__dict__:
         if type(mower_state.__dict__[mower_state_property]) in [dict]:
             complex_entities[mower_state_property] = mower_state.__dict__[

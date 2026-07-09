@@ -3,7 +3,8 @@
     "abort": {
       "already_configured": "Urządzenie jest już skonfigurowane",
       "reauth_successful": "Ponowne uwierzytelnienie powiodło się",
-      "wrong_account": "Ponowne uwierzytelnienie musi używać tego samego konta STIHL i tej samej kosiarki."
+      "wrong_account": "Ponowne uwierzytelnienie musi używać tego samego konta STIHL.",
+      "reconfigure_successful": "Ponowna konfiguracja powiodła się"
     },
     "error": {
       "cannot_connect": "Nie udało się połączyć",
@@ -25,6 +26,15 @@
         "description": "Integracja STIHL iMow musi ponownie uwierzytelnić konto {email}.",
         "data": {
           "password": "Hasło"
+        }
+      },
+      "reconfigure": {
+        "title": "Ponowna konfiguracja STIHL iMow",
+        "description": "Zaktualizuj dane logowania do konta STIHL iMow.",
+        "data": {
+          "email": "Adres e-mail",
+          "password": "Hasło",
+          "language": "Język komunikatów o stanie"
         }
       }
     }
@@ -187,6 +197,23 @@
           "description": "Czas, o którym kosiarka ma zakończyć koszenie. Używane tylko, gdy akcją jest 'Rozpocznij koszenie'."
         }
       }
+    }
+  },
+  "exceptions": {
+    "update_setting_failed": {
+      "message": "Nie udało się zaktualizować ustawienia kosiarki: {error}"
+    },
+    "entry_not_loaded": {
+      "message": "STIHL iMow nie jest skonfigurowany."
+    },
+    "no_mower_specified": {
+      "message": "Nie określono kosiarki dla akcji."
+    },
+    "mower_action_failed": {
+      "message": "Akcja kosiarki nie powiodła się: {error}"
+    },
+    "invalid_action_value": {
+      "message": "Nieprawidłowa wartość akcji: {error}"
     }
   }
 }

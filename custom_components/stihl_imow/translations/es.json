@@ -3,7 +3,8 @@
     "abort": {
       "already_configured": "El dispositivo ya está configurado",
       "reauth_successful": "La reautenticación se realizó correctamente",
-      "wrong_account": "La reautenticación debe usar la misma cuenta STIHL y el mismo robot cortacésped."
+      "wrong_account": "La reautenticación debe usar la misma cuenta STIHL.",
+      "reconfigure_successful": "La reconfiguración se realizó correctamente"
     },
     "error": {
       "cannot_connect": "No se pudo conectar",
@@ -25,6 +26,15 @@
         "description": "La integración STIHL iMow necesita volver a autenticar la cuenta {email}.",
         "data": {
           "password": "Contraseña"
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigurar STIHL iMow",
+        "description": "Actualiza las credenciales de tu cuenta STIHL iMow.",
+        "data": {
+          "email": "Dirección de correo electrónico",
+          "password": "Contraseña",
+          "language": "Idioma de los mensajes de estado"
         }
       }
     }
@@ -187,6 +197,23 @@
           "description": "Hora a la que el robot debe dejar de cortar. Solo se usa cuando la acción es 'Iniciar corte'."
         }
       }
+    }
+  },
+  "exceptions": {
+    "update_setting_failed": {
+      "message": "No se pudo actualizar el ajuste del robot: {error}"
+    },
+    "entry_not_loaded": {
+      "message": "STIHL iMow no está configurado."
+    },
+    "no_mower_specified": {
+      "message": "No se especificó ningún robot para la acción."
+    },
+    "mower_action_failed": {
+      "message": "La acción del robot falló: {error}"
+    },
+    "invalid_action_value": {
+      "message": "Valor de acción no válido: {error}"
     }
   }
 }

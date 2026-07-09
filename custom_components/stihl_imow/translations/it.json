@@ -3,7 +3,8 @@
     "abort": {
       "already_configured": "Il dispositivo è già configurato",
       "reauth_successful": "Nuova autenticazione riuscita",
-      "wrong_account": "La nuova autenticazione deve usare lo stesso account STIHL e lo stesso robot rasaerba."
+      "wrong_account": "La nuova autenticazione deve usare lo stesso account STIHL.",
+      "reconfigure_successful": "Riconfigurazione riuscita"
     },
     "error": {
       "cannot_connect": "Impossibile connettersi",
@@ -25,6 +26,15 @@
         "description": "L'integrazione STIHL iMow deve autenticare di nuovo l'account {email}.",
         "data": {
           "password": "Password"
+        }
+      },
+      "reconfigure": {
+        "title": "Riconfigura STIHL iMow",
+        "description": "Aggiorna le credenziali del tuo account STIHL iMow.",
+        "data": {
+          "email": "Indirizzo e-mail",
+          "password": "Password",
+          "language": "Lingua dei messaggi di stato"
         }
       }
     }
@@ -187,6 +197,23 @@
           "description": "Ora in cui il rasaerba deve smettere di tagliare. Usata solo quando l'azione è 'Avvia taglio'."
         }
       }
+    }
+  },
+  "exceptions": {
+    "update_setting_failed": {
+      "message": "Aggiornamento dell'impostazione del rasaerba non riuscito: {error}"
+    },
+    "entry_not_loaded": {
+      "message": "STIHL iMow non è configurato."
+    },
+    "no_mower_specified": {
+      "message": "Nessun rasaerba specificato per l'azione."
+    },
+    "mower_action_failed": {
+      "message": "L'azione del rasaerba non è riuscita: {error}"
+    },
+    "invalid_action_value": {
+      "message": "Valore azione non valido: {error}"
     }
   }
 }

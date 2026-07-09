@@ -3,7 +3,8 @@
     "abort": {
       "already_configured": "L'appareil est déjà configuré",
       "reauth_successful": "La ré-authentification a réussi",
-      "wrong_account": "La ré-authentification doit utiliser le même compte STIHL et la même tondeuse."
+      "wrong_account": "La ré-authentification doit utiliser le même compte STIHL.",
+      "reconfigure_successful": "La reconfiguration a réussi"
     },
     "error": {
       "cannot_connect": "Échec de la connexion",
@@ -25,6 +26,15 @@
         "description": "L'intégration STIHL iMow doit ré-authentifier le compte {email}.",
         "data": {
           "password": "Mot de passe"
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigurer STIHL iMow",
+        "description": "Mettez à jour les identifiants de votre compte STIHL iMow.",
+        "data": {
+          "email": "Adresse e-mail",
+          "password": "Mot de passe",
+          "language": "Langue des messages d'état"
         }
       }
     }
@@ -187,6 +197,23 @@
           "description": "Heure à laquelle la tondeuse doit arrêter de tondre. Utilisé uniquement lorsque l'action est « Démarrer la tonte »."
         }
       }
+    }
+  },
+  "exceptions": {
+    "update_setting_failed": {
+      "message": "Échec de la mise à jour du réglage de la tondeuse : {error}"
+    },
+    "entry_not_loaded": {
+      "message": "STIHL iMow n'est pas configuré."
+    },
+    "no_mower_specified": {
+      "message": "Aucune tondeuse n'a été spécifiée pour l'action."
+    },
+    "mower_action_failed": {
+      "message": "L'action de la tondeuse a échoué : {error}"
+    },
+    "invalid_action_value": {
+      "message": "Valeur d'action invalide : {error}"
     }
   }
 }

@@ -17,6 +17,7 @@ from imow.common.actions import IMowActions
 from imow.common.mowerstate import MowerState
 
 from .const import DOMAIN
+from .coordinator import ImowDataUpdateCoordinator
 
 IMOW_INTENT_SCHEMA = vol.All(
     vol.Schema(
@@ -28,9 +29,9 @@ IMOW_INTENT_SCHEMA = vol.All(
             vol.Optional("endtime"): str,
             vol.Optional("duration"): vol.Any(str, int),
             vol.Required("action"): str,
-        },
-        cv.has_at_least_one_key("mower_device", "mower_name"),
-    )
+        }
+    ),
+    cv.has_at_least_one_key("mower_device", "mower_name"),
 )
 
 _LOGGER = logging.getLogger(__package__)
@@ -55,8 +56,12 @@ def async_setup_services(hass: HomeAssistant) -> None:
 def _get_api(hass: HomeAssistant) -> IMowApi:
     """Return an authenticated IMowApi from a loaded config entry."""
     for entry in hass.config_entries.async_loaded_entries(DOMAIN):
-        return entry.runtime_data.api
-    raise ServiceValidationError("STIHL iMow is not set up")
+        coordinator: ImowDataUpdateCoordinator = entry.runtime_data
+        return coordinator.api
+    raise ServiceValidationError(
+        translation_domain=DOMAIN,
+        translation_key="entry_not_loaded",
+    )
 
 
 async def _async_intent_service(
@@ -66,9 +71,15 @@ async def _async_intent_service(
     device_registry = dr.async_get(hass)
 
     if "mower_device" in service_call.data:
-        mower_name = device_registry.async_get(
+        device = device_registry.async_get(
             device_id=service_call.data["mower_device"]
-        ).name
+        )
+        if device is None:
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="no_mower_specified",
+            )
+        mower_name = device.name
     else:
         mower_name = service_call.data.get("mower_name")
 
@@ -89,7 +100,10 @@ async def _async_intent_service(
     try:
         action = IMowActions(service_call.data["action"])
         if not mower_name:
-            raise ServiceValidationError("No mower specified")
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="no_mower_specified",
+            )
         upstream_mower_state: MowerState = await api.receive_mower_by_name(
             mower_name
         )
@@ -102,6 +116,14 @@ async def _async_intent_service(
         )
         _LOGGER.debug("Doing %s with %s", action, upstream_mower_state.name)
     except LookupError as err:
-        raise HomeAssistantError(str(err)) from err
+        raise HomeAssistantError(
+            translation_domain=DOMAIN,
+            translation_key="mower_action_failed",
+            translation_placeholders={"error": str(err)},
+        ) from err
     except ValueError as err:
-        raise ServiceValidationError(str(err)) from err
+        raise ServiceValidationError(
+            translation_domain=DOMAIN,
+            translation_key="invalid_action_value",
+            translation_placeholders={"error": str(err)},
+        ) from err

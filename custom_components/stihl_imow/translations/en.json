@@ -3,7 +3,8 @@
     "abort": {
       "already_configured": "Device is already configured",
       "reauth_successful": "Re-authentication was successful",
-      "wrong_account": "Re-authentication must use the same STIHL account and mower."
+      "wrong_account": "Re-authentication must use the same STIHL account.",
+      "reconfigure_successful": "Reconfiguration was successful"
     },
     "error": {
       "cannot_connect": "Failed to connect",
@@ -25,6 +26,15 @@
         "description": "The STIHL iMow integration needs to re-authenticate the account {email}.",
         "data": {
           "password": "Password"
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigure STIHL iMow",
+        "description": "Update your STIHL iMow account credentials.",
+        "data": {
+          "email": "E-mail address",
+          "password": "Password",
+          "language": "Language for state messages"
         }
       }
     }
@@ -187,6 +197,23 @@
           "description": "Time when the mower should stop mowing. Only used when the action is 'Start mowing'."
         }
       }
+    }
+  },
+  "exceptions": {
+    "update_setting_failed": {
+      "message": "Failed to update the mower setting: {error}"
+    },
+    "entry_not_loaded": {
+      "message": "STIHL iMow is not set up."
+    },
+    "no_mower_specified": {
+      "message": "No mower was specified for the action."
+    },
+    "mower_action_failed": {
+      "message": "The mower action failed: {error}"
+    },
+    "invalid_action_value": {
+      "message": "Invalid action value: {error}"
     }
   }
 }

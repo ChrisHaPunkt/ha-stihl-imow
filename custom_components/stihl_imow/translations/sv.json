@@ -3,7 +3,8 @@
     "abort": {
       "already_configured": "Enheten är redan konfigurerad",
       "reauth_successful": "Återautentiseringen lyckades",
-      "wrong_account": "Återautentiseringen måste använda samma STIHL-konto och samma gräsklippare."
+      "wrong_account": "Återautentiseringen måste använda samma STIHL-konto.",
+      "reconfigure_successful": "Omkonfigurationen lyckades"
     },
     "error": {
       "cannot_connect": "Det gick inte att ansluta",
@@ -25,6 +26,15 @@
         "description": "STIHL iMow-integrationen behöver autentisera kontot {email} igen.",
         "data": {
           "password": "Lösenord"
+        }
+      },
+      "reconfigure": {
+        "title": "Konfigurera om STIHL iMow",
+        "description": "Uppdatera dina inloggningsuppgifter för STIHL iMow-kontot.",
+        "data": {
+          "email": "E-postadress",
+          "password": "Lösenord",
+          "language": "Språk för statusmeddelanden"
         }
       }
     }
@@ -187,6 +197,23 @@
           "description": "Tid då gräsklipparen ska sluta klippa. Används endast när åtgärden är 'Börja klippa'."
         }
       }
+    }
+  },
+  "exceptions": {
+    "update_setting_failed": {
+      "message": "Det gick inte att uppdatera gräsklipparinställningen: {error}"
+    },
+    "entry_not_loaded": {
+      "message": "STIHL iMow är inte konfigurerad."
+    },
+    "no_mower_specified": {
+      "message": "Ingen gräsklippare angavs för åtgärden."
+    },
+    "mower_action_failed": {
+      "message": "Gräsklipparåtgärden misslyckades: {error}"
+    },
+    "invalid_action_value": {
+      "message": "Ogiltigt åtgärdsvärde: {error}"
     }
   }
 }

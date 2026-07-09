@@ -14,6 +14,75 @@ config flow (reauth, unique IDs), entity naming, integration quality scale.
 
 ---
 
+## Open follow-ups (next session)
+
+Three loose ends to work on step by step.
+
+### T1. Entity name translations not applied in the UI
+- **Symptom:** entity names show English (e.g. "Charge level") even with the UI
+  switched to German, although `translations/de.json` has the correct key
+  (`status_charge_level` → "Ladestand").
+- **Already verified:** `_attr_has_entity_name = True` + `_attr_translation_key`
+  set in `entity.py`; sensors set no `_attr_name` override; `strings.json` and
+  `translations/*.json` contain `entity.<platform>.<key>.name`; hassfest
+  translation validation passes.
+- **Check, in order:**
+  1. On the running HA box, confirm
+     `config/custom_components/stihl_imow/translations/de.json` actually exists
+     and contains the key. The translation files were untracked/uncommitted for
+     a while — a HACS/tag install may have shipped only `en.json`.
+  2. Entity-name localisation follows the **user profile** language (avatar →
+     profile → Language), not just the dashboard/server language.
+  3. Integration translations are cached at startup → **full HA restart** (not a
+     reload), then a **hard browser refresh** / incognito.
+  4. If still failing: check `Developer Tools → States` that the entity carries a
+     `translation_key` and no `friendly_name` override, and inspect the
+     `/api/translations/<lang>` payload for the integration's entity keys.
+- **Steps:** verify files on the box → verify profile language → restart + hard
+  refresh → if still broken, capture `/api/translations` and treat as a code bug.
+
+### T2. Default-disabled entities are not disabled
+- **Symptom:** the 7 entities marked off-by-default still appear enabled.
+- **Most likely cause:** `entity_registry_enabled_default = False` only applies to
+  entities **newly added** to the registry. Entities already registered on an
+  upgraded install keep their previous enabled state — HA never auto-disables an
+  already-registered entity. Only a fresh install or a **newly discovered mower**
+  gets them disabled.
+- **Verify:** (a) confirm the flag is set at runtime (registry entry
+  `disabled_by`); (b) test a fresh add (delete + re-add the integration) — the 7
+  should be disabled there.
+- **Decide:**
+  - Option A (recommended, no code): document it; fresh adds behave correctly.
+  - Option B: a one-time migration that sets `disabled_by = INTEGRATION` for those
+    unique_ids — but HA cannot distinguish "default-enabled" from "user-enabled",
+    so this risks overriding a user's explicit choice. Generally discouraged.
+- **Steps:** confirm flag set → confirm fresh-vs-upgrade behaviour → pick A
+  (document) or B (migration, note the risk).
+
+### T3. Timestamp sensors show a raw ISO string
+- **Entities:** `status_last_seen_date`, `status_last_geo_position_date`,
+  `last_weather_check`. They are plain string sensors (no `device_class`), so the
+  UI shows the raw upstream value (e.g. `2026-07-09T13:50:51+00:00`).
+- **Correct fix:** set `SensorDeviceClass.TIMESTAMP` **and** return an aware
+  `datetime` (not a string) from `native_value`; HA then renders relative/absolute
+  time. TIMESTAMP with a `str` value fails state validation — that's why TIMESTAMP
+  was dropped earlier — so a value transform is required.
+- **Plan:**
+  1. Confirm each field's exact upstream format (ISO 8601 with offset? naive?
+     epoch?) by logging a sample from `receive_mower_by_id`.
+  2. Parse in the sensor (`ImowSensorEntity.native_value`) or via a map-driven
+     value function: `homeassistant.util.dt.parse_datetime(...)`, coerce to aware
+     UTC, return `None` on empty/unparseable.
+  3. Set `ATTR_TYPE: SensorDeviceClass.TIMESTAMP` for the 3 properties in
+     `IMOW_SENSORS_MAP`.
+  4. Optionally drop the custom `mdi:` icons in favour of the timestamp default.
+  5. Tests: feed an ISO string in the fake state and assert the normalised
+     timestamp; assert a bad/empty value yields `unknown`.
+- **Watch out:** keep the transform in the sensor/native_value (or a map value
+  function) so binary_sensor/switch are unaffected.
+
+---
+
 ## Highest-impact issues (these also worsen the auth bug)
 
 ### A. Setup forces a full re-login on every start/reload — HIGH

@@ -3,7 +3,8 @@
     "abort": {
       "already_configured": "Gerät ist bereits konfiguriert",
       "reauth_successful": "Erneute Authentifizierung war erfolgreich",
-      "wrong_account": "Die erneute Authentifizierung muss dasselbe STIHL-Konto und denselben Mäher verwenden."
+      "wrong_account": "Die erneute Authentifizierung muss dasselbe STIHL-Konto verwenden.",
+      "reconfigure_successful": "Neukonfiguration war erfolgreich"
     },
     "error": {
       "cannot_connect": "Verbindung fehlgeschlagen",
@@ -25,6 +26,15 @@
         "description": "Die STIHL iMow-Integration muss das Konto {email} erneut authentifizieren.",
         "data": {
           "password": "Passwort"
+        }
+      },
+      "reconfigure": {
+        "title": "STIHL iMow neu konfigurieren",
+        "description": "Aktualisiere deine STIHL iMow-Kontodaten.",
+        "data": {
+          "email": "E-Mail-Adresse",
+          "password": "Passwort",
+          "language": "Sprache für Statusmeldungen"
         }
       }
     }
@@ -187,6 +197,23 @@
           "description": "Zeitpunkt, zu dem der Mäher das Mähen beenden soll. Wird nur verwendet, wenn die Aktion 'Mähen starten' ist."
         }
       }
+    }
+  },
+  "exceptions": {
+    "update_setting_failed": {
+      "message": "Aktualisieren der Mähereinstellung fehlgeschlagen: {error}"
+    },
+    "entry_not_loaded": {
+      "message": "STIHL iMow ist nicht eingerichtet."
+    },
+    "no_mower_specified": {
+      "message": "Für die Aktion wurde kein Mäher angegeben."
+    },
+    "mower_action_failed": {
+      "message": "Die Mäheraktion ist fehlgeschlagen: {error}"
+    },
+    "invalid_action_value": {
+      "message": "Ungültiger Aktionswert: {error}"
     }
   }
 }

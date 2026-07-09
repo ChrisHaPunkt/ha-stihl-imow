@@ -24,8 +24,8 @@ from .const import API_UPDATE_TIMEOUT, DOMAIN, LOGGER, SCAN_INTERVAL_SECONDS
 ImowConfigEntry = ConfigEntry["ImowDataUpdateCoordinator"]
 
 
-class ImowDataUpdateCoordinator(DataUpdateCoordinator[MowerState]):
-    """Coordinate polling a single STIHL iMow mower."""
+class ImowDataUpdateCoordinator(DataUpdateCoordinator[dict[str, MowerState]]):
+    """Coordinate polling every STIHL iMow mower on an account."""
 
     config_entry: ImowConfigEntry
 
@@ -34,7 +34,6 @@ class ImowDataUpdateCoordinator(DataUpdateCoordinator[MowerState]):
         hass: HomeAssistant,
         config_entry: ImowConfigEntry,
         api: IMowApi,
-        mower_id: str,
     ) -> None:
         """Initialize the coordinator."""
         super().__init__(
@@ -45,15 +44,21 @@ class ImowDataUpdateCoordinator(DataUpdateCoordinator[MowerState]):
             update_interval=timedelta(seconds=SCAN_INTERVAL_SECONDS),
         )
         self.api = api
-        self.mower_id = mower_id
 
-    async def _async_update_data(self) -> MowerState:
-        """Fetch the latest mower state (including statistics)."""
+    async def _async_update_data(self) -> dict[str, MowerState]:
+        """Fetch the latest state (incl. statistics) for every mower."""
         try:
             async with asyncio.timeout(API_UPDATE_TIMEOUT):
-                return await self.api.receive_mower_state_with_statistics(
-                    self.mower_id
-                )
+                mowers = await self.api.receive_mowers()
+            result: dict[str, MowerState] = {}
+            for mower in mowers:
+                async with asyncio.timeout(API_UPDATE_TIMEOUT):
+                    result[str(mower.id)] = (
+                        await self.api.receive_mower_state_with_statistics(
+                            mower.id
+                        )
+                    )
+            return result
         except LoginError as err:
             raise ConfigEntryAuthFailed from err
         except ApiMaintenanceError as err:

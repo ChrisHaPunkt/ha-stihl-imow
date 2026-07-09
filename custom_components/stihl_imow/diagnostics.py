@@ -33,11 +33,15 @@ async def async_get_config_entry_diagnostics(
 ) -> dict[str, Any]:
     """Return diagnostics for a config entry, with sensitive data redacted."""
     coordinator = entry.runtime_data
-    mower_state = dict(coordinator.data.__dict__)
-    # Drop the IMowApi back-reference (not serializable / holds credentials).
-    mower_state.pop(ATTR_IMOW, None)
+
+    mowers: dict[str, Any] = {}
+    for mower_id, mower_state in coordinator.data.items():
+        state = dict(mower_state.__dict__)
+        # Drop the IMowApi back-reference (not serializable / holds creds).
+        state.pop(ATTR_IMOW, None)
+        mowers[mower_id] = async_redact_data(state, TO_REDACT)
 
     return {
         "entry_data": async_redact_data(dict(entry.data), TO_REDACT),
-        "mower_state": async_redact_data(mower_state, TO_REDACT),
+        "mowers": mowers,
     }
