@@ -5,15 +5,15 @@
     "@ChrisHaPunkt"
   ],
   "config_flow": true,
-  "dependencies": [],
-  "documentation": "https://www.home-assistant.io/integrations/stihl_imow",
-  "homekit": {},
+  "documentation": "https://github.com/ChrisHaPunkt/ha-stihl-imow",
+  "integration_type": "hub",
   "iot_class": "cloud_polling",
-  "issue_tracker":  "https://github.com/ChrisHaPunkt/ha-stihl-imow/issues",
-  "requirements": [
-    "imow-webapi==0.8.4"
+  "issue_tracker": "https://github.com/ChrisHaPunkt/ha-stihl-imow/issues",
+  "loggers": [
+    "imow"
   ],
-  "ssdp": [],
-  "version": "1.0.3",
-  "zeroconf": []
+  "requirements": [
+    "imow-webapi==0.10.0"
+  ],
+  "version": "2.0.0"
 }

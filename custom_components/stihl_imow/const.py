@@ -4,6 +4,9 @@ import logging
 from typing import Final
 
 API_UPDATE_INTERVALL_SECONDS = 30
+# Fixed polling interval. Polling frequency is not user-configurable per HA
+# guidelines; the cloud-service minimum is 60s.
+SCAN_INTERVAL_SECONDS = 120
 API_DEFAULT_LANGUAGE = "English"
 API_UPDATE_TIMEOUT = 10
 

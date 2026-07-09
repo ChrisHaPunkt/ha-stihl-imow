@@ -1,205 +1,174 @@
 """Config flow for STIHL iMow integration."""
+
 from __future__ import annotations
 
 import datetime
 import logging
+from collections.abc import Mapping
 from typing import Any
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-from homeassistant import config_entries
+from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from imow.api import IMowApi
-from imow.common.exceptions import LoginError
+from imow.common.exceptions import ApiMaintenanceError, LoginError
 
 from .const import (
     API_DEFAULT_LANGUAGE,
-    API_UPDATE_INTERVALL_SECONDS,
-    ATTR_IMOW,
     CONF_API_TOKEN,
     CONF_API_TOKEN_EXPIRE_TIME,
     CONF_ATTR_EMAIL,
     CONF_ATTR_LANGUAGE,
     CONF_ATTR_PASSWORD,
-    CONF_ATTR_POLLING_INTERVALL,
-    CONF_ENTRY_TITLE,
-    CONF_MOWER,
     CONF_MOWER_IDENTIFIER,
     CONF_MOWER_MODEL,
     CONF_MOWER_NAME,
-    CONF_MOWER_STATE,
     CONF_MOWER_VERSION,
-    CONF_USER_INPUT,
     DOMAIN,
 )
 from .maps import LANGUAGES
 
 _LOGGER = logging.getLogger(__name__)
 
-
-# TODO adjust the data schema to the data that you need
+STEP_USER_DATA_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_ATTR_EMAIL): cv.string,
+        vol.Required(CONF_ATTR_PASSWORD): cv.string,
+        vol.Optional(
+            CONF_ATTR_LANGUAGE, default=API_DEFAULT_LANGUAGE
+        ): vol.In([e.value for e in LANGUAGES]),
+    }
+)
+STEP_REAUTH_SCHEMA = vol.Schema({vol.Required(CONF_ATTR_PASSWORD): cv.string})
 
 
 async def validate_input(
     hass: HomeAssistant, data: dict[str, Any]
 ) -> dict[str, Any]:
-    """Validate the user input allows us to connect.
+    """Validate credentials and return the config-entry payload.
 
-    Data has the keys from STEP_USER_DATA_SCHEMA
-    with values provided by the user.
+    ``data`` must contain the email, password, and a language *code* (enum
+    name, e.g. ``"en"``). The wrapper uses its own cookie-isolated session for
+    this transient check, which is closed again afterwards.
     """
-    # TODO validate the data can be used to set up a connection.
-
-    # If your PyPI package is not built with async, pass your methods
-    # to the executor:
-    session = async_get_clientsession(hass)
-
     imow = IMowApi(
         email=data[CONF_ATTR_EMAIL],
         password=data[CONF_ATTR_PASSWORD],
-        aiohttp_session=session,
     )
     try:
         token, expire_time = await imow.get_token(
             force_reauth=True, return_expire_time=True
         )
-    except LoginError as e:
+        mowers = await imow.receive_mowers()
+    except LoginError as err:
+        raise InvalidAuth from err
+    except ApiMaintenanceError as err:
+        raise CannotConnect from err
+    finally:
         await imow.close()
-        _LOGGER.exception(e)
-        raise InvalidAuth
 
-    # If you cannot connect:
-    # throw CannotConnect
-    # If the authentication is wrong:
-    # InvalidAuth
+    if not mowers:
+        raise CannotConnect
 
-    # Return info that you want to store in the config entry.
-    mowers = []
-    for mower in await imow.receive_mowers():
-        mowers_state = dict(mower.__dict__)
-        del mowers_state[ATTR_IMOW]
-        mowers.append(
-            {
-                CONF_MOWER_NAME: mower.name,
-                CONF_MOWER_IDENTIFIER: mower.id,
-                CONF_MOWER_MODEL: mower.deviceTypeDescription,
-                CONF_MOWER_VERSION: mower.softwarePacket,
-                CONF_MOWER_STATE: mowers_state,
-            }
-        )
-    # await imow.close()
-    return {
+    mower = mowers[0]
+    entry_data = {
+        CONF_ATTR_EMAIL: data[CONF_ATTR_EMAIL],
+        CONF_ATTR_PASSWORD: data[CONF_ATTR_PASSWORD],
         CONF_API_TOKEN: token,
         CONF_API_TOKEN_EXPIRE_TIME: datetime.datetime.timestamp(expire_time),
-        CONF_USER_INPUT: data,
-        CONF_MOWER: mowers,
+        CONF_MOWER_IDENTIFIER: mower.id,
+        CONF_MOWER_NAME: mower.name,
+        CONF_MOWER_MODEL: mower.deviceTypeDescription,
+        CONF_MOWER_VERSION: mower.softwarePacket,
+        CONF_ATTR_LANGUAGE: data.get(CONF_ATTR_LANGUAGE, "en"),
+    }
+    return {
+        "mower_id": str(mower.id),
+        "title": mower.name,
+        "data": entry_data,
     }
 
 
-STEP_USER_DATA_SCHEMA = vol.Schema(
-    {
-        vol.Required(CONF_ATTR_EMAIL): cv.string,
-        vol.Required(CONF_ATTR_PASSWORD): cv.string,
-    },
-)
-STEP_ADVANCED = vol.Schema(
-    {
-        vol.Optional(CONF_ATTR_LANGUAGE, default=API_DEFAULT_LANGUAGE): vol.In(
-            [e.value for e in LANGUAGES]
-        ),
-        vol.Optional(
-            CONF_ATTR_POLLING_INTERVALL, default=API_UPDATE_INTERVALL_SECONDS
-        ): vol.In([20, 30, 60, 120, 300]),
-    }
-)
-
-
-class StihlImowConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class StihlImowConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for STIHL iMow."""
 
-    VERSION = 1
-
-    def __init__(self):
-        """Initialize config flow."""
-        self.data = {}
-        self.available_mowers = []
-        self.token = None
-        self.token_expire = None
-        self.language = None
-        self.polling_interval = None
+    VERSION = 2
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Handle the initial step."""
-        if user_input is None:
-            return self.async_show_form(
-                step_id="user",
-                data_schema=STEP_USER_DATA_SCHEMA,
-                last_step=False,
-            )
-
-        errors = {}
-
-        try:
-            self.data = await validate_input(self.hass, user_input)
-            self.available_mowers = self.data[CONF_MOWER]
-            self.token = self.data[CONF_API_TOKEN]
-            self.token_expire = self.data[CONF_API_TOKEN_EXPIRE_TIME]
-
-        except CannotConnect:
-            errors["base"] = "cannot_connect"
-        except InvalidAuth:
-            errors["base"] = "invalid_auth"
-        except Exception:  # pylint: disable=broad-except
-            _LOGGER.exception("Unexpected exception")
-            errors["base"] = "unknown"
-        else:
-            return await self.async_step_advanced()
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            payload = dict(user_input)
+            # Store the language *code* (enum name), not the display value.
+            payload[CONF_ATTR_LANGUAGE] = LANGUAGES(
+                payload.get(CONF_ATTR_LANGUAGE, API_DEFAULT_LANGUAGE)
+            ).name
+            try:
+                info = await validate_input(self.hass, payload)
+            except CannotConnect:
+                errors["base"] = "cannot_connect"
+            except InvalidAuth:
+                errors["base"] = "invalid_auth"
+            except Exception:  # pylint: disable=broad-except
+                _LOGGER.exception("Unexpected exception")
+                errors["base"] = "unknown"
+            else:
+                await self.async_set_unique_id(info["mower_id"])
+                self._abort_if_unique_id_configured()
+                return self.async_create_entry(
+                    title=info["title"], data=info["data"]
+                )
 
         return self.async_show_form(
             step_id="user",
             data_schema=STEP_USER_DATA_SCHEMA,
             errors=errors,
-            last_step=False,
         )
 
-    async def async_step_advanced(
-        self, user_input: dict[str, int] | None = None
-    ) -> FlowResult:
-        """Handle the initial step."""
-        if user_input is None:
-            return self.async_show_form(
-                step_id="advanced", data_schema=STEP_ADVANCED
-            )
+    async def async_step_reauth(
+        self, entry_data: Mapping[str, Any]
+    ) -> ConfigFlowResult:
+        """Perform reauth upon an API authentication error."""
+        return await self.async_step_reauth_confirm()
 
-        errors = {}
-
-        try:
-            self.language = LANGUAGES(user_input[CONF_ATTR_LANGUAGE]).name
-            self.polling_interval = user_input[CONF_ATTR_POLLING_INTERVALL]
-
-        except CannotConnect:
-            errors["base"] = "cannot_connect"
-        except InvalidAuth:
-            errors["base"] = "invalid_auth"
-        except Exception:  # pylint: disable=broad-except
-            _LOGGER.exception("Unexpected exception")
-            errors["base"] = "unknown"
-        else:
-            self.data[CONF_ATTR_LANGUAGE] = self.language
-            self.data[CONF_ATTR_POLLING_INTERVALL] = self.polling_interval
-            return self.async_create_entry(
-                title=CONF_ENTRY_TITLE, data=self.data
-            )
+    async def async_step_reauth_confirm(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Confirm reauth with a new password for the same account."""
+        errors: dict[str, str] = {}
+        reauth_entry = self._get_reauth_entry()
+        if user_input is not None:
+            payload = {
+                **reauth_entry.data,
+                CONF_ATTR_PASSWORD: user_input[CONF_ATTR_PASSWORD],
+            }
+            try:
+                info = await validate_input(self.hass, payload)
+            except CannotConnect:
+                errors["base"] = "cannot_connect"
+            except InvalidAuth:
+                errors["base"] = "invalid_auth"
+            except Exception:  # pylint: disable=broad-except
+                _LOGGER.exception("Unexpected exception")
+                errors["base"] = "unknown"
+            else:
+                await self.async_set_unique_id(info["mower_id"])
+                self._abort_if_unique_id_mismatch(reason="wrong_account")
+                return self.async_update_reload_and_abort(
+                    reauth_entry, data_updates=info["data"]
+                )
 
         return self.async_show_form(
-            step_id="advanced",
-            data_schema=STEP_ADVANCED,
+            step_id="reauth_confirm",
+            data_schema=STEP_REAUTH_SCHEMA,
             errors=errors,
+            description_placeholders={
+                "email": reauth_entry.data[CONF_ATTR_EMAIL]
+            },
         )
 
 

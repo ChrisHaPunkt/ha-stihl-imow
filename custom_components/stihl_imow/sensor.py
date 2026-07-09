@@ -1,28 +1,30 @@
 """Platform for sensor integration."""
+
 import logging
 
-from homeassistant import config_entries, core
+from homeassistant import core
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.const import STATE_OFF
 from imow.common.mowerstate import MowerState
 
 from . import extract_properties_by_type
-from .const import ATTR_COORDINATOR, ATTR_LONG, ATTR_SHORT, DOMAIN
+from .const import ATTR_LONG, ATTR_SHORT
+from .coordinator import ImowConfigEntry
 from .entity import ImowBaseEntity
 
 _LOGGER = logging.getLogger(__name__)
 
+PARALLEL_UPDATES = 0
+
 
 async def async_setup_entry(
     hass: core.HomeAssistant,
-    config_entry: config_entries.ConfigEntry,
+    config_entry: ImowConfigEntry,
     async_add_entities,
 ):
     """Add sensors for passed config_entry in HA."""
-    config = hass.data[DOMAIN][config_entry.entry_id]
-    coordinator = hass.data[DOMAIN][config_entry.entry_id][ATTR_COORDINATOR]
-
-    mower_state: MowerState = config[ATTR_COORDINATOR].data
+    coordinator = config_entry.runtime_data
+    mower_state: MowerState = coordinator.data
 
     entities, device = extract_properties_by_type(
         mower_state, bool, negotiate=True  # all, but bool

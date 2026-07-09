@@ -3,7 +3,16 @@
     "step": {
       "user": {
         "data": {
-          "username": "[%key:common::config_flow::data::username%]",
+          "email": "E-mail address",
+          "password": "[%key:common::config_flow::data::password%]",
+          "language": "Language for state messages"
+        },
+        "description": "Enter your STIHL iMow account credentials."
+      },
+      "reauth_confirm": {
+        "title": "[%key:common::config_flow::title::reauth%]",
+        "description": "The STIHL iMow integration needs to re-authenticate the account {email}.",
+        "data": {
           "password": "[%key:common::config_flow::data::password%]"
         }
       }
@@ -14,7 +23,9 @@
       "unknown": "[%key:common::config_flow::error::unknown%]"
     },
     "abort": {
-      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]",
+      "reauth_successful": "[%key:common::config_flow::abort::reauth_successful%]",
+      "wrong_account": "Re-authentication must use the same STIHL account and mower."
     }
   }
 }
