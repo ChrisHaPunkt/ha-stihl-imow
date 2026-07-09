@@ -11,6 +11,7 @@ from homeassistant.exceptions import (
     ConfigEntryNotReady,
 )
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.typing import ConfigType
 from imow.api import IMowApi
@@ -89,6 +90,8 @@ async def async_setup_entry(
 
     entry.runtime_data = coordinator
 
+    await _migrate_entity_unique_ids(hass, entry)
+
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
@@ -133,6 +136,32 @@ async def async_migrate_entry(
         )
 
     return True
+
+
+async def _migrate_entity_unique_ids(
+    hass: HomeAssistant, entry: ImowConfigEntry
+) -> None:
+    """Migrate legacy entity unique ids to the stable scheme.
+
+    Old: ``{mower_id}_{idx}_{property}`` (index-dependent, unstable).
+    New: ``{mower_id}_{property}`` (``{mower_id}_tracker`` for the tracker).
+    Idempotent: already-migrated ids are left untouched.
+    """
+    mower_id = str(entry.data[CONF_MOWER_IDENTIFIER])
+    prefix = f"{mower_id}_"
+
+    @callback
+    def _migrate(reg_entry: er.RegistryEntry) -> dict[str, str] | None:
+        if not reg_entry.unique_id.startswith(prefix):
+            return None
+        rest = reg_entry.unique_id.removeprefix(prefix)
+        head, _, tail = rest.partition("_")
+        if not head.isdigit():
+            return None  # already the new scheme
+        suffix = tail if tail else "tracker"
+        return {"new_unique_id": f"{mower_id}_{suffix}"}
+
+    await er.async_migrate_entries(hass, entry.entry_id, _migrate)
 
 
 @callback

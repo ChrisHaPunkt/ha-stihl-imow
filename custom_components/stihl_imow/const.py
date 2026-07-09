@@ -3,10 +3,10 @@
 import logging
 from typing import Final
 
-API_UPDATE_INTERVALL_SECONDS = 30
-# Fixed polling interval. Polling frequency is not user-configurable per HA
-# guidelines; the cloud-service minimum is 60s.
-SCAN_INTERVAL_SECONDS = 120
+# Fixed polling interval (not user-configurable, per HA guidelines). HA's hard
+# minimum is 5s; the cloud recommendation is 60s. 30s is a deliberate choice by
+# the maintainer, balancing responsiveness against STIHL's cloud API.
+SCAN_INTERVAL_SECONDS = 30
 API_DEFAULT_LANGUAGE = "English"
 API_UPDATE_TIMEOUT = 10
 
@@ -19,6 +19,7 @@ ATTR_IMOW = "imow"
 ATTR_PICTURE = "picture"
 ATTR_UOM = "uom"
 ATTR_TYPE = "type"
+ATTR_STATE_CLASS = "state_class"
 ATTR_ICON = "icon"
 ATTR_NAME = "name"
 ATTR_MANUFACTURER = "manufacturer"

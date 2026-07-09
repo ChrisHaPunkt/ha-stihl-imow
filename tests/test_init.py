@@ -6,6 +6,7 @@ from unittest.mock import AsyncMock, patch
 
 from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 from imow.common.exceptions import LoginError
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
@@ -93,3 +94,40 @@ async def test_migrate_v1_to_v2(
     assert "user_input" not in entry.data
     assert "polling_interval" not in entry.data
     assert "mower" not in entry.data
+
+
+async def test_entity_unique_id_migration(
+    hass: HomeAssistant,
+    mock_config_entry: MockConfigEntry,
+    mock_runtime_api,
+) -> None:
+    """Legacy ``{id}_{idx}_{prop}`` unique ids migrate to ``{id}_{prop}``."""
+    mock_config_entry.add_to_hass(hass)
+    ent_reg = er.async_get(hass)
+    old_sensor = ent_reg.async_get_or_create(
+        "sensor",
+        DOMAIN,
+        f"{MOWER_ID}_3_machineState",
+        config_entry=mock_config_entry,
+    )
+    old_tracker = ent_reg.async_get_or_create(
+        "device_tracker",
+        DOMAIN,
+        f"{MOWER_ID}_99999_",
+        config_entry=mock_config_entry,
+    )
+
+    with patch("custom_components.stihl_imow.PLATFORMS", []):
+        assert await hass.config_entries.async_setup(
+            mock_config_entry.entry_id
+        )
+        await hass.async_block_till_done()
+
+    assert (
+        ent_reg.async_get(old_sensor.entity_id).unique_id
+        == f"{MOWER_ID}_machineState"
+    )
+    assert (
+        ent_reg.async_get(old_tracker.entity_id).unique_id
+        == f"{MOWER_ID}_tracker"
+    )

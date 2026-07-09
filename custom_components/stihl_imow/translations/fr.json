@@ -1,0 +1,192 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "L'appareil est déjà configuré",
+      "reauth_successful": "La ré-authentification a réussi",
+      "wrong_account": "La ré-authentification doit utiliser le même compte STIHL et la même tondeuse."
+    },
+    "error": {
+      "cannot_connect": "Échec de la connexion",
+      "invalid_auth": "Authentification invalide",
+      "unknown": "Erreur inattendue"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "email": "Adresse e-mail",
+          "password": "Mot de passe",
+          "language": "Langue des messages d'état"
+        },
+        "description": "Saisissez les identifiants de votre compte STIHL iMow.\n\n**Cette intégration ne prend en charge que les tondeuses STIHL iMow jusqu'à la génération 4.** Elle fonctionne si vos identifiants sont valides sur app.imow.stihl.com. Elle ne fonctionne **pas** avec les tondeuses de génération 5 qui utilisent myimow.stihl.com.",
+        "title": "STIHL iMow"
+      },
+      "reauth_confirm": {
+        "title": "Ré-authentifier STIHL iMow",
+        "description": "L'intégration STIHL iMow doit ré-authentifier le compte {email}.",
+        "data": {
+          "password": "Mot de passe"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "machine_error": {
+        "name": "Erreur machine"
+      },
+      "machine_state": {
+        "name": "État de la machine"
+      },
+      "circumference": {
+        "name": "Circonférence"
+      },
+      "corridor_mode": {
+        "name": "Mode couloir"
+      },
+      "edge_mowing_mode": {
+        "name": "Mode tonte des bords"
+      },
+      "energy_mode": {
+        "name": "Mode énergie"
+      },
+      "last_weather_check": {
+        "name": "Dernière vérification météo"
+      },
+      "led_status": {
+        "name": "État de la LED"
+      },
+      "mapping_intelligent_home_drive": {
+        "name": "Retour intelligent à la base"
+      },
+      "protection_level": {
+        "name": "Niveau de protection"
+      },
+      "rain_sensor_mode": {
+        "name": "Mode capteur de pluie"
+      },
+      "time_zone": {
+        "name": "Fuseau horaire"
+      },
+      "state_message_short": {
+        "name": "Message d'état"
+      },
+      "state_message_long": {
+        "name": "Détails du message d'état"
+      },
+      "smart_logic_mowing_area_in_feet": {
+        "name": "Surface de tonte (pieds)"
+      },
+      "smart_logic_mowing_area_in_meter": {
+        "name": "Surface de tonte"
+      },
+      "smart_logic_mowing_growth_adjustment": {
+        "name": "Ajustement de croissance"
+      },
+      "smart_logic_mowing_time": {
+        "name": "Temps de tonte"
+      },
+      "smart_logic_performed_activity_time": {
+        "name": "Temps d'activité effectué"
+      },
+      "smart_logic_suggested_activity_time": {
+        "name": "Temps d'activité suggéré"
+      },
+      "status_charge_level": {
+        "name": "Niveau de charge"
+      },
+      "status_last_geo_position_date": {
+        "name": "Dernière position GPS"
+      },
+      "status_last_seen_date": {
+        "name": "Vu pour la dernière fois"
+      },
+      "statistics_total_blade_operating_time": {
+        "name": "Temps de fonctionnement total des lames"
+      },
+      "statistics_total_distance_travelled": {
+        "name": "Distance totale parcourue"
+      },
+      "statistics_total_operating_time": {
+        "name": "Temps de fonctionnement total"
+      }
+    },
+    "binary_sensor": {
+      "asm_enabled": {
+        "name": "ASM activé"
+      },
+      "demo_mode_enabled": {
+        "name": "Mode démo"
+      },
+      "teamable": {
+        "name": "Compatible équipe"
+      },
+      "state_message_error": {
+        "name": "Erreur"
+      },
+      "smart_logic_dynamic_mowingplan": {
+        "name": "Plan de tonte dynamique"
+      },
+      "smart_logic_mowing_time_manual": {
+        "name": "Temps de tonte manuel"
+      },
+      "smart_logic_smart_notifications": {
+        "name": "Notifications intelligentes"
+      },
+      "smart_logic_weather_forecast_enabled": {
+        "name": "Prévisions météo"
+      },
+      "status_blade_service": {
+        "name": "Entretien des lames"
+      },
+      "status_online": {
+        "name": "En ligne"
+      },
+      "status_rain_status": {
+        "name": "Pluie détectée"
+      }
+    },
+    "switch": {
+      "automatic_mode_enabled": {
+        "name": "Mode automatique"
+      },
+      "child_lock": {
+        "name": "Sécurité enfant"
+      },
+      "gps_protection_enabled": {
+        "name": "Protection GPS"
+      }
+    }
+  },
+  "services": {
+    "intent": {
+      "name": "Envoyer une action à la tondeuse",
+      "description": "Envoie une commande d'action à une tondeuse STIHL iMow.",
+      "fields": {
+        "mower_device": {
+          "name": "Tondeuse",
+          "description": "La tondeuse à laquelle envoyer l'action."
+        },
+        "action": {
+          "name": "Action",
+          "description": "L'action que la tondeuse doit effectuer."
+        },
+        "duration": {
+          "name": "Durée de tonte",
+          "description": "Durée de tonte en minutes. Utilisé uniquement lorsque l'action est « Démarrer la tonte depuis un point »."
+        },
+        "startpoint": {
+          "name": "Point de départ",
+          "description": "Point de départ défini par la tondeuse. Utilisé uniquement lorsque l'action est « Démarrer la tonte depuis un point » et que la tondeuse ne doit pas partir de la station."
+        },
+        "starttime": {
+          "name": "Heure de début",
+          "description": "Heure à laquelle la tondeuse doit commencer à tondre. Utilisé uniquement lorsque l'action est « Démarrer la tonte »."
+        },
+        "endtime": {
+          "name": "Heure de fin",
+          "description": "Heure à laquelle la tondeuse doit arrêter de tondre. Utilisé uniquement lorsque l'action est « Démarrer la tonte »."
+        }
+      }
+    }
+  }
+}

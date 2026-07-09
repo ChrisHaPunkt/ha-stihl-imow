@@ -1,0 +1,192 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Enheten är redan konfigurerad",
+      "reauth_successful": "Återautentiseringen lyckades",
+      "wrong_account": "Återautentiseringen måste använda samma STIHL-konto och samma gräsklippare."
+    },
+    "error": {
+      "cannot_connect": "Det gick inte att ansluta",
+      "invalid_auth": "Ogiltig autentisering",
+      "unknown": "Oväntat fel"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "email": "E-postadress",
+          "password": "Lösenord",
+          "language": "Språk för statusmeddelanden"
+        },
+        "description": "Ange dina inloggningsuppgifter för STIHL iMow-kontot.\n\n**Denna integration stöder endast STIHL iMow-gräsklippare upp till generation 4.** Den fungerar om dina inloggningsuppgifter är giltiga på app.imow.stihl.com. Den fungerar **inte** med gräsklippare av generation 5 som använder myimow.stihl.com.",
+        "title": "STIHL iMow"
+      },
+      "reauth_confirm": {
+        "title": "Autentisera STIHL iMow igen",
+        "description": "STIHL iMow-integrationen behöver autentisera kontot {email} igen.",
+        "data": {
+          "password": "Lösenord"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "machine_error": {
+        "name": "Maskinfel"
+      },
+      "machine_state": {
+        "name": "Maskinstatus"
+      },
+      "circumference": {
+        "name": "Omkrets"
+      },
+      "corridor_mode": {
+        "name": "Korridorläge"
+      },
+      "edge_mowing_mode": {
+        "name": "Kantklippningsläge"
+      },
+      "energy_mode": {
+        "name": "Energiläge"
+      },
+      "last_weather_check": {
+        "name": "Senaste väderkontroll"
+      },
+      "led_status": {
+        "name": "LED-status"
+      },
+      "mapping_intelligent_home_drive": {
+        "name": "Intelligent hemkörning"
+      },
+      "protection_level": {
+        "name": "Skyddsnivå"
+      },
+      "rain_sensor_mode": {
+        "name": "Regnsensorläge"
+      },
+      "time_zone": {
+        "name": "Tidszon"
+      },
+      "state_message_short": {
+        "name": "Statusmeddelande"
+      },
+      "state_message_long": {
+        "name": "Statusmeddelande detaljer"
+      },
+      "smart_logic_mowing_area_in_feet": {
+        "name": "Klippyta (fot)"
+      },
+      "smart_logic_mowing_area_in_meter": {
+        "name": "Klippyta"
+      },
+      "smart_logic_mowing_growth_adjustment": {
+        "name": "Tillväxtjustering"
+      },
+      "smart_logic_mowing_time": {
+        "name": "Klipptid"
+      },
+      "smart_logic_performed_activity_time": {
+        "name": "Utförd aktivitetstid"
+      },
+      "smart_logic_suggested_activity_time": {
+        "name": "Föreslagen aktivitetstid"
+      },
+      "status_charge_level": {
+        "name": "Laddningsnivå"
+      },
+      "status_last_geo_position_date": {
+        "name": "Senaste GPS-position"
+      },
+      "status_last_seen_date": {
+        "name": "Senast sedd"
+      },
+      "statistics_total_blade_operating_time": {
+        "name": "Total knivdrifttid"
+      },
+      "statistics_total_distance_travelled": {
+        "name": "Total tillryggalagd sträcka"
+      },
+      "statistics_total_operating_time": {
+        "name": "Total drifttid"
+      }
+    },
+    "binary_sensor": {
+      "asm_enabled": {
+        "name": "ASM aktiverad"
+      },
+      "demo_mode_enabled": {
+        "name": "Demoläge"
+      },
+      "teamable": {
+        "name": "Teamkompatibel"
+      },
+      "state_message_error": {
+        "name": "Fel"
+      },
+      "smart_logic_dynamic_mowingplan": {
+        "name": "Dynamisk klippplan"
+      },
+      "smart_logic_mowing_time_manual": {
+        "name": "Manuell klipptid"
+      },
+      "smart_logic_smart_notifications": {
+        "name": "Smarta aviseringar"
+      },
+      "smart_logic_weather_forecast_enabled": {
+        "name": "Väderprognos"
+      },
+      "status_blade_service": {
+        "name": "Knivservice"
+      },
+      "status_online": {
+        "name": "Online"
+      },
+      "status_rain_status": {
+        "name": "Regn upptäckt"
+      }
+    },
+    "switch": {
+      "automatic_mode_enabled": {
+        "name": "Automatiskt läge"
+      },
+      "child_lock": {
+        "name": "Barnlås"
+      },
+      "gps_protection_enabled": {
+        "name": "GPS-skydd"
+      }
+    }
+  },
+  "services": {
+    "intent": {
+      "name": "Skicka klipparåtgärd",
+      "description": "Skickar ett åtgärdskommando till en STIHL iMow-gräsklippare.",
+      "fields": {
+        "mower_device": {
+          "name": "Gräsklippare",
+          "description": "Gräsklipparen som åtgärden ska skickas till."
+        },
+        "action": {
+          "name": "Åtgärd",
+          "description": "Åtgärden som gräsklipparen ska utföra."
+        },
+        "duration": {
+          "name": "Klipptid",
+          "description": "Klipptid i minuter. Används endast när åtgärden är 'Börja klippa från punkt'."
+        },
+        "startpoint": {
+          "name": "Startpunkt",
+          "description": "Startpunkt definierad av gräsklipparen. Används endast när åtgärden är 'Börja klippa från punkt' och gräsklipparen inte ska starta från dockningsstationen."
+        },
+        "starttime": {
+          "name": "Starttid",
+          "description": "Tid då gräsklipparen ska börja klippa. Används endast när åtgärden är 'Börja klippa'."
+        },
+        "endtime": {
+          "name": "Sluttid",
+          "description": "Tid då gräsklipparen ska sluta klippa. Används endast när åtgärden är 'Börja klippa'."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,192 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Apparaat is al geconfigureerd",
+      "reauth_successful": "Herauthenticatie geslaagd",
+      "wrong_account": "Herauthenticatie moet hetzelfde STIHL-account en dezelfde maaier gebruiken."
+    },
+    "error": {
+      "cannot_connect": "Verbinding mislukt",
+      "invalid_auth": "Ongeldige authenticatie",
+      "unknown": "Onverwachte fout"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "email": "E-mailadres",
+          "password": "Wachtwoord",
+          "language": "Taal voor statusberichten"
+        },
+        "description": "Voer je STIHL iMow-accountgegevens in.\n\n**Deze integratie ondersteunt alleen STIHL iMow-maaiers tot en met generatie 4.** Ze werkt als je inloggegevens geldig zijn op app.imow.stihl.com. Ze werkt **niet** met generatie 5-maaiers die myimow.stihl.com gebruiken.",
+        "title": "STIHL iMow"
+      },
+      "reauth_confirm": {
+        "title": "STIHL iMow opnieuw authenticeren",
+        "description": "De STIHL iMow-integratie moet het account {email} opnieuw authenticeren.",
+        "data": {
+          "password": "Wachtwoord"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "machine_error": {
+        "name": "Machinefout"
+      },
+      "machine_state": {
+        "name": "Machinestatus"
+      },
+      "circumference": {
+        "name": "Omtrek"
+      },
+      "corridor_mode": {
+        "name": "Corridormodus"
+      },
+      "edge_mowing_mode": {
+        "name": "Randmaaimodus"
+      },
+      "energy_mode": {
+        "name": "Energiemodus"
+      },
+      "last_weather_check": {
+        "name": "Laatste weercontrole"
+      },
+      "led_status": {
+        "name": "Led-status"
+      },
+      "mapping_intelligent_home_drive": {
+        "name": "Intelligente thuisrit"
+      },
+      "protection_level": {
+        "name": "Beschermingsniveau"
+      },
+      "rain_sensor_mode": {
+        "name": "Regensensormodus"
+      },
+      "time_zone": {
+        "name": "Tijdzone"
+      },
+      "state_message_short": {
+        "name": "Statusbericht"
+      },
+      "state_message_long": {
+        "name": "Statusbericht details"
+      },
+      "smart_logic_mowing_area_in_feet": {
+        "name": "Maaioppervlak (voet)"
+      },
+      "smart_logic_mowing_area_in_meter": {
+        "name": "Maaioppervlak"
+      },
+      "smart_logic_mowing_growth_adjustment": {
+        "name": "Groei-aanpassing"
+      },
+      "smart_logic_mowing_time": {
+        "name": "Maaitijd"
+      },
+      "smart_logic_performed_activity_time": {
+        "name": "Uitgevoerde activiteitstijd"
+      },
+      "smart_logic_suggested_activity_time": {
+        "name": "Voorgestelde activiteitstijd"
+      },
+      "status_charge_level": {
+        "name": "Laadniveau"
+      },
+      "status_last_geo_position_date": {
+        "name": "Laatste gps-positie"
+      },
+      "status_last_seen_date": {
+        "name": "Laatst gezien"
+      },
+      "statistics_total_blade_operating_time": {
+        "name": "Totale mesbedrijfstijd"
+      },
+      "statistics_total_distance_travelled": {
+        "name": "Totale afgelegde afstand"
+      },
+      "statistics_total_operating_time": {
+        "name": "Totale bedrijfstijd"
+      }
+    },
+    "binary_sensor": {
+      "asm_enabled": {
+        "name": "ASM ingeschakeld"
+      },
+      "demo_mode_enabled": {
+        "name": "Demomodus"
+      },
+      "teamable": {
+        "name": "Teamgeschikt"
+      },
+      "state_message_error": {
+        "name": "Fout"
+      },
+      "smart_logic_dynamic_mowingplan": {
+        "name": "Dynamisch maaiplan"
+      },
+      "smart_logic_mowing_time_manual": {
+        "name": "Handmatige maaitijd"
+      },
+      "smart_logic_smart_notifications": {
+        "name": "Slimme meldingen"
+      },
+      "smart_logic_weather_forecast_enabled": {
+        "name": "Weersverwachting"
+      },
+      "status_blade_service": {
+        "name": "Mesonderhoud"
+      },
+      "status_online": {
+        "name": "Online"
+      },
+      "status_rain_status": {
+        "name": "Regen gedetecteerd"
+      }
+    },
+    "switch": {
+      "automatic_mode_enabled": {
+        "name": "Automatische modus"
+      },
+      "child_lock": {
+        "name": "Kinderslot"
+      },
+      "gps_protection_enabled": {
+        "name": "Gps-beveiliging"
+      }
+    }
+  },
+  "services": {
+    "intent": {
+      "name": "Maaieractie verzenden",
+      "description": "Stuurt een actieopdracht naar een STIHL iMow-maaier.",
+      "fields": {
+        "mower_device": {
+          "name": "Maaier",
+          "description": "De maaier waarnaar de actie moet worden verzonden."
+        },
+        "action": {
+          "name": "Actie",
+          "description": "De actie die de maaier moet uitvoeren."
+        },
+        "duration": {
+          "name": "Maaiduur",
+          "description": "Maaiduur in minuten. Alleen gebruikt wanneer de actie 'Maaien vanaf punt starten' is."
+        },
+        "startpoint": {
+          "name": "Startpunt",
+          "description": "Door de maaier gedefinieerd startpunt. Alleen gebruikt wanneer de actie 'Maaien vanaf punt starten' is en de maaier niet vanaf het dockstation moet starten."
+        },
+        "starttime": {
+          "name": "Starttijd",
+          "description": "Tijdstip waarop de maaier moet beginnen met maaien. Alleen gebruikt wanneer de actie 'Maaien starten' is."
+        },
+        "endtime": {
+          "name": "Eindtijd",
+          "description": "Tijdstip waarop de maaier moet stoppen met maaien. Alleen gebruikt wanneer de actie 'Maaien starten' is."
+        }
+      }
+    }
+  }
+}

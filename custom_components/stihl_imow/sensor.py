@@ -4,13 +4,19 @@ import logging
 
 from homeassistant import core
 from homeassistant.components.sensor import SensorEntity
-from homeassistant.const import STATE_OFF
 from imow.common.mowerstate import MowerState
 
 from . import extract_properties_by_type
-from .const import ATTR_LONG, ATTR_SHORT
+from .const import (
+    ATTR_LONG,
+    ATTR_SHORT,
+    ATTR_STATE_CLASS,
+    ATTR_TYPE,
+    ATTR_UOM,
+)
 from .coordinator import ImowConfigEntry
 from .entity import ImowBaseEntity
+from .maps import IMOW_SENSORS_MAP
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -33,6 +39,7 @@ async def async_setup_entry(
     async_add_entities(
         ImowSensorEntity(coordinator, device, idx, mower_state_property)
         for idx, mower_state_property in enumerate(entities)
+        if mower_state_property in IMOW_SENSORS_MAP
     )
 
 
@@ -40,8 +47,17 @@ class ImowSensorEntity(ImowBaseEntity, SensorEntity):
     """Representation of a Sensor."""
 
     def __init__(self, coordinator, device_info, idx, mower_state_property):
-        """Override the BaseEntity with Binary Sensor content."""
+        """Set device_class, unit and state_class from the sensor map."""
         super().__init__(coordinator, device_info, idx, mower_state_property)
+        info = IMOW_SENSORS_MAP.get(mower_state_property, {})
+        self._attr_device_class = info.get(ATTR_TYPE)
+        self._attr_native_unit_of_measurement = info.get(ATTR_UOM)
+        self._attr_state_class = info.get(ATTR_STATE_CLASS)
+
+    @property
+    def native_value(self):
+        """Return the native value of the sensor."""
+        return self.get_value_from_mowerstate()
 
     @property
     def extra_state_attributes(self):
@@ -51,12 +67,4 @@ class ImowSensorEntity(ImowBaseEntity, SensorEntity):
                 ATTR_SHORT: self.mowerstate.stateMessage[ATTR_SHORT],
                 ATTR_LONG: self.mowerstate.stateMessage[ATTR_LONG],
             }
-
-    @property
-    def state(self):
-        """Return the state of the sensor."""
-        return (
-            self.get_value_from_mowerstate()
-            if bool(self.get_value_from_mowerstate())
-            else STATE_OFF
-        )
+        return None

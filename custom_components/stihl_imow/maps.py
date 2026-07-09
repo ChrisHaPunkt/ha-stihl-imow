@@ -12,8 +12,18 @@ from homeassistant.const import (
     UnitOfTime,
     PERCENTAGE,
 )
-from homeassistant.components.sensor import SensorDeviceClass
-from .const import ATTR_ICON, ATTR_PICTURE, ATTR_SWITCH, ATTR_TYPE, ATTR_UOM
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorStateClass,
+)
+from .const import (
+    ATTR_ICON,
+    ATTR_PICTURE,
+    ATTR_STATE_CLASS,
+    ATTR_SWITCH,
+    ATTR_TYPE,
+    ATTR_UOM,
+)
 
 IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
     "asmEnabled": {
@@ -87,9 +97,9 @@ IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
         ATTR_PICTURE: False,
     },
     "energyMode": {
-        ATTR_TYPE: SensorDeviceClass.ENERGY,
+        ATTR_TYPE: None,
         ATTR_UOM: None,
-        ATTR_ICON: None,
+        ATTR_ICON: "mdi:lightning-bolt-outline",
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
     },
@@ -108,9 +118,9 @@ IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
         ATTR_PICTURE: False,
     },
     "lastWeatherCheck": {
-        ATTR_TYPE: SensorDeviceClass.TIMESTAMP,
+        ATTR_TYPE: None,
         ATTR_UOM: None,
-        ATTR_ICON: None,
+        ATTR_ICON: "mdi:weather-partly-cloudy",
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
     },
@@ -283,22 +293,25 @@ IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
         ATTR_PICTURE: False,
     },
     "statistics_totalBladeOperatingTime": {
-        ATTR_TYPE: None,
+        ATTR_TYPE: SensorDeviceClass.DURATION,
         ATTR_UOM: UnitOfTime.SECONDS,
-        ATTR_ICON: "mdi:watch",
+        ATTR_STATE_CLASS: SensorStateClass.TOTAL_INCREASING,
+        ATTR_ICON: "mdi:knife",
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
     },
     "statistics_totalDistanceTravelled": {
-        ATTR_TYPE: None,
+        ATTR_TYPE: SensorDeviceClass.DISTANCE,
         ATTR_UOM: UnitOfLength.METERS,
+        ATTR_STATE_CLASS: SensorStateClass.TOTAL_INCREASING,
         ATTR_ICON: "mdi:map-marker-distance",
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
     },
     "statistics_totalOperatingTime": {
-        ATTR_TYPE: None,
+        ATTR_TYPE: SensorDeviceClass.DURATION,
         ATTR_UOM: UnitOfTime.SECONDS,
+        ATTR_STATE_CLASS: SensorStateClass.TOTAL_INCREASING,
         ATTR_ICON: "mdi:watch",
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
@@ -313,21 +326,22 @@ IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
     "status_chargeLevel": {
         ATTR_TYPE: SensorDeviceClass.BATTERY,
         ATTR_UOM: PERCENTAGE,
+        ATTR_STATE_CLASS: SensorStateClass.MEASUREMENT,
         ATTR_ICON: None,
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
     },
     "status_lastGeoPositionDate": {
-        ATTR_TYPE: SensorDeviceClass.TIMESTAMP,
+        ATTR_TYPE: None,
         ATTR_UOM: None,
-        ATTR_ICON: None,
+        ATTR_ICON: "mdi:map-marker-clock",
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
     },
     "status_lastSeenDate": {
-        ATTR_TYPE: SensorDeviceClass.TIMESTAMP,
+        ATTR_TYPE: None,
         ATTR_UOM: None,
-        ATTR_ICON: None,
+        ATTR_ICON: "mdi:clock-outline",
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
     },
@@ -378,6 +392,19 @@ IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
 
 # Upstream attributes, which should not be exposesd to HA
 ENTITY_STRIP_OUT_PROPERTIES = [
+    # Redundant with the device_tracker entity
+    "coordinateLatitude",
+    "coordinateLongitude",
+    # Image URLs / device metadata that belong on the device, not as sensors
+    "mowerImageUrl",
+    "mowerImageThumbnailUrl",
+    "name",
+    "deviceTypeDescription",
+    "version",
+    "firmwareVersion",
+    "softwarePacket",
+    "smartLogic_softwarePacket",
+    "team",
     "status_extraStatus",
     "status_extraStatus1",
     "status_extraStatus2",

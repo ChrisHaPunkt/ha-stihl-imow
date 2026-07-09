@@ -1,7 +1,12 @@
-"""BaseEntity for iMow Sensors."""
+"""BaseEntity for iMow entities."""
+
+from __future__ import annotations
+
+import re
 
 from homeassistant.const import ATTR_MANUFACTURER
 from homeassistant.core import callback
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from imow.common.mowerstate import MowerState
 
@@ -10,111 +15,57 @@ from .const import (
     ATTR_ID,
     ATTR_MODEL,
     ATTR_NAME,
-    ATTR_PICTURE,
     ATTR_SW_VERSION,
-    ATTR_TYPE,
-    ATTR_UOM,
     DOMAIN,
 )
 from .maps import IMOW_SENSORS_MAP
 
 
+def to_translation_key(property_name: str) -> str:
+    """Convert a mower property name into a snake_case translation key."""
+    return re.sub(r"(?<=[a-z0-9])(?=[A-Z])", "_", property_name).lower()
+
+
 class ImowBaseEntity(CoordinatorEntity):
-    """Representation of a Sensor."""
+    """Base entity for a STIHL iMow mower property."""
+
+    _attr_has_entity_name = True
 
     def __init__(self, coordinator, device, idx, mower_state_property):
-        """Initialize the sensor."""
+        """Initialize the entity."""
         super().__init__(coordinator)
-        self.idx = idx
         self.key_device_infos = device
         self.property_name = mower_state_property
-        self.cleaned_property_name = mower_state_property.replace("_", " ")
+        self._attr_translation_key = to_translation_key(mower_state_property)
+        self._attr_unique_id = f"{device[ATTR_ID]}_{mower_state_property}"
+        icon = IMOW_SENSORS_MAP.get(mower_state_property, {}).get(ATTR_ICON)
+        if icon:
+            self._attr_icon = icon
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, str(device[ATTR_ID]))},
+            name=device[ATTR_NAME],
+            manufacturer=device[ATTR_MANUFACTURER],
+            model=device[ATTR_MODEL],
+            sw_version=device[ATTR_SW_VERSION],
+        )
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        # self._attr_is_on = self.get_value_from_mowerstate()
         self.async_write_ha_state()
 
     @property
     def mowerstate(self) -> MowerState:
-        """Return device object from coordinator."""
+        """Return the mower state from the coordinator."""
         return self.coordinator.data
 
-    @property
-    def state(self):
-        """Return the state of the sensor."""
-        return self.get_value_from_mowerstate()
-
     def get_value_from_mowerstate(self):
-        """Extract values based on property complexity."""
-        if "_" in self.property_name:  # Complex Entity
-            return getattr(self.mowerstate, self.property_name.split("_")[0])[
-                self.property_name.split("_")[1]
-            ]
+        """Return the value for this entity's property.
 
+        A property name containing ``_`` denotes a nested value
+        (e.g. ``status_chargeLevel`` -> ``status["chargeLevel"]``).
+        """
+        if "_" in self.property_name:
+            outer, inner = self.property_name.split("_", 1)
+            return getattr(self.mowerstate, outer)[inner]
         return getattr(self.mowerstate, self.property_name)
-
-    @property
-    def device_info(self):
-        """Provide info for device registration."""
-        return {
-            "identifiers": {
-                # Serial numbers are unique identifiers
-                # within a specific domain
-                (
-                    DOMAIN,
-                    self.key_device_infos[ATTR_ID],
-                ),
-            },
-            ATTR_NAME: self.key_device_infos[ATTR_NAME],
-            ATTR_MANUFACTURER: self.key_device_infos[ATTR_MANUFACTURER],
-            ATTR_MODEL: self.key_device_infos[ATTR_MODEL],
-            ATTR_SW_VERSION: self.key_device_infos[ATTR_SW_VERSION],
-        }
-
-    @property
-    def device_class(self):
-        """Return the class of this device, from component DEVICE_CLASSES."""
-        if self.property_name in IMOW_SENSORS_MAP:
-            if IMOW_SENSORS_MAP[self.property_name][ATTR_TYPE]:
-                return IMOW_SENSORS_MAP[self.property_name][ATTR_TYPE]
-
-    @property
-    def unit_of_measurement(self):
-        """Return the unit of measurement of this entity, if any."""
-        if self.property_name in IMOW_SENSORS_MAP:
-            if IMOW_SENSORS_MAP[self.property_name][ATTR_UOM]:
-                return IMOW_SENSORS_MAP[self.property_name][ATTR_UOM]
-
-    @property
-    def entity_picture(self):
-        """Return the entity picture to use in the frontend, if any."""
-        if (
-            self.property_name in IMOW_SENSORS_MAP
-            and IMOW_SENSORS_MAP[self.property_name][ATTR_PICTURE]
-        ):
-            if self.mowerstate.mowerImageThumbnailUrl:
-                return self.mowerstate.mowerImageThumbnailUrl
-
-    @property
-    def name(self):
-        """Return the name of the sensor."""
-        return (
-            f"{self.key_device_infos[ATTR_NAME]} {self.cleaned_property_name}"
-        )
-
-    @property
-    def unique_id(self):
-        """Return the unique ID of the sensor."""
-        return (
-            f"{self.key_device_infos[ATTR_ID]}_"
-            f"{self.idx}_"
-            f"{self.property_name}"
-        )
-
-    @property
-    def icon(self):
-        """Icon of the entity."""
-        if self.property_name in IMOW_SENSORS_MAP:
-            return IMOW_SENSORS_MAP[self.property_name][ATTR_ICON]

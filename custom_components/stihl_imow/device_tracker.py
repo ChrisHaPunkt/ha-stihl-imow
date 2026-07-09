@@ -6,7 +6,7 @@ from homeassistant import core
 from homeassistant.components.device_tracker import SourceType, TrackerEntity
 from imow.common.mowerstate import MowerState
 
-from .const import ATTR_NAME
+from .const import ATTR_ID
 from .coordinator import ImowConfigEntry
 from .entity import ImowBaseEntity
 
@@ -40,11 +40,16 @@ async def async_setup_entry(
 
 
 class ImowDeviceTrackerEntity(TrackerEntity, ImowBaseEntity):
-    """Represent a tracked device."""
+    """Represent a tracked mower (the device's main feature)."""
+
+    _attr_name = None
 
     def __init__(self, coordinator, device_info, idx, mower_state_property):
-        """Override the BaseEntity with DeviceTracker Sensor content."""
+        """Override the BaseEntity with DeviceTracker content."""
         super().__init__(coordinator, device_info, idx, mower_state_property)
+        # Main feature of the device: no own name, stable unique id.
+        self._attr_translation_key = None
+        self._attr_unique_id = f"{device_info[ATTR_ID]}_tracker"
 
     @property
     def source_type(self):
@@ -68,8 +73,3 @@ class ImowDeviceTrackerEntity(TrackerEntity, ImowBaseEntity):
             return None
 
         return gpsLong
-
-    @property
-    def name(self):
-        """Return the name of the device."""
-        return self.key_device_infos[ATTR_NAME]

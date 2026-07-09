@@ -1,0 +1,192 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Urządzenie jest już skonfigurowane",
+      "reauth_successful": "Ponowne uwierzytelnienie powiodło się",
+      "wrong_account": "Ponowne uwierzytelnienie musi używać tego samego konta STIHL i tej samej kosiarki."
+    },
+    "error": {
+      "cannot_connect": "Nie udało się połączyć",
+      "invalid_auth": "Nieprawidłowe uwierzytelnienie",
+      "unknown": "Nieoczekiwany błąd"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "email": "Adres e-mail",
+          "password": "Hasło",
+          "language": "Język komunikatów o stanie"
+        },
+        "description": "Wprowadź dane logowania do konta STIHL iMow.\n\n**Ta integracja obsługuje tylko kosiarki STIHL iMow do generacji 4.** Działa, jeśli Twoje dane logowania są ważne w app.imow.stihl.com. **Nie** działa z kosiarkami generacji 5, które używają myimow.stihl.com.",
+        "title": "STIHL iMow"
+      },
+      "reauth_confirm": {
+        "title": "Ponownie uwierzytelnij STIHL iMow",
+        "description": "Integracja STIHL iMow musi ponownie uwierzytelnić konto {email}.",
+        "data": {
+          "password": "Hasło"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "machine_error": {
+        "name": "Błąd maszyny"
+      },
+      "machine_state": {
+        "name": "Stan maszyny"
+      },
+      "circumference": {
+        "name": "Obwód"
+      },
+      "corridor_mode": {
+        "name": "Tryb korytarza"
+      },
+      "edge_mowing_mode": {
+        "name": "Tryb koszenia krawędzi"
+      },
+      "energy_mode": {
+        "name": "Tryb energii"
+      },
+      "last_weather_check": {
+        "name": "Ostatnie sprawdzenie pogody"
+      },
+      "led_status": {
+        "name": "Stan LED"
+      },
+      "mapping_intelligent_home_drive": {
+        "name": "Inteligentny powrót do bazy"
+      },
+      "protection_level": {
+        "name": "Poziom ochrony"
+      },
+      "rain_sensor_mode": {
+        "name": "Tryb czujnika deszczu"
+      },
+      "time_zone": {
+        "name": "Strefa czasowa"
+      },
+      "state_message_short": {
+        "name": "Komunikat o stanie"
+      },
+      "state_message_long": {
+        "name": "Szczegóły komunikatu o stanie"
+      },
+      "smart_logic_mowing_area_in_feet": {
+        "name": "Obszar koszenia (stopy)"
+      },
+      "smart_logic_mowing_area_in_meter": {
+        "name": "Obszar koszenia"
+      },
+      "smart_logic_mowing_growth_adjustment": {
+        "name": "Regulacja wzrostu"
+      },
+      "smart_logic_mowing_time": {
+        "name": "Czas koszenia"
+      },
+      "smart_logic_performed_activity_time": {
+        "name": "Wykonany czas aktywności"
+      },
+      "smart_logic_suggested_activity_time": {
+        "name": "Sugerowany czas aktywności"
+      },
+      "status_charge_level": {
+        "name": "Poziom naładowania"
+      },
+      "status_last_geo_position_date": {
+        "name": "Ostatnia pozycja GPS"
+      },
+      "status_last_seen_date": {
+        "name": "Ostatnio widziano"
+      },
+      "statistics_total_blade_operating_time": {
+        "name": "Całkowity czas pracy ostrza"
+      },
+      "statistics_total_distance_travelled": {
+        "name": "Całkowity przebyty dystans"
+      },
+      "statistics_total_operating_time": {
+        "name": "Całkowity czas pracy"
+      }
+    },
+    "binary_sensor": {
+      "asm_enabled": {
+        "name": "ASM włączony"
+      },
+      "demo_mode_enabled": {
+        "name": "Tryb demonstracyjny"
+      },
+      "teamable": {
+        "name": "Tryb zespołowy"
+      },
+      "state_message_error": {
+        "name": "Błąd"
+      },
+      "smart_logic_dynamic_mowingplan": {
+        "name": "Dynamiczny plan koszenia"
+      },
+      "smart_logic_mowing_time_manual": {
+        "name": "Ręczny czas koszenia"
+      },
+      "smart_logic_smart_notifications": {
+        "name": "Inteligentne powiadomienia"
+      },
+      "smart_logic_weather_forecast_enabled": {
+        "name": "Prognoza pogody"
+      },
+      "status_blade_service": {
+        "name": "Serwis ostrza"
+      },
+      "status_online": {
+        "name": "Online"
+      },
+      "status_rain_status": {
+        "name": "Wykryto deszcz"
+      }
+    },
+    "switch": {
+      "automatic_mode_enabled": {
+        "name": "Tryb automatyczny"
+      },
+      "child_lock": {
+        "name": "Blokada rodzicielska"
+      },
+      "gps_protection_enabled": {
+        "name": "Ochrona GPS"
+      }
+    }
+  },
+  "services": {
+    "intent": {
+      "name": "Wyślij akcję do kosiarki",
+      "description": "Wysyła polecenie akcji do kosiarki STIHL iMow.",
+      "fields": {
+        "mower_device": {
+          "name": "Kosiarka",
+          "description": "Kosiarka, do której zostanie wysłana akcja."
+        },
+        "action": {
+          "name": "Akcja",
+          "description": "Akcja, którą kosiarka ma wykonać."
+        },
+        "duration": {
+          "name": "Czas koszenia",
+          "description": "Czas koszenia w minutach. Używane tylko, gdy akcją jest 'Rozpocznij koszenie od punktu'."
+        },
+        "startpoint": {
+          "name": "Punkt startowy",
+          "description": "Punkt startowy zdefiniowany przez kosiarkę. Używane tylko, gdy akcją jest 'Rozpocznij koszenie od punktu' i kosiarka nie ma startować z bazy."
+        },
+        "starttime": {
+          "name": "Czas rozpoczęcia",
+          "description": "Czas, o którym kosiarka ma rozpocząć koszenie. Używane tylko, gdy akcją jest 'Rozpocznij koszenie'."
+        },
+        "endtime": {
+          "name": "Czas zakończenia",
+          "description": "Czas, o którym kosiarka ma zakończyć koszenie. Używane tylko, gdy akcją jest 'Rozpocznij koszenie'."
+        }
+      }
+    }
+  }
+}

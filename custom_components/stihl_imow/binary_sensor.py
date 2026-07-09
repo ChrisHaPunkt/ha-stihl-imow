@@ -4,7 +4,6 @@ import logging
 
 from homeassistant import core
 from homeassistant.components.binary_sensor import BinarySensorEntity
-from homeassistant.const import STATE_OFF, STATE_ON
 from imow.common.mowerstate import MowerState
 
 from . import extract_properties_by_type
@@ -31,7 +30,10 @@ async def async_setup_entry(
     entities, device = extract_properties_by_type(mower_state, bool)
 
     for entity in entities:
-        if not IMOW_SENSORS_MAP[entity][ATTR_SWITCH]:
+        if (
+            entity in IMOW_SENSORS_MAP
+            and not IMOW_SENSORS_MAP[entity][ATTR_SWITCH]
+        ):
             binary_sensor_entities[entity] = entities[entity]
     async_add_entities(
         ImowBinarySensorEntity(coordinator, device, idx, mower_state_property)
@@ -40,11 +42,9 @@ async def async_setup_entry(
 
 
 class ImowBinarySensorEntity(ImowBaseEntity, BinarySensorEntity):
-    """Representation of a Sensor."""
+    """Representation of a binary sensor."""
 
     @property
-    def state(self):
-        """Return the state of the sensor."""
-        return (
-            STATE_ON if bool(self.get_value_from_mowerstate()) else STATE_OFF
-        )
+    def is_on(self) -> bool:
+        """Return true if the binary sensor is on."""
+        return bool(self.get_value_from_mowerstate())

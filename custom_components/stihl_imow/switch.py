@@ -4,8 +4,7 @@ import logging
 
 from homeassistant import core
 from homeassistant.components.switch import SwitchEntity
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.helpers.update_coordinator import UpdateFailed
+from homeassistant.exceptions import HomeAssistantError
 from imow.common.mowerstate import MowerState
 
 from . import extract_properties_by_type
@@ -31,7 +30,10 @@ async def async_setup_entry(
     entities, device = extract_properties_by_type(mower_state, bool)
 
     for entity in entities:
-        if IMOW_SENSORS_MAP[entity][ATTR_SWITCH]:
+        if (
+            entity in IMOW_SENSORS_MAP
+            and IMOW_SENSORS_MAP[entity][ATTR_SWITCH]
+        ):
             switch_entities[entity] = entities[entity]
 
     async_add_entities(
@@ -41,7 +43,7 @@ async def async_setup_entry(
 
 
 class ImowSwitchSensorEntity(ImowBaseEntity, SwitchEntity):
-    """Representation of a Sensor."""
+    """Representation of a switch."""
 
     def __init__(self, coordinator, device_info, idx, mower_state_property):
         """Override the BaseEntity with Switch Entity content."""
@@ -53,25 +55,17 @@ class ImowSwitchSensorEntity(ImowBaseEntity, SwitchEntity):
         """Return true if the switch is on."""
         return bool(self.get_value_from_mowerstate())
 
-    @property
-    def state(self):
-        """Return the state of the sensor."""
-        return (
-            STATE_ON if bool(self.get_value_from_mowerstate()) else STATE_OFF
-        )
-
     async def async_turn_on(self, **kwargs):
         """Turn the entity on."""
         try:
             await self.api.update_setting(
-                self.key_device_infos["id"], self.property_name, True
+                self.key_device_infos[ATTR_ID], self.property_name, True
             )
-            self._attr_is_on = True
-            self._attr_state = STATE_ON
-            await self.coordinator.async_request_refresh()
-
         except Exception as err:
-            raise UpdateFailed(f"Error communicating with API: {err}")
+            raise HomeAssistantError(
+                f"Error communicating with API: {err}"
+            ) from err
+        await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs):
         """Turn the entity off."""
@@ -79,9 +73,8 @@ class ImowSwitchSensorEntity(ImowBaseEntity, SwitchEntity):
             await self.api.update_setting(
                 self.key_device_infos[ATTR_ID], self.property_name, False
             )
-
-            self._attr_is_on = False
-            self._attr_state = STATE_OFF
-            await self.coordinator.async_request_refresh()
         except Exception as err:
-            raise UpdateFailed(f"Error communicating with API: {err}")
+            raise HomeAssistantError(
+                f"Error communicating with API: {err}"
+            ) from err
+        await self.coordinator.async_request_refresh()

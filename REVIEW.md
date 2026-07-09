@@ -176,6 +176,44 @@ config flow (reauth, unique IDs), entity naming, integration quality scale.
 
 ---
 
+## Multiple mowers per account
+
+### S. Support more than one mower on a STIHL account — MEDIUM
+- **Where:** `config_flow.validate_input` and `__init__.async_setup_entry` only
+  ever use `mowers[0]`; the config entry, coordinator, and device are all built
+  around a single mower id. A STIHL account with two or more mowers exposes only
+  the first; the rest are silently dropped (see the wrapper `receive_mowers()`
+  returning a list).
+- **Impact:** users with multiple mowers can't see all of them; the single
+  `unique_id = mower_id` also means a second account-level entry can't be added
+  cleanly.
+- **Options (pick one):**
+  1. **One config entry per mower.** The `user` step lists the account's mowers
+     and either creates an entry per selected mower or auto-creates one entry per
+     mower. `unique_id = mower_id` per entry (already the case). Simple, but each
+     entry re-authenticates/holds its own session and token.
+  2. **One config entry per account + config subentries per mower.** The entry
+     stores the account credentials/token; each mower is a subentry with its own
+     coordinator and device. Matches HA's "hub with sub-devices" model and shares
+     one authenticated session/token across mowers. `unique_id` = account
+     (lowercased email); subentry `unique_id` = mower id.
+  3. **One config entry per account, multiple devices.** Single coordinator
+     fetches all mowers (`receive_mowers()`), entities are created per mower and
+     registered to per-mower devices via `DeviceInfo`. One session/token, one poll
+     cycle. Simplest data flow; no subentry UI.
+- **Recommendation:** option 3 (single account entry, one coordinator returning a
+  list keyed by mower id, entities/devices per mower). It shares auth, keeps a
+  single poll, and avoids duplicate logins — which best fits the
+  cookie-isolation/token-reuse design. Requires: coordinator returns
+  `dict[mower_id, MowerState]`; entities take a `mower_id`; `unique_id` becomes
+  `{account}_{mower_id}_{property}`; `unique_id` of the entry becomes the account.
+  This is a **breaking** data-model change (entry `unique_id` + entity ids), so it
+  pairs naturally with the 2.0.0 major bump and the entity-naming change (M).
+- **Interaction with M:** best sequenced **with or right after M**, since both
+  touch `entity.py`/platform entity construction and `unique_id`.
+
+---
+
 ## Quality-scale snapshot
 
 | Tier | Status | Blockers |
