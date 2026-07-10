@@ -1,9 +1,7 @@
 # Version 2.0.0
 
-## Breaking changes
-- The integration is now organised **per STIHL account** instead of per mower. Existing setups migrate automatically on update — your mower's entities and history are preserved, no re-adding needed.
-- The integration is now keyed to your STIHL **account id**, so changing your account e-mail address no longer breaks the integration.
-- Requires `imow-webapi` 0.11.0 (installed automatically).
+> Updates automatically. Existing setups migrate on update — your mowers'
+> entities and history are preserved, so there's nothing to re-add.
 
 ## New
 - **Multiple mowers per account** are now fully supported. Every mower on your STIHL account shows up as its own device; previously only the first mower was added.
@@ -16,6 +14,7 @@
 
 ## Improved
 - **Much more stable login.** STIHL session cookies are isolated and tokens are reused across restarts, eliminating the recurring login failures that previously required a Home Assistant restart.
+- The integration is now keyed to your STIHL **account id**, so changing your account e-mail address no longer breaks it.
 - Entity names and icons now use Home Assistant's translation system, so they follow your selected language and theme.
 - The account is polled every 30 seconds.
 - **Entities are now organised by category.** Read-only status readouts appear under the device's **Diagnostic** section and the settings toggles under **Configuration**; the main sensors (machine state, charge level, status message) and the mower tracker stay at the top.
