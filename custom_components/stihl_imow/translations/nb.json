@@ -1,0 +1,219 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Enheten er allerede konfigurert",
+      "reauth_successful": "Ny autentisering var vellykket",
+      "wrong_account": "Ny autentisering må bruke samme STIHL-konto.",
+      "reconfigure_successful": "Rekonfigurasjonen var vellykket"
+    },
+    "error": {
+      "cannot_connect": "Kunne ikke koble til",
+      "invalid_auth": "Ugyldig autentisering",
+      "unknown": "Uventet feil"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "email": "E-postadresse",
+          "password": "Passord",
+          "language": "Språk for statusmeldinger"
+        },
+        "description": "Skriv inn påloggingsinformasjonen for STIHL iMow-kontoen din.\n\n**Denne integrasjonen støtter bare STIHL iMow-gressklippere opp til generasjon 4.** Den fungerer hvis påloggingsinformasjonen din er gyldig på app.imow.stihl.com. Den fungerer **ikke** med gressklippere av generasjon 5 som bruker myimow.stihl.com.",
+        "title": "STIHL iMow"
+      },
+      "reauth_confirm": {
+        "title": "Autentiser STIHL iMow på nytt",
+        "description": "STIHL iMow-integrasjonen må autentisere kontoen {email} på nytt.",
+        "data": {
+          "password": "Passord"
+        }
+      },
+      "reconfigure": {
+        "title": "Konfigurer STIHL iMow på nytt",
+        "description": "Oppdater påloggingsinformasjonen for STIHL iMow-kontoen din.",
+        "data": {
+          "email": "E-postadresse",
+          "password": "Passord",
+          "language": "Språk for statusmeldinger"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "machine_error": {
+        "name": "Maskinfeil"
+      },
+      "machine_state": {
+        "name": "Maskinstatus"
+      },
+      "circumference": {
+        "name": "Omkrets"
+      },
+      "corridor_mode": {
+        "name": "Korridormodus"
+      },
+      "edge_mowing_mode": {
+        "name": "Kantklippemodus"
+      },
+      "energy_mode": {
+        "name": "Energimodus"
+      },
+      "last_weather_check": {
+        "name": "Siste værsjekk"
+      },
+      "led_status": {
+        "name": "LED-status"
+      },
+      "mapping_intelligent_home_drive": {
+        "name": "Intelligent hjemkjøring"
+      },
+      "protection_level": {
+        "name": "Beskyttelsesnivå"
+      },
+      "rain_sensor_mode": {
+        "name": "Regnsensormodus"
+      },
+      "time_zone": {
+        "name": "Tidssone"
+      },
+      "state_message_short": {
+        "name": "Statusmelding"
+      },
+      "state_message_long": {
+        "name": "Statusmelding detaljer"
+      },
+      "smart_logic_mowing_area_in_feet": {
+        "name": "Klippeområde (feet)"
+      },
+      "smart_logic_mowing_area_in_meter": {
+        "name": "Klippeområde"
+      },
+      "smart_logic_mowing_growth_adjustment": {
+        "name": "Vekstjustering"
+      },
+      "smart_logic_mowing_time": {
+        "name": "Klippetid"
+      },
+      "smart_logic_performed_activity_time": {
+        "name": "Utført aktivitetstid"
+      },
+      "smart_logic_suggested_activity_time": {
+        "name": "Foreslått aktivitetstid"
+      },
+      "status_charge_level": {
+        "name": "Ladenivå"
+      },
+      "status_last_geo_position_date": {
+        "name": "Siste GPS-posisjon"
+      },
+      "status_last_seen_date": {
+        "name": "Sist sett"
+      },
+      "statistics_total_blade_operating_time": {
+        "name": "Total knivdriftstid"
+      },
+      "statistics_total_distance_travelled": {
+        "name": "Total tilbakelagt distanse"
+      },
+      "statistics_total_operating_time": {
+        "name": "Total driftstid"
+      }
+    },
+    "binary_sensor": {
+      "asm_enabled": {
+        "name": "ASM aktivert"
+      },
+      "demo_mode_enabled": {
+        "name": "Demomodus"
+      },
+      "teamable": {
+        "name": "Teamkompatibel"
+      },
+      "state_message_error": {
+        "name": "Feil"
+      },
+      "smart_logic_dynamic_mowingplan": {
+        "name": "Dynamisk klippeplan"
+      },
+      "smart_logic_mowing_time_manual": {
+        "name": "Manuell klippetid"
+      },
+      "smart_logic_smart_notifications": {
+        "name": "Smarte varsler"
+      },
+      "smart_logic_weather_forecast_enabled": {
+        "name": "Værmelding"
+      },
+      "status_blade_service": {
+        "name": "Knivservice"
+      },
+      "status_online": {
+        "name": "Online"
+      },
+      "status_rain_status": {
+        "name": "Regn oppdaget"
+      }
+    },
+    "switch": {
+      "automatic_mode_enabled": {
+        "name": "Automatisk modus"
+      },
+      "child_lock": {
+        "name": "Barnesikring"
+      },
+      "gps_protection_enabled": {
+        "name": "GPS-beskyttelse"
+      }
+    }
+  },
+  "services": {
+    "intent": {
+      "name": "Send klipperhandling",
+      "description": "Sender en handlingskommando til en STIHL iMow-gressklipper.",
+      "fields": {
+        "mower_device": {
+          "name": "Gressklipper",
+          "description": "Gressklipperen handlingen skal sendes til."
+        },
+        "action": {
+          "name": "Handling",
+          "description": "Handlingen gressklipperen skal utføre."
+        },
+        "duration": {
+          "name": "Klippetid",
+          "description": "Klippetid i minutter. Brukes bare når handlingen er 'Start klipping fra punkt'."
+        },
+        "startpoint": {
+          "name": "Startpunkt",
+          "description": "Startpunkt definert av gressklipperen. Brukes bare når handlingen er 'Start klipping fra punkt' og gressklipperen ikke skal starte fra dokkingstasjonen."
+        },
+        "starttime": {
+          "name": "Starttid",
+          "description": "Tidspunkt når gressklipperen skal begynne å klippe. Brukes bare når handlingen er 'Start klipping'."
+        },
+        "endtime": {
+          "name": "Sluttid",
+          "description": "Tidspunkt når gressklipperen skal slutte å klippe. Brukes bare når handlingen er 'Start klipping'."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "update_setting_failed": {
+      "message": "Kunne ikke oppdatere gressklipperinnstillingen: {error}"
+    },
+    "entry_not_loaded": {
+      "message": "STIHL iMow er ikke konfigurert."
+    },
+    "no_mower_specified": {
+      "message": "Ingen gressklipper ble angitt for handlingen."
+    },
+    "mower_action_failed": {
+      "message": "Gressklipperhandlingen mislyktes: {error}"
+    },
+    "invalid_action_value": {
+      "message": "Ugyldig handlingsverdi: {error}"
+    }
+  }
+}

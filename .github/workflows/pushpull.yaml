@@ -13,7 +13,7 @@ jobs:
     name: HACS Action
     runs-on: "ubuntu-latest"
     steps:
-      - uses: "actions/checkout@v4"
+      - uses: "actions/checkout@v5"
       - name: HACS Action
         uses: "hacs/action@main"
         with:
@@ -23,7 +23,7 @@ jobs:
     runs-on: "ubuntu-latest"
     name: Validate
     steps:
-      - uses: "actions/checkout@v4"
+      - uses: "actions/checkout@v5"
       - name: Hassfest validation
         uses: "home-assistant/actions/hassfest@master"
 
@@ -31,8 +31,8 @@ jobs:
     runs-on: "ubuntu-latest"
     name: Check style formatting
     steps:
-      - uses: "actions/checkout@v4"
-      - uses: "actions/setup-python@v5"
+      - uses: "actions/checkout@v5"
+      - uses: "actions/setup-python@v6"
         with:
           python-version: "3.x"
       - run: python3 -m pip install black
@@ -49,3 +49,20 @@ jobs:
 
 
       - run: if git ls-files | xargs file | grep CRLF; then exit 1; fi
+
+  tests:
+    runs-on: "ubuntu-latest"
+    name: Tests
+    steps:
+      - uses: "actions/checkout@v5"
+      - name: Install uv
+        uses: "astral-sh/setup-uv@v6"
+        with:
+          enable-cache: true
+      - name: Install dependencies and run tests
+        run: |
+          uv python install 3.14
+          uv venv --python 3.14
+          source .venv/bin/activate
+          uv pip install -r requirements_test.txt imow-webapi
+          pytest tests/ -v

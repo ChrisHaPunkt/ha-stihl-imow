@@ -1,47 +1,51 @@
 """Platform for sensor integration."""
+
 import logging
 
-from homeassistant import config_entries, core
+from homeassistant import core
 from homeassistant.components.binary_sensor import BinarySensorEntity
-from homeassistant.const import STATE_OFF, STATE_ON
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from imow.common.mowerstate import MowerState
 
 from . import extract_properties_by_type
-from .const import ATTR_COORDINATOR, ATTR_SWITCH, DOMAIN
-from .entity import ImowBaseEntity
+from .const import ATTR_SWITCH
+from .coordinator import ImowConfigEntry
+from .entity import ImowBaseEntity, add_mower_entities
 from .maps import IMOW_SENSORS_MAP
 
 _LOGGER = logging.getLogger(__name__)
 
+PARALLEL_UPDATES = 0
+
 
 async def async_setup_entry(
     hass: core.HomeAssistant,
-    config_entry: config_entries.ConfigEntry,
-    async_add_entities,
-):
+    config_entry: ImowConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+) -> None:
     """Add sensors for passed config_entry in HA."""
-    config = hass.data[DOMAIN][config_entry.entry_id]
-    coordinator = hass.data[DOMAIN][config_entry.entry_id][ATTR_COORDINATOR]
+    coordinator = config_entry.runtime_data
 
-    mower_state: MowerState = config[ATTR_COORDINATOR].data
-    binary_sensor_entities = {}
-    entities, device = extract_properties_by_type(mower_state, bool)
+    def _build(
+        mower_id: str, mower_state: MowerState
+    ) -> list["ImowBinarySensorEntity"]:
+        properties, device = extract_properties_by_type(mower_state, bool)
+        return [
+            ImowBinarySensorEntity(coordinator, mower_id, device, prop)
+            for prop in properties
+            if prop in IMOW_SENSORS_MAP
+            and not IMOW_SENSORS_MAP[prop][ATTR_SWITCH]
+        ]
 
-    for entity in entities:
-        if not IMOW_SENSORS_MAP[entity][ATTR_SWITCH]:
-            binary_sensor_entities[entity] = entities[entity]
-    async_add_entities(
-        ImowBinarySensorEntity(coordinator, device, idx, mower_state_property)
-        for idx, mower_state_property in enumerate(binary_sensor_entities)
+    config_entry.async_on_unload(
+        add_mower_entities(coordinator, async_add_entities, _build)
     )
 
 
 class ImowBinarySensorEntity(ImowBaseEntity, BinarySensorEntity):
-    """Representation of a Sensor."""
+    """Representation of a binary sensor."""
 
     @property
-    def state(self):
-        """Return the state of the sensor."""
-        return (
-            STATE_ON if bool(self.get_value_from_mowerstate()) else STATE_OFF
-        )
+    def is_on(self) -> bool:
+        """Return true if the binary sensor is on."""
+        return bool(self.get_value_from_mowerstate())

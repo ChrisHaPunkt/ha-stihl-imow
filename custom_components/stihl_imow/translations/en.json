@@ -1,7 +1,10 @@
 {
   "config": {
     "abort": {
-      "already_configured": "Device is already configured"
+      "already_configured": "Device is already configured",
+      "reauth_successful": "Re-authentication was successful",
+      "wrong_account": "Re-authentication must use the same STIHL account.",
+      "reconfigure_successful": "Reconfiguration was successful"
     },
     "error": {
       "cannot_connect": "Failed to connect",
@@ -11,20 +14,239 @@
     "step": {
       "user": {
         "data": {
+          "email": "E-mail address",
           "password": "Password",
-          "email": "E-Mail"
+          "language": "Language for state messages"
         },
-        "description": "Login credentials.",
-        "title": "STIHL iMow Upstream Authentication"
+        "description": "Enter your STIHL iMow account credentials.\n\n**This integration only supports STIHL iMow mowers up to Generation 4.** It works if your credentials are valid at app.imow.stihl.com. It does **not** work with Generation 5 mowers that use myimow.stihl.com.",
+        "title": "STIHL iMow"
       },
-      "advanced": {
+      "reauth_confirm": {
+        "title": "Re-authenticate STIHL iMow",
+        "description": "The STIHL iMow integration needs to re-authenticate the account {email}.",
         "data": {
-          "language": "Language for messages (short, long)",
-          "polling_interval": "Polling Interval in Seconds"
-        },
-        "description": "The state messages (short, long) will be displayed in the selected language. \n\n Choose, how often HA will fetch the latest data from upstream server in seconds. A suggested value is 30s.",
-        "title": "Advanced"
+          "password": "Password"
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigure STIHL iMow",
+        "description": "Update your STIHL iMow account credentials.",
+        "data": {
+          "email": "E-mail address",
+          "password": "Password",
+          "language": "Language for state messages"
+        }
       }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "machine_error": {
+        "name": "Machine error"
+      },
+      "machine_state": {
+        "name": "Machine state"
+      },
+      "circumference": {
+        "name": "Circumference"
+      },
+      "corridor_mode": {
+        "name": "Corridor mode"
+      },
+      "edge_mowing_mode": {
+        "name": "Edge mowing mode"
+      },
+      "energy_mode": {
+        "name": "Energy mode"
+      },
+      "last_weather_check": {
+        "name": "Last weather check"
+      },
+      "led_status": {
+        "name": "LED status"
+      },
+      "mapping_intelligent_home_drive": {
+        "name": "Intelligent home drive"
+      },
+      "protection_level": {
+        "name": "Protection level"
+      },
+      "rain_sensor_mode": {
+        "name": "Rain sensor mode"
+      },
+      "time_zone": {
+        "name": "Time zone"
+      },
+      "state_message_short": {
+        "name": "Status message"
+      },
+      "state_message_long": {
+        "name": "Status message details"
+      },
+      "smart_logic_mowing_area_in_feet": {
+        "name": "Mowing area (feet)"
+      },
+      "smart_logic_mowing_area_in_meter": {
+        "name": "Mowing area"
+      },
+      "smart_logic_mowing_growth_adjustment": {
+        "name": "Growth adjustment"
+      },
+      "smart_logic_mowing_time": {
+        "name": "Mowing time"
+      },
+      "smart_logic_performed_activity_time": {
+        "name": "Performed activity time"
+      },
+      "smart_logic_suggested_activity_time": {
+        "name": "Suggested activity time"
+      },
+      "status_charge_level": {
+        "name": "Charge level"
+      },
+      "status_last_geo_position_date": {
+        "name": "Last GPS position"
+      },
+      "status_last_seen_date": {
+        "name": "Last seen"
+      },
+      "statistics_total_blade_operating_time": {
+        "name": "Total blade operating time"
+      },
+      "statistics_total_distance_travelled": {
+        "name": "Total distance travelled"
+      },
+      "statistics_total_operating_time": {
+        "name": "Total operating time"
+      },
+      "coordinate_latitude": {
+        "name": "Latitude"
+      },
+      "coordinate_longitude": {
+        "name": "Longitude"
+      },
+      "mower_image_url": {
+        "name": "Mower image URL"
+      },
+      "mower_image_thumbnail_url": {
+        "name": "Mower image thumbnail URL"
+      },
+      "name": {
+        "name": "Name"
+      },
+      "device_type_description": {
+        "name": "Device type"
+      },
+      "version": {
+        "name": "Version"
+      },
+      "firmware_version": {
+        "name": "Firmware version"
+      },
+      "software_packet": {
+        "name": "Software packet"
+      },
+      "smart_logic_software_packet": {
+        "name": "Smart software packet"
+      },
+      "team": {
+        "name": "Team"
+      }
+    },
+    "binary_sensor": {
+      "asm_enabled": {
+        "name": "ASM enabled"
+      },
+      "demo_mode_enabled": {
+        "name": "Demo mode"
+      },
+      "teamable": {
+        "name": "Teamable"
+      },
+      "state_message_error": {
+        "name": "Error"
+      },
+      "smart_logic_dynamic_mowingplan": {
+        "name": "Dynamic mowing plan"
+      },
+      "smart_logic_mowing_time_manual": {
+        "name": "Manual mowing time"
+      },
+      "smart_logic_smart_notifications": {
+        "name": "Smart notifications"
+      },
+      "smart_logic_weather_forecast_enabled": {
+        "name": "Weather forecast"
+      },
+      "status_blade_service": {
+        "name": "Blade service"
+      },
+      "status_online": {
+        "name": "Online"
+      },
+      "status_rain_status": {
+        "name": "Rain detected"
+      }
+    },
+    "switch": {
+      "automatic_mode_enabled": {
+        "name": "Automatic mode"
+      },
+      "child_lock": {
+        "name": "Child lock"
+      },
+      "gps_protection_enabled": {
+        "name": "GPS protection"
+      }
+    }
+  },
+  "services": {
+    "intent": {
+      "name": "Send mower action",
+      "description": "Sends an action command to a STIHL iMow mower.",
+      "fields": {
+        "mower_device": {
+          "name": "Mower",
+          "description": "The mower to send the action to."
+        },
+        "action": {
+          "name": "Action",
+          "description": "The action the mower should perform."
+        },
+        "duration": {
+          "name": "Mowing duration",
+          "description": "Mowing duration in minutes. Only used when the action is 'Start mowing from point'."
+        },
+        "startpoint": {
+          "name": "Starting point",
+          "description": "Mower-defined starting point. Only used when the action is 'Start mowing from point' and the mower should not start from the dock."
+        },
+        "starttime": {
+          "name": "Start time",
+          "description": "Time when the mower should start mowing. Only used when the action is 'Start mowing'."
+        },
+        "endtime": {
+          "name": "End time",
+          "description": "Time when the mower should stop mowing. Only used when the action is 'Start mowing'."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "update_setting_failed": {
+      "message": "Failed to update the mower setting: {error}"
+    },
+    "entry_not_loaded": {
+      "message": "STIHL iMow is not set up."
+    },
+    "no_mower_specified": {
+      "message": "No mower was specified for the action."
+    },
+    "mower_action_failed": {
+      "message": "The mower action failed: {error}"
+    },
+    "invalid_action_value": {
+      "message": "Invalid action value: {error}"
     }
   }
 }

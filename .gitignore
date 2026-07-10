@@ -1,3 +1,6 @@
 .idea
 venv
+.venv*
+.pytest_cache
+dist
 *__pycache__*

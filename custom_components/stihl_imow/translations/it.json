@@ -1,0 +1,219 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Il dispositivo è già configurato",
+      "reauth_successful": "Nuova autenticazione riuscita",
+      "wrong_account": "La nuova autenticazione deve usare lo stesso account STIHL.",
+      "reconfigure_successful": "Riconfigurazione riuscita"
+    },
+    "error": {
+      "cannot_connect": "Impossibile connettersi",
+      "invalid_auth": "Autenticazione non valida",
+      "unknown": "Errore imprevisto"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "email": "Indirizzo e-mail",
+          "password": "Password",
+          "language": "Lingua dei messaggi di stato"
+        },
+        "description": "Inserisci le credenziali del tuo account STIHL iMow.\n\n**Questa integrazione supporta solo i robot rasaerba STIHL iMow fino alla generazione 4.** Funziona se le tue credenziali sono valide su app.imow.stihl.com. **Non** funziona con i robot di generazione 5 che usano myimow.stihl.com.",
+        "title": "STIHL iMow"
+      },
+      "reauth_confirm": {
+        "title": "Autentica di nuovo STIHL iMow",
+        "description": "L'integrazione STIHL iMow deve autenticare di nuovo l'account {email}.",
+        "data": {
+          "password": "Password"
+        }
+      },
+      "reconfigure": {
+        "title": "Riconfigura STIHL iMow",
+        "description": "Aggiorna le credenziali del tuo account STIHL iMow.",
+        "data": {
+          "email": "Indirizzo e-mail",
+          "password": "Password",
+          "language": "Lingua dei messaggi di stato"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "machine_error": {
+        "name": "Errore macchina"
+      },
+      "machine_state": {
+        "name": "Stato macchina"
+      },
+      "circumference": {
+        "name": "Circonferenza"
+      },
+      "corridor_mode": {
+        "name": "Modalità corridoio"
+      },
+      "edge_mowing_mode": {
+        "name": "Modalità taglio bordi"
+      },
+      "energy_mode": {
+        "name": "Modalità energia"
+      },
+      "last_weather_check": {
+        "name": "Ultimo controllo meteo"
+      },
+      "led_status": {
+        "name": "Stato LED"
+      },
+      "mapping_intelligent_home_drive": {
+        "name": "Ritorno intelligente alla base"
+      },
+      "protection_level": {
+        "name": "Livello di protezione"
+      },
+      "rain_sensor_mode": {
+        "name": "Modalità sensore pioggia"
+      },
+      "time_zone": {
+        "name": "Fuso orario"
+      },
+      "state_message_short": {
+        "name": "Messaggio di stato"
+      },
+      "state_message_long": {
+        "name": "Dettagli messaggio di stato"
+      },
+      "smart_logic_mowing_area_in_feet": {
+        "name": "Area di taglio (feet)"
+      },
+      "smart_logic_mowing_area_in_meter": {
+        "name": "Area di taglio"
+      },
+      "smart_logic_mowing_growth_adjustment": {
+        "name": "Regolazione crescita"
+      },
+      "smart_logic_mowing_time": {
+        "name": "Tempo di taglio"
+      },
+      "smart_logic_performed_activity_time": {
+        "name": "Tempo di attività svolto"
+      },
+      "smart_logic_suggested_activity_time": {
+        "name": "Tempo di attività suggerito"
+      },
+      "status_charge_level": {
+        "name": "Livello di carica"
+      },
+      "status_last_geo_position_date": {
+        "name": "Ultima posizione GPS"
+      },
+      "status_last_seen_date": {
+        "name": "Ultimo avvistamento"
+      },
+      "statistics_total_blade_operating_time": {
+        "name": "Tempo totale di funzionamento delle lame"
+      },
+      "statistics_total_distance_travelled": {
+        "name": "Distanza totale percorsa"
+      },
+      "statistics_total_operating_time": {
+        "name": "Tempo totale di funzionamento"
+      }
+    },
+    "binary_sensor": {
+      "asm_enabled": {
+        "name": "ASM attivato"
+      },
+      "demo_mode_enabled": {
+        "name": "Modalità demo"
+      },
+      "teamable": {
+        "name": "Compatibile team"
+      },
+      "state_message_error": {
+        "name": "Errore"
+      },
+      "smart_logic_dynamic_mowingplan": {
+        "name": "Piano di taglio dinamico"
+      },
+      "smart_logic_mowing_time_manual": {
+        "name": "Tempo di taglio manuale"
+      },
+      "smart_logic_smart_notifications": {
+        "name": "Notifiche intelligenti"
+      },
+      "smart_logic_weather_forecast_enabled": {
+        "name": "Previsioni meteo"
+      },
+      "status_blade_service": {
+        "name": "Manutenzione lame"
+      },
+      "status_online": {
+        "name": "Online"
+      },
+      "status_rain_status": {
+        "name": "Pioggia rilevata"
+      }
+    },
+    "switch": {
+      "automatic_mode_enabled": {
+        "name": "Modalità automatica"
+      },
+      "child_lock": {
+        "name": "Blocco bambini"
+      },
+      "gps_protection_enabled": {
+        "name": "Protezione GPS"
+      }
+    }
+  },
+  "services": {
+    "intent": {
+      "name": "Invia azione al rasaerba",
+      "description": "Invia un comando di azione a un robot rasaerba STIHL iMow.",
+      "fields": {
+        "mower_device": {
+          "name": "Rasaerba",
+          "description": "Il rasaerba a cui inviare l'azione."
+        },
+        "action": {
+          "name": "Azione",
+          "description": "L'azione che il rasaerba deve eseguire."
+        },
+        "duration": {
+          "name": "Durata di taglio",
+          "description": "Durata di taglio in minuti. Usata solo quando l'azione è 'Avvia taglio da un punto'."
+        },
+        "startpoint": {
+          "name": "Punto di partenza",
+          "description": "Punto di partenza definito dal rasaerba. Usato solo quando l'azione è 'Avvia taglio da un punto' e il rasaerba non deve partire dalla base."
+        },
+        "starttime": {
+          "name": "Ora di inizio",
+          "description": "Ora in cui il rasaerba deve iniziare a tagliare. Usata solo quando l'azione è 'Avvia taglio'."
+        },
+        "endtime": {
+          "name": "Ora di fine",
+          "description": "Ora in cui il rasaerba deve smettere di tagliare. Usata solo quando l'azione è 'Avvia taglio'."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "update_setting_failed": {
+      "message": "Aggiornamento dell'impostazione del rasaerba non riuscito: {error}"
+    },
+    "entry_not_loaded": {
+      "message": "STIHL iMow non è configurato."
+    },
+    "no_mower_specified": {
+      "message": "Nessun rasaerba specificato per l'azione."
+    },
+    "mower_action_failed": {
+      "message": "L'azione del rasaerba non è riuscita: {error}"
+    },
+    "invalid_action_value": {
+      "message": "Valore azione non valido: {error}"
+    }
+  }
+}

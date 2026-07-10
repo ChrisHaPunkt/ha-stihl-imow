@@ -1,0 +1,219 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Gerät ist bereits konfiguriert",
+      "reauth_successful": "Erneute Authentifizierung war erfolgreich",
+      "wrong_account": "Die erneute Authentifizierung muss dasselbe STIHL-Konto verwenden.",
+      "reconfigure_successful": "Neukonfiguration war erfolgreich"
+    },
+    "error": {
+      "cannot_connect": "Verbindung fehlgeschlagen",
+      "invalid_auth": "Ungültige Authentifizierung",
+      "unknown": "Unerwarteter Fehler"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "email": "E-Mail-Adresse",
+          "password": "Passwort",
+          "language": "Sprache für Statusmeldungen"
+        },
+        "description": "Gib deine STIHL iMow-Kontodaten ein.\n\n**Diese Integration unterstützt nur STIHL iMow-Mäher bis Generation 4.** Sie funktioniert, wenn deine Zugangsdaten unter app.imow.stihl.com gültig sind. Sie funktioniert **nicht** mit Mähern der Generation 5, die myimow.stihl.com verwenden.",
+        "title": "STIHL iMow"
+      },
+      "reauth_confirm": {
+        "title": "STIHL iMow erneut authentifizieren",
+        "description": "Die STIHL iMow-Integration muss das Konto {email} erneut authentifizieren.",
+        "data": {
+          "password": "Passwort"
+        }
+      },
+      "reconfigure": {
+        "title": "STIHL iMow neu konfigurieren",
+        "description": "Aktualisiere deine STIHL iMow-Kontodaten.",
+        "data": {
+          "email": "E-Mail-Adresse",
+          "password": "Passwort",
+          "language": "Sprache für Statusmeldungen"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "machine_error": {
+        "name": "Maschinenfehler"
+      },
+      "machine_state": {
+        "name": "Maschinenstatus"
+      },
+      "circumference": {
+        "name": "Umfang"
+      },
+      "corridor_mode": {
+        "name": "Korridormodus"
+      },
+      "edge_mowing_mode": {
+        "name": "Kantenmähmodus"
+      },
+      "energy_mode": {
+        "name": "Energiemodus"
+      },
+      "last_weather_check": {
+        "name": "Letzte Wetterprüfung"
+      },
+      "led_status": {
+        "name": "LED-Status"
+      },
+      "mapping_intelligent_home_drive": {
+        "name": "Intelligente Heimfahrt"
+      },
+      "protection_level": {
+        "name": "Schutzstufe"
+      },
+      "rain_sensor_mode": {
+        "name": "Regensensormodus"
+      },
+      "time_zone": {
+        "name": "Zeitzone"
+      },
+      "state_message_short": {
+        "name": "Statusmeldung"
+      },
+      "state_message_long": {
+        "name": "Statusmeldung – Details"
+      },
+      "smart_logic_mowing_area_in_feet": {
+        "name": "Mähfläche (feet)"
+      },
+      "smart_logic_mowing_area_in_meter": {
+        "name": "Mähfläche"
+      },
+      "smart_logic_mowing_growth_adjustment": {
+        "name": "Wachstumsanpassung"
+      },
+      "smart_logic_mowing_time": {
+        "name": "Mähzeit"
+      },
+      "smart_logic_performed_activity_time": {
+        "name": "Durchgeführte Aktivitätszeit"
+      },
+      "smart_logic_suggested_activity_time": {
+        "name": "Vorgeschlagene Aktivitätszeit"
+      },
+      "status_charge_level": {
+        "name": "Ladestand"
+      },
+      "status_last_geo_position_date": {
+        "name": "Letzte GPS-Position"
+      },
+      "status_last_seen_date": {
+        "name": "Zuletzt gesehen"
+      },
+      "statistics_total_blade_operating_time": {
+        "name": "Gesamte Messerbetriebszeit"
+      },
+      "statistics_total_distance_travelled": {
+        "name": "Gesamte zurückgelegte Strecke"
+      },
+      "statistics_total_operating_time": {
+        "name": "Gesamte Betriebszeit"
+      }
+    },
+    "binary_sensor": {
+      "asm_enabled": {
+        "name": "ASM aktiviert"
+      },
+      "demo_mode_enabled": {
+        "name": "Demomodus"
+      },
+      "teamable": {
+        "name": "Teamfähig"
+      },
+      "state_message_error": {
+        "name": "Fehler"
+      },
+      "smart_logic_dynamic_mowingplan": {
+        "name": "Dynamischer Mähplan"
+      },
+      "smart_logic_mowing_time_manual": {
+        "name": "Manuelle Mähzeit"
+      },
+      "smart_logic_smart_notifications": {
+        "name": "Intelligente Benachrichtigungen"
+      },
+      "smart_logic_weather_forecast_enabled": {
+        "name": "Wettervorhersage"
+      },
+      "status_blade_service": {
+        "name": "Messerwartung"
+      },
+      "status_online": {
+        "name": "Online"
+      },
+      "status_rain_status": {
+        "name": "Regen erkannt"
+      }
+    },
+    "switch": {
+      "automatic_mode_enabled": {
+        "name": "Automatikmodus"
+      },
+      "child_lock": {
+        "name": "Kindersicherung"
+      },
+      "gps_protection_enabled": {
+        "name": "GPS-Schutz"
+      }
+    }
+  },
+  "services": {
+    "intent": {
+      "name": "Mäher-Aktion senden",
+      "description": "Sendet einen Aktionsbefehl an einen STIHL iMow-Mäher.",
+      "fields": {
+        "mower_device": {
+          "name": "Mäher",
+          "description": "Der Mäher, an den die Aktion gesendet werden soll."
+        },
+        "action": {
+          "name": "Aktion",
+          "description": "Die Aktion, die der Mäher ausführen soll."
+        },
+        "duration": {
+          "name": "Mähdauer",
+          "description": "Mähdauer in Minuten. Wird nur verwendet, wenn die Aktion 'Mähen ab Punkt starten' ist."
+        },
+        "startpoint": {
+          "name": "Startpunkt",
+          "description": "Vom Mäher definierter Startpunkt. Wird nur verwendet, wenn die Aktion 'Mähen ab Punkt starten' ist und der Mäher nicht von der Dockingstation starten soll."
+        },
+        "starttime": {
+          "name": "Startzeit",
+          "description": "Zeitpunkt, zu dem der Mäher mit dem Mähen beginnen soll. Wird nur verwendet, wenn die Aktion 'Mähen starten' ist."
+        },
+        "endtime": {
+          "name": "Endzeit",
+          "description": "Zeitpunkt, zu dem der Mäher das Mähen beenden soll. Wird nur verwendet, wenn die Aktion 'Mähen starten' ist."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "update_setting_failed": {
+      "message": "Aktualisieren der Mähereinstellung fehlgeschlagen: {error}"
+    },
+    "entry_not_loaded": {
+      "message": "STIHL iMow ist nicht eingerichtet."
+    },
+    "no_mower_specified": {
+      "message": "Für die Aktion wurde kein Mäher angegeben."
+    },
+    "mower_action_failed": {
+      "message": "Die Mäheraktion ist fehlgeschlagen: {error}"
+    },
+    "invalid_action_value": {
+      "message": "Ungültiger Aktionswert: {error}"
+    }
+  }
+}

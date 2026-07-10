@@ -1,15 +1,23 @@
 """Services for the STIHL iMow integration."""
+
+from __future__ import annotations
+
 import logging
 
 import voluptuous as vol
-from homeassistant.exceptions import HomeAssistantError
+from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.exceptions import (
+    HomeAssistantError,
+    ServiceValidationError,
+)
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import device_registry as dr
 from imow.api import IMowApi
 from imow.common.actions import IMowActions
 from imow.common.mowerstate import MowerState
 
-from .const import DOMAIN, ATTR_COORDINATOR
+from .const import DOMAIN
+from .coordinator import ImowDataUpdateCoordinator
 
 IMOW_INTENT_SCHEMA = vol.All(
     vol.Schema(
@@ -21,100 +29,101 @@ IMOW_INTENT_SCHEMA = vol.All(
             vol.Optional("endtime"): str,
             vol.Optional("duration"): vol.Any(str, int),
             vol.Required("action"): str,
-        },
-        cv.has_at_least_one_key("mower_device", "mower_name"),
-    )
+        }
+    ),
+    cv.has_at_least_one_key("mower_device", "mower_name"),
 )
 
 _LOGGER = logging.getLogger(__package__)
 
+SERVICE_INTENT = "intent"
 
-async def async_setup_services(hass, entry):
-    """Set up services for the iMow component."""
 
-    async def async_call_intent_service(service_call):
-        await intent_service(hass, entry, service_call, device_registry)
+def async_setup_services(hass: HomeAssistant) -> None:
+    """Register integration-wide services once."""
+
+    async def async_call_intent_service(service_call: ServiceCall) -> None:
+        await _async_intent_service(hass, service_call)
 
     hass.services.async_register(
         DOMAIN,
-        "intent",
+        SERVICE_INTENT,
         async_call_intent_service,
         schema=IMOW_INTENT_SCHEMA,
     )
+
+
+def _get_api(hass: HomeAssistant) -> IMowApi:
+    """Return an authenticated IMowApi from a loaded config entry."""
+    for entry in hass.config_entries.async_loaded_entries(DOMAIN):
+        coordinator: ImowDataUpdateCoordinator = entry.runtime_data
+        return coordinator.api
+    raise ServiceValidationError(
+        translation_domain=DOMAIN,
+        translation_key="entry_not_loaded",
+    )
+
+
+async def _async_intent_service(
+    hass: HomeAssistant, service_call: ServiceCall
+) -> None:
+    """Call the correct iMow action."""
     device_registry = dr.async_get(hass)
-    return True
 
-
-async def intent_service(hass, entry, service_call, device_registry):
-    """Call correct iMow service."""
-    if "mower_device" not in service_call.data:
-        service_data_mower_name = (
-            service_call.data["mower_name"]
-            if "mower_name" in service_call.data
-            else None
-        )
-    else:
-        service_data_mower_name = device_registry.async_get(
+    if "mower_device" in service_call.data:
+        device = device_registry.async_get(
             device_id=service_call.data["mower_device"]
-        ).name
+        )
+        if device is None:
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="no_mower_specified",
+            )
+        mower_name = device.name
+    else:
+        mower_name = service_call.data.get("mower_name")
 
-    service_data_mower_action_duration = (
+    duration = (
         str(service_call.data["duration"])
         if "duration" in service_call.data
         else None
     )
-    service_data_mower_action_startpoint = (
+    startpoint = (
         str(service_call.data["startpoint"])
         if "startpoint" in service_call.data
         else None
     )
-    service_data_mower_action_starttime = (
-        service_call.data["starttime"]
-        if "starttime" in service_call.data
-        else None
-    )
-    service_data_mower_action_endtime = (
-        service_call.data["endtime"]
-        if "endtime" in service_call.data
-        else None
-    )
-    coordinator_mower_state: MowerState = hass.data[DOMAIN][entry.entry_id][
-        ATTR_COORDINATOR
-    ].data
-    api: IMowApi = coordinator_mower_state.imow
+    starttime = service_call.data.get("starttime")
+    endtime = service_call.data.get("endtime")
 
+    api = _get_api(hass)
     try:
-        service_data_mower_action = IMowActions(service_call.data["action"])
-        if service_data_mower_name:
-            upstream_mower_state: MowerState = await api.receive_mower_by_name(
-                service_data_mower_name
+        action = IMowActions(service_call.data["action"])
+        if not mower_name:
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="no_mower_specified",
             )
-
-            await upstream_mower_state.intent(
-                imow_action=service_data_mower_action,
-                startpoint=service_data_mower_action_startpoint,
-                duration=service_data_mower_action_duration,
-                starttime=service_data_mower_action_starttime,
-                endtime=service_data_mower_action_endtime
-            )
-            _LOGGER.info(
-                f"service_data_mower_action: {service_data_mower_action}"
-                f"service_data_mower_action_startpoint: "
-                f"{service_data_mower_action_startpoint} \n"
-                f"service_data_mower_action_duration: "
-                f"{service_data_mower_action_duration} \n"
-                f"service_data_mower_name: {service_data_mower_name}\n"
-            )
-
-            _LOGGER.debug(
-                f"Doing {service_data_mower_action} with "
-                f"{upstream_mower_state.name}"
-            )
-    except LookupError as e:
-        _LOGGER.exception(e)
-        raise HomeAssistantError(e)
-    except ValueError as e:
-        _LOGGER.exception(e)
-        raise HomeAssistantError(e)
-
-    return True
+        upstream_mower_state: MowerState = await api.receive_mower_by_name(
+            mower_name
+        )
+        await upstream_mower_state.intent(
+            imow_action=action,
+            startpoint=startpoint,
+            duration=duration,
+            starttime=starttime,
+            endtime=endtime,
+        )
+        _LOGGER.debug("Doing %s with %s", action, upstream_mower_state.name)
+    except LookupError as err:
+        raise HomeAssistantError(
+            translation_domain=DOMAIN,
+            translation_key="mower_action_failed",
+            translation_placeholders={"error": str(err)},
+        ) from err
+    except ValueError as err:
+        raise ServiceValidationError(
+            translation_domain=DOMAIN,
+            translation_key="invalid_action_value",
+            translation_placeholders={"error": str(err)},
+        ) from err

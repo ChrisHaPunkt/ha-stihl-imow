@@ -1,0 +1,48 @@
+{
+  "entity": {
+    "sensor": {
+      "machine_error": { "default": "mdi:lightning-bolt-outline" },
+      "machine_state": { "default": "mdi:state-machine" },
+      "circumference": { "default": "mdi:go-kart-track" },
+      "corridor_mode": { "default": "mdi:go-kart-track" },
+      "edge_mowing_mode": { "default": "mdi:axis-arrow-info" },
+      "energy_mode": { "default": "mdi:lightning-bolt-outline" },
+      "last_weather_check": { "default": "mdi:weather-partly-cloudy" },
+      "led_status": { "default": "mdi:lightbulb" },
+      "mapping_intelligent_home_drive": { "default": "mdi:state-machine" },
+      "protection_level": { "default": "mdi:shield-check" },
+      "rain_sensor_mode": { "default": "mdi:weather-pouring" },
+      "time_zone": { "default": "mdi:map-clock-outline" },
+      "state_message_short": { "default": "mdi:message-text" },
+      "state_message_long": { "default": "mdi:message-text" },
+      "smart_logic_mowing_area_in_feet": { "default": "mdi:lightbulb-on-outline" },
+      "smart_logic_mowing_area_in_meter": { "default": "mdi:lightbulb-on-outline" },
+      "smart_logic_mowing_growth_adjustment": { "default": "mdi:lightbulb-on-outline" },
+      "smart_logic_mowing_time": { "default": "mdi:watch" },
+      "smart_logic_performed_activity_time": { "default": "mdi:watch" },
+      "smart_logic_suggested_activity_time": { "default": "mdi:lightbulb-on-outline" },
+      "status_last_geo_position_date": { "default": "mdi:clock-fast" },
+      "status_last_seen_date": { "default": "mdi:clock-outline" },
+      "statistics_total_blade_operating_time": { "default": "mdi:knife" },
+      "statistics_total_distance_travelled": { "default": "mdi:map-marker-distance" },
+      "statistics_total_operating_time": { "default": "mdi:watch" }
+    },
+    "binary_sensor": {
+      "demo_mode_enabled": { "default": "mdi:information-outline" },
+      "teamable": { "default": "mdi:account-group" },
+      "state_message_error": { "default": "mdi:message-text" },
+      "smart_logic_dynamic_mowingplan": { "default": "mdi:lightbulb-on-outline" },
+      "smart_logic_mowing_time_manual": { "default": "mdi:lightbulb-on-outline" },
+      "smart_logic_smart_notifications": { "default": "mdi:cellphone-message" },
+      "smart_logic_weather_forecast_enabled": { "default": "mdi:lightbulb-on-outline" },
+      "status_blade_service": { "default": "mdi:knife" },
+      "status_online": { "default": "mdi:antenna" },
+      "status_rain_status": { "default": "mdi:weather-pouring" }
+    },
+    "switch": {
+      "automatic_mode_enabled": { "default": "mdi:arrow-decision-auto-outline" },
+      "child_lock": { "default": "mdi:baby-carriage" },
+      "gps_protection_enabled": { "default": "mdi:shield-check" }
+    }
+  }
+}

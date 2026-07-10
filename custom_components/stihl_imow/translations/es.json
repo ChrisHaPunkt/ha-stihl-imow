@@ -1,0 +1,219 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "El dispositivo ya está configurado",
+      "reauth_successful": "La reautenticación se realizó correctamente",
+      "wrong_account": "La reautenticación debe usar la misma cuenta STIHL.",
+      "reconfigure_successful": "La reconfiguración se realizó correctamente"
+    },
+    "error": {
+      "cannot_connect": "No se pudo conectar",
+      "invalid_auth": "Autenticación no válida",
+      "unknown": "Error inesperado"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "email": "Dirección de correo electrónico",
+          "password": "Contraseña",
+          "language": "Idioma de los mensajes de estado"
+        },
+        "description": "Introduce las credenciales de tu cuenta STIHL iMow.\n\n**Esta integración solo es compatible con robots cortacésped STIHL iMow hasta la generación 4.** Funciona si tus credenciales son válidas en app.imow.stihl.com. **No** funciona con robots de generación 5 que usan myimow.stihl.com.",
+        "title": "STIHL iMow"
+      },
+      "reauth_confirm": {
+        "title": "Volver a autenticar STIHL iMow",
+        "description": "La integración STIHL iMow necesita volver a autenticar la cuenta {email}.",
+        "data": {
+          "password": "Contraseña"
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigurar STIHL iMow",
+        "description": "Actualiza las credenciales de tu cuenta STIHL iMow.",
+        "data": {
+          "email": "Dirección de correo electrónico",
+          "password": "Contraseña",
+          "language": "Idioma de los mensajes de estado"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "machine_error": {
+        "name": "Error de la máquina"
+      },
+      "machine_state": {
+        "name": "Estado de la máquina"
+      },
+      "circumference": {
+        "name": "Circunferencia"
+      },
+      "corridor_mode": {
+        "name": "Modo corredor"
+      },
+      "edge_mowing_mode": {
+        "name": "Modo de corte de bordes"
+      },
+      "energy_mode": {
+        "name": "Modo de energía"
+      },
+      "last_weather_check": {
+        "name": "Última comprobación meteorológica"
+      },
+      "led_status": {
+        "name": "Estado del LED"
+      },
+      "mapping_intelligent_home_drive": {
+        "name": "Regreso inteligente a la base"
+      },
+      "protection_level": {
+        "name": "Nivel de protección"
+      },
+      "rain_sensor_mode": {
+        "name": "Modo sensor de lluvia"
+      },
+      "time_zone": {
+        "name": "Zona horaria"
+      },
+      "state_message_short": {
+        "name": "Mensaje de estado"
+      },
+      "state_message_long": {
+        "name": "Detalles del mensaje de estado"
+      },
+      "smart_logic_mowing_area_in_feet": {
+        "name": "Área de corte (feet)"
+      },
+      "smart_logic_mowing_area_in_meter": {
+        "name": "Área de corte"
+      },
+      "smart_logic_mowing_growth_adjustment": {
+        "name": "Ajuste de crecimiento"
+      },
+      "smart_logic_mowing_time": {
+        "name": "Tiempo de corte"
+      },
+      "smart_logic_performed_activity_time": {
+        "name": "Tiempo de actividad realizado"
+      },
+      "smart_logic_suggested_activity_time": {
+        "name": "Tiempo de actividad sugerido"
+      },
+      "status_charge_level": {
+        "name": "Nivel de carga"
+      },
+      "status_last_geo_position_date": {
+        "name": "Última posición GPS"
+      },
+      "status_last_seen_date": {
+        "name": "Visto por última vez"
+      },
+      "statistics_total_blade_operating_time": {
+        "name": "Tiempo total de funcionamiento de la cuchilla"
+      },
+      "statistics_total_distance_travelled": {
+        "name": "Distancia total recorrida"
+      },
+      "statistics_total_operating_time": {
+        "name": "Tiempo total de funcionamiento"
+      }
+    },
+    "binary_sensor": {
+      "asm_enabled": {
+        "name": "ASM activado"
+      },
+      "demo_mode_enabled": {
+        "name": "Modo demostración"
+      },
+      "teamable": {
+        "name": "Compatible con equipo"
+      },
+      "state_message_error": {
+        "name": "Error"
+      },
+      "smart_logic_dynamic_mowingplan": {
+        "name": "Plan de corte dinámico"
+      },
+      "smart_logic_mowing_time_manual": {
+        "name": "Tiempo de corte manual"
+      },
+      "smart_logic_smart_notifications": {
+        "name": "Notificaciones inteligentes"
+      },
+      "smart_logic_weather_forecast_enabled": {
+        "name": "Pronóstico del tiempo"
+      },
+      "status_blade_service": {
+        "name": "Servicio de cuchilla"
+      },
+      "status_online": {
+        "name": "En línea"
+      },
+      "status_rain_status": {
+        "name": "Lluvia detectada"
+      }
+    },
+    "switch": {
+      "automatic_mode_enabled": {
+        "name": "Modo automático"
+      },
+      "child_lock": {
+        "name": "Bloqueo infantil"
+      },
+      "gps_protection_enabled": {
+        "name": "Protección GPS"
+      }
+    }
+  },
+  "services": {
+    "intent": {
+      "name": "Enviar acción al robot",
+      "description": "Envía un comando de acción a un robot cortacésped STIHL iMow.",
+      "fields": {
+        "mower_device": {
+          "name": "Robot cortacésped",
+          "description": "El robot al que enviar la acción."
+        },
+        "action": {
+          "name": "Acción",
+          "description": "La acción que debe realizar el robot."
+        },
+        "duration": {
+          "name": "Duración de corte",
+          "description": "Duración de corte en minutos. Solo se usa cuando la acción es 'Iniciar corte desde un punto'."
+        },
+        "startpoint": {
+          "name": "Punto de inicio",
+          "description": "Punto de inicio definido por el robot. Solo se usa cuando la acción es 'Iniciar corte desde un punto' y el robot no debe salir de la base."
+        },
+        "starttime": {
+          "name": "Hora de inicio",
+          "description": "Hora a la que el robot debe empezar a cortar. Solo se usa cuando la acción es 'Iniciar corte'."
+        },
+        "endtime": {
+          "name": "Hora de fin",
+          "description": "Hora a la que el robot debe dejar de cortar. Solo se usa cuando la acción es 'Iniciar corte'."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "update_setting_failed": {
+      "message": "No se pudo actualizar el ajuste del robot: {error}"
+    },
+    "entry_not_loaded": {
+      "message": "STIHL iMow no está configurado."
+    },
+    "no_mower_specified": {
+      "message": "No se especificó ningún robot para la acción."
+    },
+    "mower_action_failed": {
+      "message": "La acción del robot falló: {error}"
+    },
+    "invalid_action_value": {
+      "message": "Valor de acción no válido: {error}"
+    }
+  }
+}

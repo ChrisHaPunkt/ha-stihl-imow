@@ -12,10 +12,21 @@ from homeassistant.const import (
     UnitOfTime,
     PERCENTAGE,
 )
-from homeassistant.components.sensor import SensorDeviceClass
-from .const import ATTR_ICON, ATTR_PICTURE, ATTR_SWITCH, ATTR_TYPE, ATTR_UOM
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorStateClass,
+)
+from .const import (
+    ATTR_ICON,
+    ATTR_PICTURE,
+    ATTR_STATE_CLASS,
+    ATTR_SUGGESTED_UOM,
+    ATTR_SWITCH,
+    ATTR_TYPE,
+    ATTR_UOM,
+)
 
-IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
+IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict[str, typing.Any]] = {
     "asmEnabled": {
         ATTR_TYPE: None,
         ATTR_UOM: None,
@@ -87,9 +98,9 @@ IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
         ATTR_PICTURE: False,
     },
     "energyMode": {
-        ATTR_TYPE: SensorDeviceClass.ENERGY,
+        ATTR_TYPE: None,
         ATTR_UOM: None,
-        ATTR_ICON: None,
+        ATTR_ICON: "mdi:lightning-bolt-outline",
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
     },
@@ -110,7 +121,7 @@ IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
     "lastWeatherCheck": {
         ATTR_TYPE: SensorDeviceClass.TIMESTAMP,
         ATTR_UOM: None,
-        ATTR_ICON: None,
+        ATTR_ICON: "mdi:weather-partly-cloudy",
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
     },
@@ -283,22 +294,28 @@ IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
         ATTR_PICTURE: False,
     },
     "statistics_totalBladeOperatingTime": {
-        ATTR_TYPE: None,
+        ATTR_TYPE: SensorDeviceClass.DURATION,
         ATTR_UOM: UnitOfTime.SECONDS,
-        ATTR_ICON: "mdi:watch",
+        ATTR_SUGGESTED_UOM: UnitOfTime.HOURS,
+        ATTR_STATE_CLASS: SensorStateClass.TOTAL_INCREASING,
+        ATTR_ICON: "mdi:knife",
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
     },
     "statistics_totalDistanceTravelled": {
-        ATTR_TYPE: None,
+        ATTR_TYPE: SensorDeviceClass.DISTANCE,
         ATTR_UOM: UnitOfLength.METERS,
+        ATTR_SUGGESTED_UOM: UnitOfLength.KILOMETERS,
+        ATTR_STATE_CLASS: SensorStateClass.TOTAL_INCREASING,
         ATTR_ICON: "mdi:map-marker-distance",
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
     },
     "statistics_totalOperatingTime": {
-        ATTR_TYPE: None,
+        ATTR_TYPE: SensorDeviceClass.DURATION,
         ATTR_UOM: UnitOfTime.SECONDS,
+        ATTR_SUGGESTED_UOM: UnitOfTime.HOURS,
+        ATTR_STATE_CLASS: SensorStateClass.TOTAL_INCREASING,
         ATTR_ICON: "mdi:watch",
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
@@ -313,6 +330,7 @@ IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
     "status_chargeLevel": {
         ATTR_TYPE: SensorDeviceClass.BATTERY,
         ATTR_UOM: PERCENTAGE,
+        ATTR_STATE_CLASS: SensorStateClass.MEASUREMENT,
         ATTR_ICON: None,
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
@@ -320,14 +338,14 @@ IMOW_SENSORS_MAP: typing.Dict[str, typing.Dict] = {
     "status_lastGeoPositionDate": {
         ATTR_TYPE: SensorDeviceClass.TIMESTAMP,
         ATTR_UOM: None,
-        ATTR_ICON: None,
+        ATTR_ICON: "mdi:map-marker-clock",
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
     },
     "status_lastSeenDate": {
         ATTR_TYPE: SensorDeviceClass.TIMESTAMP,
         ATTR_UOM: None,
-        ATTR_ICON: None,
+        ATTR_ICON: "mdi:clock-outline",
         ATTR_SWITCH: False,
         ATTR_PICTURE: False,
     },
@@ -408,6 +426,40 @@ ENTITY_STRIP_OUT_PROPERTIES = [
     "status_lastNoErrorMainState",
     "imow",
 ]
+
+
+# Properties representing the mower's primary function; these get no entity
+# category (shown prominently rather than grouped under "Diagnostic").
+PRIMARY_PROPERTIES = {
+    "machineState",
+    "status_chargeLevel",
+    "stateMessage_short",
+}
+
+# Properties created but disabled in the entity registry by default (niche or
+# redundant readouts the user can enable on demand).
+DISABLED_BY_DEFAULT_PROPERTIES = {
+    "smartLogic_mowingAreaInFeet",
+    "circumference",
+    "timeZone",
+    "lastWeatherCheck",
+    "status_lastGeoPositionDate",
+    "demoModeEnabled",
+    "teamable",
+    # Device metadata, image URLs and coordinates (redundant with the
+    # device_tracker): exposed for parity with older versions, off by default.
+    "coordinateLatitude",
+    "coordinateLongitude",
+    "mowerImageUrl",
+    "mowerImageThumbnailUrl",
+    "name",
+    "deviceTypeDescription",
+    "version",
+    "firmwareVersion",
+    "softwarePacket",
+    "smartLogic_softwarePacket",
+    "team",
+}
 
 
 class LANGUAGES(Enum):
