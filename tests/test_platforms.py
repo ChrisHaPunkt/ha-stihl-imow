@@ -40,6 +40,42 @@ def test_entity_registry_enabled_default_flag() -> None:
     assert enabled.entity_registry_enabled_default is True
 
 
+def test_timestamp_sensor_parses_value() -> None:
+    """Timestamp properties get TIMESTAMP class and parse to aware datetime."""
+    from datetime import datetime, timezone
+    from unittest.mock import MagicMock
+    from types import SimpleNamespace
+
+    from homeassistant.components.sensor import SensorDeviceClass
+    from custom_components.stihl_imow.sensor import (
+        ImowSensorEntity,
+        _parse_timestamp,
+    )
+
+    device = {
+        "name": "Mahrlin",
+        "model": "iMow",
+        "sw_version": "1.2.3",
+        "manufacturer": "STIHL",
+    }
+    coordinator = MagicMock()
+    coordinator.data = {
+        "31466": SimpleNamespace(
+            lastWeatherCheck="2026-07-09T08:49:00+00:00"
+        )
+    }
+
+    entity = ImowSensorEntity(coordinator, "31466", device, "lastWeatherCheck")
+    assert entity.device_class == SensorDeviceClass.TIMESTAMP
+    assert entity.native_value == datetime(
+        2026, 7, 9, 8, 49, tzinfo=timezone.utc
+    )
+
+    assert _parse_timestamp("") is None
+    assert _parse_timestamp(None) is None
+    assert _parse_timestamp("not-a-date") is None
+
+
 
 async def test_entities_created_for_all_platforms(
     hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_runtime_api

@@ -118,6 +118,39 @@
       },
       "statistics_total_operating_time": {
         "name": "Total operating time"
+      },
+      "coordinate_latitude": {
+        "name": "Latitude"
+      },
+      "coordinate_longitude": {
+        "name": "Longitude"
+      },
+      "mower_image_url": {
+        "name": "Mower image URL"
+      },
+      "mower_image_thumbnail_url": {
+        "name": "Mower image thumbnail URL"
+      },
+      "name": {
+        "name": "Name"
+      },
+      "device_type_description": {
+        "name": "Device type"
+      },
+      "version": {
+        "name": "Version"
+      },
+      "firmware_version": {
+        "name": "Firmware version"
+      },
+      "software_packet": {
+        "name": "Software packet"
+      },
+      "smart_logic_software_packet": {
+        "name": "Smart software packet"
+      },
+      "team": {
+        "name": "Team"
       }
     },
     "binary_sensor": {

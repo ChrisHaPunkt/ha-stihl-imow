@@ -111,6 +111,7 @@ def make_mower_state(
             "gpsProtectionEnabled": False,
             "asmEnabled": False,
             "teamable": True,
+            "lastWeatherCheck": "2026-07-09T08:49:00+00:00",
             "coordinateLatitude": 54.1,
             "coordinateLongitude": 10.6,
             "status": {
@@ -118,8 +119,8 @@ def make_mower_state(
                 "online": True,
                 "rainStatus": False,
                 "bladeService": False,
-                "lastSeenDate": "2026-07-09",
-                "lastGeoPositionDate": "2026-07-09",
+                "lastSeenDate": "2026-07-09T08:49:00+00:00",
+                "lastGeoPositionDate": "2026-07-09T08:49:00+00:00",
             },
             "statistics": {
                 "totalOperatingTime": 1000,

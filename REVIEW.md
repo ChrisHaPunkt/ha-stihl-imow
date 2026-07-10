@@ -62,27 +62,17 @@ Three loose ends to work on step by step.
   behavior — a forced-disable migration is discouraged (can't tell user-enabled
   from default-enabled).
 
-### T3. Timestamp sensors show a raw ISO string
+### T3. Timestamp sensors show a raw ISO string — ✅ FIXED
 - **Entities:** `status_last_seen_date`, `status_last_geo_position_date`,
-  `last_weather_check`. They are plain string sensors (no `device_class`), so the
-  UI shows the raw upstream value (e.g. `2026-07-09T13:50:51+00:00`).
-- **Correct fix:** set `SensorDeviceClass.TIMESTAMP` **and** return an aware
-  `datetime` (not a string) from `native_value`; HA then renders relative/absolute
-  time. TIMESTAMP with a `str` value fails state validation — that's why TIMESTAMP
-  was dropped earlier — so a value transform is required.
-- **Plan:**
-  1. Confirm each field's exact upstream format (ISO 8601 with offset? naive?
-     epoch?) by logging a sample from `receive_mower_by_id`.
-  2. Parse in the sensor (`ImowSensorEntity.native_value`) or via a map-driven
-     value function: `homeassistant.util.dt.parse_datetime(...)`, coerce to aware
-     UTC, return `None` on empty/unparseable.
-  3. Set `ATTR_TYPE: SensorDeviceClass.TIMESTAMP` for the 3 properties in
-     `IMOW_SENSORS_MAP`.
-  4. Optionally drop the custom `mdi:` icons in favour of the timestamp default.
-  5. Tests: feed an ISO string in the fake state and assert the normalised
-     timestamp; assert a bad/empty value yields `unknown`.
-- **Watch out:** keep the transform in the sensor/native_value (or a map value
-  function) so binary_sensor/switch are unaffected.
+  `last_weather_check`. They were plain string sensors (no `device_class`), so the
+  UI showed the raw upstream value (e.g. `2026-07-09T13:50:51+00:00`).
+- **Fix applied:** set `ATTR_TYPE: SensorDeviceClass.TIMESTAMP` for the 3
+  properties in `IMOW_SENSORS_MAP`, and parse the upstream ISO string into an
+  aware UTC `datetime` in `sensor._parse_timestamp` (called from
+  `ImowSensorEntity.native_value` only when the device class is TIMESTAMP, so
+  binary_sensor/switch are unaffected). Empty/unparseable values → `None`.
+- **Tests:** `test_timestamp_sensor_parses_value` asserts the TIMESTAMP class,
+  a parsed aware datetime, and `None` for empty/`None`/bad input.
 
 ---
 

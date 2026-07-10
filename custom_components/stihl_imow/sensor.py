@@ -1,11 +1,13 @@
 """Platform for sensor integration."""
 
 import logging
+from datetime import datetime
 from typing import Any
 
 from homeassistant import core
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.util import dt as dt_util
 from imow.common.mowerstate import MowerState
 
 from . import extract_properties_by_type
@@ -13,6 +15,7 @@ from .const import (
     ATTR_LONG,
     ATTR_SHORT,
     ATTR_STATE_CLASS,
+    ATTR_SUGGESTED_UOM,
     ATTR_TYPE,
     ATTR_UOM,
 )
@@ -23,6 +26,16 @@ from .maps import IMOW_SENSORS_MAP
 _LOGGER = logging.getLogger(__name__)
 
 PARALLEL_UPDATES = 0
+
+
+def _parse_timestamp(value: Any) -> datetime | None:
+    """Parse an upstream ISO timestamp string into an aware UTC datetime."""
+    if not value:
+        return None
+    parsed = dt_util.parse_datetime(str(value))
+    if parsed is None:
+        return None
+    return dt_util.as_utc(parsed)
 
 
 async def async_setup_entry(
@@ -67,12 +80,16 @@ class ImowSensorEntity(ImowBaseEntity, SensorEntity):
         info = IMOW_SENSORS_MAP.get(mower_state_property, {})
         self._attr_device_class = info.get(ATTR_TYPE)
         self._attr_native_unit_of_measurement = info.get(ATTR_UOM)
+        self._attr_suggested_unit_of_measurement = info.get(ATTR_SUGGESTED_UOM)
         self._attr_state_class = info.get(ATTR_STATE_CLASS)
 
     @property
     def native_value(self) -> Any:
         """Return the native value of the sensor."""
-        return self.get_value_from_mowerstate()
+        value = self.get_value_from_mowerstate()
+        if self._attr_device_class == SensorDeviceClass.TIMESTAMP:
+            return _parse_timestamp(value)
+        return value
 
     @property
     def extra_state_attributes(self) -> dict[str, Any] | None:
