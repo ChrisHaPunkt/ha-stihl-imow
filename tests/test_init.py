@@ -7,6 +7,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 from imow.common.exceptions import ApiMaintenanceError, LoginError
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -251,3 +252,65 @@ async def test_remove_config_entry_device(
     assert await async_remove_config_entry_device(
         hass, mock_config_entry, gone
     )
+
+
+async def test_device_identifier_migration_in_place(
+    hass: HomeAssistant,
+    mock_config_entry: MockConfigEntry,
+    mock_runtime_api,
+) -> None:
+    """A legacy ``(DOMAIN, <int>)`` device is retyped to ``<str>`` in place."""
+    mock_config_entry.add_to_hass(hass)
+    dev_reg = dr.async_get(hass)
+    legacy = dev_reg.async_get_or_create(
+        config_entry_id=mock_config_entry.entry_id,
+        identifiers={(DOMAIN, MOWER_ID)},
+        name=MOWER_NAME,
+    )
+
+    with patch("custom_components.stihl_imow.PLATFORMS", []):
+        assert await hass.config_entries.async_setup(
+            mock_config_entry.entry_id
+        )
+        await hass.async_block_till_done()
+
+    migrated = dev_reg.async_get_device(
+        identifiers={(DOMAIN, str(MOWER_ID))}
+    )
+    assert migrated is not None
+    assert migrated.id == legacy.id
+    assert dev_reg.async_get_device(identifiers={(DOMAIN, MOWER_ID)}) is None
+
+
+async def test_device_identifier_migration_removes_duplicate(
+    hass: HomeAssistant,
+    mock_config_entry: MockConfigEntry,
+    mock_runtime_api,
+) -> None:
+    """A stale legacy int device is dropped if the new str device exists."""
+    mock_config_entry.add_to_hass(hass)
+    dev_reg = dr.async_get(hass)
+    legacy = dev_reg.async_get_or_create(
+        config_entry_id=mock_config_entry.entry_id,
+        identifiers={(DOMAIN, MOWER_ID)},
+        name=MOWER_NAME,
+    )
+    current = dev_reg.async_get_or_create(
+        config_entry_id=mock_config_entry.entry_id,
+        identifiers={(DOMAIN, str(MOWER_ID))},
+        name=MOWER_NAME,
+    )
+    assert legacy.id != current.id
+
+    with patch("custom_components.stihl_imow.PLATFORMS", []):
+        assert await hass.config_entries.async_setup(
+            mock_config_entry.entry_id
+        )
+        await hass.async_block_till_done()
+
+    assert dev_reg.async_get_device(identifiers={(DOMAIN, MOWER_ID)}) is None
+    survived = dev_reg.async_get_device(
+        identifiers={(DOMAIN, str(MOWER_ID))}
+    )
+    assert survived is not None
+    assert survived.id == current.id

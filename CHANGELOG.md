@@ -27,6 +27,7 @@
 ## Fixed
 - Entities no longer disappear intermittently after a restart.
 - Mower status/statistics are fetched more reliably (no more upstream timeouts from requesting them too quickly).
+- Upgrading from 1.0.x no longer leaves an empty duplicate device behind — your existing mower device is migrated in place, keeping its name, area and automations.
 
 
 # Version 1.0.3

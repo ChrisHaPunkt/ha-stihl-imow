@@ -95,6 +95,7 @@ async def async_setup_entry(
         hass.config_entries.async_update_entry(entry, unique_id=account_id)
 
     await _migrate_entity_unique_ids(hass, entry, set(coordinator.data))
+    _migrate_device_identifiers(hass, entry)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
@@ -115,7 +116,7 @@ async def async_remove_config_entry_device(
     """Allow removing a device only when its mower left the account."""
     coordinator = config_entry.runtime_data
     return not any(
-        domain == DOMAIN and identifier in coordinator.data
+        domain == DOMAIN and str(identifier) in coordinator.data
         for domain, identifier in device_entry.identifiers
     )
 
@@ -178,6 +179,41 @@ async def _migrate_entity_unique_ids(
         return None
 
     await er.async_migrate_entries(hass, entry.entry_id, _migrate)
+
+
+@callback
+def _migrate_device_identifiers(
+    hass: HomeAssistant, entry: ImowConfigEntry
+) -> None:
+    """Reconcile legacy integer device identifiers to the string scheme.
+
+    1.0.x registered the mower device as ``(DOMAIN, <int>)`` while the current
+    code uses ``(DOMAIN, <str>)``. Because the identifiers differ, HA would
+    otherwise leave the old device empty and create a new one on update. Retype
+    the identifier in place, or drop the stale legacy device if the new one was
+    already created. Runs before the platforms so entities keep their device.
+    The legacy ``int`` identifier only exists at runtime (from `.storage`), so
+    the stored value is inspected loosely against the typed ``tuple``.
+    """
+    dev_reg = dr.async_get(hass)
+    for device in dr.async_entries_for_config_entry(dev_reg, entry.entry_id):
+        normalized: set[tuple[str, str]] = set()
+        is_legacy = False
+        for domain, identifier in typing.cast(
+            "set[tuple[str, object]]", device.identifiers
+        ):
+            normalized.add((domain, str(identifier)))
+            if domain == DOMAIN and not isinstance(identifier, str):
+                is_legacy = True
+        if not is_legacy:
+            continue
+        existing = dev_reg.async_get_device(identifiers=normalized)
+        if existing is not None and existing.id != device.id:
+            dev_reg.async_remove_device(device.id)
+        else:
+            dev_reg.async_update_device(
+                device.id, new_identifiers=normalized
+            )
 
 
 @callback
