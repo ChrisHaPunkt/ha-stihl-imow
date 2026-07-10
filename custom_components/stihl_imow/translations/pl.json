@@ -84,7 +84,7 @@
         "name": "Szczegóły komunikatu o stanie"
       },
       "smart_logic_mowing_area_in_feet": {
-        "name": "Obszar koszenia (stopy)"
+        "name": "Obszar koszenia (feet)"
       },
       "smart_logic_mowing_area_in_meter": {
         "name": "Obszar koszenia"

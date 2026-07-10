@@ -19,6 +19,28 @@ async def _setup(hass: HomeAssistant, entry: MockConfigEntry) -> None:
     await hass.async_block_till_done()
 
 
+def test_entity_registry_enabled_default_flag() -> None:
+    """Off-by-default properties set enabled_default False, others True."""
+    from unittest.mock import MagicMock
+
+    from custom_components.stihl_imow.sensor import ImowSensorEntity
+
+    device = {
+        "name": "Mahrlin",
+        "model": "iMow",
+        "sw_version": "1.2.3",
+        "manufacturer": "STIHL",
+    }
+    coordinator = MagicMock()
+
+    disabled = ImowSensorEntity(coordinator, "31466", device, "circumference")
+    assert disabled.entity_registry_enabled_default is False
+
+    enabled = ImowSensorEntity(coordinator, "31466", device, "machineState")
+    assert enabled.entity_registry_enabled_default is True
+
+
+
 async def test_entities_created_for_all_platforms(
     hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_runtime_api
 ) -> None:

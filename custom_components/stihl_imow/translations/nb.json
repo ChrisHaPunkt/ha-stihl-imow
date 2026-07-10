@@ -84,7 +84,7 @@
         "name": "Statusmelding detaljer"
       },
       "smart_logic_mowing_area_in_feet": {
-        "name": "Klippeområde (fot)"
+        "name": "Klippeområde (feet)"
       },
       "smart_logic_mowing_area_in_meter": {
         "name": "Klippeområde"

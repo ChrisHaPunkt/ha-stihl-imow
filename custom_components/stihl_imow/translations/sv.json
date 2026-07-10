@@ -84,7 +84,7 @@
         "name": "Statusmeddelande detaljer"
       },
       "smart_logic_mowing_area_in_feet": {
-        "name": "Klippyta (fot)"
+        "name": "Klippyta (feet)"
       },
       "smart_logic_mowing_area_in_meter": {
         "name": "Klippyta"

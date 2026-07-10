@@ -84,7 +84,7 @@
         "name": "Statusmeldung – Details"
       },
       "smart_logic_mowing_area_in_feet": {
-        "name": "Mähfläche (Fuß)"
+        "name": "Mähfläche (feet)"
       },
       "smart_logic_mowing_area_in_meter": {
         "name": "Mähfläche"

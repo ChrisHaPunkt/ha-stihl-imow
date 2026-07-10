@@ -18,46 +18,49 @@ config flow (reauth, unique IDs), entity naming, integration quality scale.
 
 Three loose ends to work on step by step.
 
-### T1. Entity name translations not applied in the UI
-- **Symptom:** entity names show English (e.g. "Charge level") even with the UI
-  switched to German, although `translations/de.json` has the correct key
-  (`status_charge_level` → "Ladestand").
-- **Already verified:** `_attr_has_entity_name = True` + `_attr_translation_key`
-  set in `entity.py`; sensors set no `_attr_name` override; `strings.json` and
-  `translations/*.json` contain `entity.<platform>.<key>.name`; hassfest
-  translation validation passes.
-- **Check, in order:**
-  1. On the running HA box, confirm
-     `config/custom_components/stihl_imow/translations/de.json` actually exists
-     and contains the key. The translation files were untracked/uncommitted for
-     a while — a HACS/tag install may have shipped only `en.json`.
-  2. Entity-name localisation follows the **user profile** language (avatar →
-     profile → Language), not just the dashboard/server language.
-  3. Integration translations are cached at startup → **full HA restart** (not a
-     reload), then a **hard browser refresh** / incognito.
-  4. If still failing: check `Developer Tools → States` that the entity carries a
-     `translation_key` and no `friendly_name` override, and inspect the
-     `/api/translations/<lang>` payload for the integration's entity keys.
-- **Steps:** verify files on the box → verify profile language → restart + hard
-  refresh → if still broken, capture `/api/translations` and treat as a code bug.
+### T1. Entity name translations not applied in the UI — ✅ FIXED
+- **Confirmed fixed:** setting the **backend/system language** (Settings → System →
+  General → Language) and re-creating the entities produced the translated names
+  (e.g. "Ladestand"). No code change needed.
+- **Resolution: not a code bug — expected HA behavior.** The code is correct
+  (`_attr_has_entity_name = True`, `_attr_translation_key` set, no `_attr_name`
+  override on sensors, keys present in `strings.json` + all `translations/*.json`,
+  hassfest passes).
+- **Root cause (HA docs, core/entity → Entity naming):** a translated entity name
+  is resolved from the **system (backend) language at entity creation time**, not
+  the per-user UI language. Changing the backend language only affects entities
+  created *after* the change; existing entities keep their baked-in name.
+- **To get German names:**
+  1. Settings → System → General → **Language** = Deutsch (the *backend* language,
+     not the top-right per-user UI language).
+  2. Restart Home Assistant.
+  3. **Re-create the entities** — remove and re-add the config entry (or delete the
+     mower device). A restart alone will not re-translate existing entities.
+- **Note:** in this workspace the integration is symlinked into the running core
+  dev instance, so the translation files are already live — no reinstall needed;
+  only the backend-language + entity re-creation steps apply.
 
-### T2. Default-disabled entities are not disabled
-- **Symptom:** the 7 entities marked off-by-default still appear enabled.
-- **Most likely cause:** `entity_registry_enabled_default = False` only applies to
-  entities **newly added** to the registry. Entities already registered on an
-  upgraded install keep their previous enabled state — HA never auto-disables an
-  already-registered entity. Only a fresh install or a **newly discovered mower**
-  gets them disabled.
-- **Verify:** (a) confirm the flag is set at runtime (registry entry
-  `disabled_by`); (b) test a fresh add (delete + re-add the integration) — the 7
-  should be disabled there.
-- **Decide:**
-  - Option A (recommended, no code): document it; fresh adds behave correctly.
-  - Option B: a one-time migration that sets `disabled_by = INTEGRATION` for those
-    unique_ids — but HA cannot distinguish "default-enabled" from "user-enabled",
-    so this risks overriding a user's explicit choice. Generally discouraged.
-- **Steps:** confirm flag set → confirm fresh-vs-upgrade behaviour → pick A
-  (document) or B (migration, note the risk).
+### T2. Default-disabled entities are not disabled — ✅ FIXED
+- **Confirmed fixed:** after purging the stale/orphaned `stihl_imow` registry
+  entries and re-adding the integration, the 7 off-by-default entities are created
+  with `disabled_by: integration`. No code change needed.
+- **Symptom (was):** the 7 entities marked off-by-default still appeared enabled.
+- **Root cause:** `entity_registry_enabled_default` only applies the **first time**
+  an entity is added to the registry. On the dev instance the `circumference`
+  registry entry has `created_at: 2026-07-09` and the same `config_entry_id` as the
+  current entry (`01KX5BYPB6…`) — i.e. the config entry was never actually deleted
+  (a real delete + re-add yields a new ULID `entry_id` + new `created_at`). So the
+  stale entries were reused and the flag never re-applied.
+- **Fix / how to verify:** genuinely re-create the entities.
+  - UI: Settings → Devices & Services → STIHL iMow → ⋮ → Delete, **confirm the
+    device/entities are gone**, then re-add → the 7 come back `disabled_by:
+    integration`.
+  - Dev shortcut: stop HA, strip `platform: stihl_imow` entries (or the mower
+    device) from `config/.storage/core.entity_registry`, start HA.
+- **Note:** for end users upgrading in place (not re-adding) the 7 stay enabled;
+  fresh adds / newly discovered mowers get them disabled. This is documented HA
+  behavior — a forced-disable migration is discouraged (can't tell user-enabled
+  from default-enabled).
 
 ### T3. Timestamp sensors show a raw ISO string
 - **Entities:** `status_last_seen_date`, `status_last_geo_position_date`,
