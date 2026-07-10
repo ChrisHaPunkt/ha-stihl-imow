@@ -76,7 +76,6 @@ def test_timestamp_sensor_parses_value() -> None:
     assert _parse_timestamp("not-a-date") is None
 
 
-
 async def test_entities_created_for_all_platforms(
     hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_runtime_api
 ) -> None:

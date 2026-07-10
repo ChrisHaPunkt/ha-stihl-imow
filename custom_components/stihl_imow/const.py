@@ -39,7 +39,6 @@ CONF_API_TOKEN = "token"
 CONF_API_TOKEN_EXPIRE_TIME = "expire_time"
 CONF_ENTRY_TITLE = "Lawn Mower"
 CONF_MOWER_NAME = "name"
-CONF_MOWER_STATE = "mower_state"
 
 # Config Flow
 CONF_ATTR_EMAIL = "email"

@@ -25,7 +25,6 @@ from .conftest import (
     ACCOUNT_ID,
     TEST_EMAIL,
     TEST_PASSWORD,
-    make_mower,
 )
 
 USER_INPUT = {CONF_ATTR_EMAIL: TEST_EMAIL, CONF_ATTR_PASSWORD: TEST_PASSWORD}

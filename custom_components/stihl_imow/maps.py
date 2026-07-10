@@ -447,7 +447,7 @@ DISABLED_BY_DEFAULT_PROPERTIES = {
     "demoModeEnabled",
     "teamable",
     # Device metadata, image URLs and coordinates (redundant with the
-    # device_tracker): exposed for parity with older versions but off by default.
+    # device_tracker): exposed for parity with older versions, off by default.
     "coordinateLatitude",
     "coordinateLongitude",
     "mowerImageUrl",

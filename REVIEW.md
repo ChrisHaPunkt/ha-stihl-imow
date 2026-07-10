@@ -12,6 +12,12 @@ the "restart HA to fix login" workaround is eliminated.
 Sources: HA developer docs — config entries, fetching data / `DataUpdateCoordinator`,
 config flow (reauth, unique IDs), entity naming, integration quality scale.
 
+> **Status (2026-07-10): all items below are implemented.** Findings A–S and the
+> follow-ups T1–T3 have been addressed in code; the integration now declares
+> `quality_scale: platinum` with every `quality_scale.yaml` rule `done`/`exempt`.
+> The sections below are retained as an implementation record. See the
+> per-item ✅ markers.
+
 ---
 
 ## Open follow-ups (next session)
@@ -78,7 +84,7 @@ Three loose ends to work on step by step.
 
 ## Highest-impact issues (these also worsen the auth bug)
 
-### A. Setup forces a full re-login on every start/reload — HIGH
+### A. Setup forces a full re-login on every start/reload — HIGH ✅ DONE
 - **Where:** `async_setup_entry` calls `await imow_api.get_token(force_reauth=True)`
   unconditionally, ignoring the persisted `CONF_API_TOKEN` / `CONF_API_TOKEN_EXPIRE_TIME`.
 - **Impact:** every HA restart/reload does a fresh scraped login — the exact path
@@ -86,13 +92,13 @@ Three loose ends to work on step by step.
 - **Fix:** construct `IMowApi(token=stored_token, ...)` and only authenticate if the
   token is missing/expired. Reserve `force_reauth=True` for the reauth flow.
 
-### B. Platforms are set up in a detached task (race condition) — HIGH
+### B. Platforms are set up in a detached task (race condition) — HIGH ✅ DONE
 - **Where:** `hass.async_create_task(hass.config_entries.async_forward_entry_setups(entry, PLATFORMS))`.
 - **Impact:** `async_setup_entry` can return before platforms exist → intermittent
   "entities missing after restart" and ordering bugs.
 - **Fix:** `await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)`.
 
-### C. No reauth flow despite raising `ConfigEntryAuthFailed` — HIGH (Silver blocker)
+### C. No reauth flow despite raising `ConfigEntryAuthFailed` — HIGH (Silver blocker) ✅ DONE
 - **Where:** `__init__.py` and the coordinator raise `ConfigEntryAuthFailed`
   (which starts a `SOURCE_REAUTH` flow), but `config_flow.py` has **no**
   `async_step_reauth` / `async_step_reauth_confirm`.
@@ -103,7 +109,7 @@ Three loose ends to work on step by step.
   `_abort_if_unique_id_mismatch(reason="wrong_account")`, then
   `async_update_reload_and_abort(self._get_reauth_entry(), data_updates=...)`.
 
-### O. Inject a cookie-isolated session into the wrapper — HIGH (fixes the cookie bug, HA side)
+### O. Inject a cookie-isolated session into the wrapper — HIGH (fixes the cookie bug, HA side) ✅ DONE
 - **Where:** `async_setup_entry` and `validate_input` pass
   `async_get_clientsession(hass)` (HA's **shared** session + cookie jar) into
   `IMowApi`.
@@ -124,7 +130,7 @@ Three loose ends to work on step by step.
 
 ## Config-entry / data model
 
-### D. Use `entry.runtime_data` instead of `hass.data[DOMAIN][entry_id]` — MEDIUM
+### D. Use `entry.runtime_data` instead of `hass.data[DOMAIN][entry_id]` — MEDIUM ✅ DONE
 - Current standard: a typed entry + `runtime_data`.
   ```python
   type ImowConfigEntry = ConfigEntry[ImowCoordinator]
@@ -134,7 +140,7 @@ Three loose ends to work on step by step.
 - Replaces the `hass.data.setdefault(DOMAIN, {})` bookkeeping and the manual `pop`
   in `async_unload_entry`.
 
-### E. Don't store volatile mower state in the config entry — MEDIUM
+### E. Don't store volatile mower state in the config entry — MEDIUM ✅ DONE
 - **Where:** `validate_input` writes the entire mower `__dict__` into
   `CONF_MOWER_STATE`.
 - **Impact:** config entries should hold small, stable config; this bloats
@@ -142,14 +148,14 @@ Three loose ends to work on step by step.
 - **Fix:** persist only `email`, `token`, `token_expire`, `mower_id`, `language`,
   `polling_interval`. Fetch state at runtime via the coordinator.
 
-### F. No `unique_id` on the config entry — MEDIUM
+### F. No `unique_id` on the config entry — MEDIUM ✅ DONE
 - **Where:** `config_flow.py` never calls `async_set_unique_id` /
   `_abort_if_unique_id_configured`.
 - **Impact:** duplicate entries possible; reauth can't match the right entry.
 - **Fix:** for a cloud service, use the mower id or the lowercased account email:
   `await self.async_set_unique_id(...)` then `self._abort_if_unique_id_configured()`.
 
-### G. Fragile schema access needs a migration — LOW
+### G. Fragile schema access needs a migration — LOW ✅ DONE
 - **Where:** `async_setup_entry` works around `email`/`username` key drift inline.
 - **Fix:** formalize with `async_migrate_entry` + `VERSION` / `MINOR_VERSION` and
   normalize the stored data once.
@@ -158,7 +164,7 @@ Three loose ends to work on step by step.
 
 ## Coordinator
 
-### H. Typed coordinator subclass + pass `config_entry` — MEDIUM
+### H. Typed coordinator subclass + pass `config_entry` — MEDIUM ✅ DONE
 - **Where:** inline `update_method=` form without a subclass and without
   `config_entry`.
 - **Fix:** subclass `DataUpdateCoordinator[MowerState]`, put logic in
@@ -166,16 +172,16 @@ Three loose ends to work on step by step.
   (newer HA warns/requires it). Consider `always_update=False` if `MowerState`
   implements `__eq__`.
 
-### I. Replace `async_timeout` with `asyncio.timeout` — LOW
+### I. Replace `async_timeout` with `asyncio.timeout` — LOW ✅ DONE
 - **Where:** `_async_update_data` uses `async_timeout.timeout(...)` (deprecated for
   Python 3.11+).
 - **Fix:** `async with asyncio.timeout(...)`; drop the `import async_timeout`.
 
-### J. Move the `asyncio.sleep(1)` throttle into the wrapper — LOW
+### J. Move the `asyncio.sleep(1)` throttle into the wrapper — LOW ✅ DONE
 - The upstream-pacing `sleep` between the state and statistics calls should live in
   `imow-webapi`, keeping the coordinator declarative.
 
-### P. Polling interval must NOT be user-configurable — MEDIUM (HA rule)
+### P. Polling interval must NOT be user-configurable — MEDIUM (HA rule) ✅ DONE
 - **Where:** `STEP_ADVANCED` in `config_flow.py` offers
   `CONF_ATTR_POLLING_INTERVALL` = `vol.In([20, 30, 60, 120, 300])`, stored in the
   config entry and used as `update_interval`.
@@ -187,14 +193,14 @@ Three loose ends to work on step by step.
   programmatically (e.g. a fixed `>= 60s` constant). If migrating, drop the stored
   value in `async_migrate_entry`.
 
-### Q. Declare `PARALLEL_UPDATES` in each platform — LOW (HA rule)
+### Q. Declare `PARALLEL_UPDATES` in each platform — LOW (HA rule) ✅ DONE
 - **Where:** platform files (`sensor.py`, `binary_sensor.py`, `switch.py`,
   `device_tracker.py`).
 - **Fix:** add `PARALLEL_UPDATES = 0` for the coordinator-based read platforms
   (data comes from the coordinator, not per-entity polling); use `1` for the
   command platform (`switch`) if serializing writes to the cloud is desired.
 
-### R. Don't let users set the config entry name — LOW (HA rule)
+### R. Don't let users set the config entry name — LOW (HA rule) ✅ DONE
 - **Where:** `async_create_entry(title=CONF_ENTRY_TITLE, ...)` uses a static title.
 - **Fix:** name the entry automatically from a stable source (e.g. the mower name
   or account), not a hard-coded/user-facing name. Users can rename later in the UI.
@@ -203,7 +209,7 @@ Three loose ends to work on step by step.
 
 ## Services
 
-### K. Register services once, not per entry — LOW
+### K. Register services once, not per entry — LOW ✅ DONE
 - **Where:** `async_setup_services(hass, entry)` runs on every entry setup.
 - **Fix:** register global services a single time (in `async_setup` or guarded on
   first entry); unregister/clean up when the last entry unloads. `async_unload_entry`
@@ -213,7 +219,7 @@ Three loose ends to work on step by step.
 
 ## Manifest
 
-### L. Modernize `manifest.json` — LOW
+### L. Modernize `manifest.json` — LOW ✅ DONE
 - Add `"integration_type": "hub"` (or `"device"`).
 - Add `"loggers": ["imow"]`.
 - Drop empty `"homekit": {}`, `"ssdp": []`, `"zeroconf": []` (only keep discovery
@@ -225,13 +231,13 @@ Three loose ends to work on step by step.
 
 ## Entities
 
-### M. `has_entity_name` + translated names — MEDIUM
+### M. `has_entity_name` + translated names — MEDIUM ✅ DONE
 - New integrations must set `_attr_has_entity_name = True` and use translated entity
   names (`translation_key` + the `entity` section of `strings.json`) rather than
   hard-coded English. Verify `entity.py` sets this; prefer icon translations
   (`icons.json`) over the discouraged `icon` property where practical.
 
-### N. Add a diagnostics platform — MEDIUM (Gold tier, high value)
+### N. Add a diagnostics platform — MEDIUM (Gold tier, high value) ✅ DONE
 - A `diagnostics.py` that dumps the coordinator's `MowerState` with
   credentials/token **redacted** makes future auth issues self-service to debug via
   the UI download button.
@@ -240,7 +246,7 @@ Three loose ends to work on step by step.
 
 ## Multiple mowers per account
 
-### S. Support more than one mower on a STIHL account — MEDIUM
+### S. Support more than one mower on a STIHL account — MEDIUM ✅ DONE
 - **Where:** `config_flow.validate_input` and `__init__.async_setup_entry` only
   ever use `mowers[0]`; the config entry, coordinator, and device are all built
   around a single mower id. A STIHL account with two or more mowers exposes only
@@ -278,12 +284,15 @@ Three loose ends to work on step by step.
 
 ## Quality-scale snapshot
 
-| Tier | Status | Blockers |
-|------|--------|----------|
-| 🥉 Bronze | Mostly met | B (await forwards), P (no user-set polling), R (no user-set name) |
-| 🥈 Silver | Not met | C (no reauth), O (cookie-isolated session), robust error/backoff (see wrapper review) |
-| 🥇 Gold | Not met | N (diagnostics), reconfigure/options, translated entities (M) |
-| 🏆 Platinum | Not met | async deps (met via `imow-webapi`), websession injection (O), strict typing |
+| Tier | Status | Notes |
+|------|--------|-------|
+| 🥉 Bronze | ✅ Met | B, P, R done |
+| 🥈 Silver | ✅ Met | C (reauth), O (cookie-isolated session), robust error handling done |
+| 🥇 Gold | ✅ Met | N (diagnostics), reconfigure flow, translated entities (M) done |
+| 🏆 Platinum | ✅ Met | async deps, websession injection (O), strict typing, test coverage done |
+
+`manifest.json` declares `quality_scale: platinum`; every rule in
+`quality_scale.yaml` is `done` or `exempt`.
 
 ---
 
@@ -335,12 +344,12 @@ Items 1–2, combined with the wrapper's cookie-isolation fix, are what stop the
 
 ---
 
-## Open questions
+## Open questions (resolved)
 
-- Unique ID source: mower id or lowercased account email? (Email is simplest for a
-  single-account cloud service; mower id ties the entry to one mower.)
-- Should the config entry hold one mower per entry (current shape) or support
-  multiple mowers per account (subentries)?
-- Target quality tier for this pass (Bronze polish vs. push to Silver with reauth)?
-- Fixed polling interval to standardize on now that it's no longer user-set
-  (finding P) — e.g. 60s or 120s?
+- **Unique ID source:** the STIHL **account id** (from `receive_account()`), not
+  the email (which can change). Entities are keyed `{mower_id}_{property}`.
+- **One entry per mower vs. per account:** one config entry per **account**; a
+  single coordinator returns `dict[mower_id, MowerState]` and registers one device
+  per mower (finding S, option 3).
+- **Quality tier:** pushed all the way to **Platinum**.
+- **Fixed polling interval:** standardized in `const.py` (>= the 60s cloud floor).
