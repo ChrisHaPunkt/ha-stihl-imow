@@ -11,32 +11,22 @@
 [hainstall]: https://my.home-assistant.io/redirect/config_flow_start/?domain=stihl_imow
 [hainstallbadge]: https://img.shields.io/badge/dynamic/json?style=for-the-badge&logo=home-assistant&logoColor=ccc&label=usage&suffix=%20installs&cacheSeconds=15600&url=https://analytics.home-assistant.io/custom_integrations.json&query=$.stihl_imow.total
 
-
-# Limitations
-### This integration only supports the STIHL iMow Generation up to __4__
-This integration is NOT  compatible to Generation 5 mowers from STIHL.   
-If your credentials work on https://app.imow.stihl.com/#/ you can use this integration.  
-If your credentials are only working on https://myimow.stihl.com/ you can __NOT__ use this integration.
- 
-See https://github.com/ChrisHaPunkt/stihl-imow-webapi/issues/13 
+> [!IMPORTANT]
+> **Only STIHL iMow Generation 4 and earlier are supported.** If your credentials work on [app.imow.stihl.com](https://app.imow.stihl.com) ✅ you can use this integration. If they only work on [myimow.stihl.com](https://myimow.stihl.com) ❌ (Generation 5), you **cannot** — see [issue #13](https://github.com/ChrisHaPunkt/stihl-imow-webapi/issues/13).
 
 ## HomeAssistant custom component for STIHL iMow lawn mower
 A platform which allows you to interact with the STIHL iMow lawn mower.
 
 ## Features
-This platform is using the [STIHL iMow API](https://app.imow.stihl.com/#) via the [unofficial STIHL iMow Python WebAPI wrapper](https://github.com/ChrisHaPunkt/stihl-imow-webapi) to
-get the information from the mower via the upstream STIHL Server.
+Built on top of the [unofficial STIHL iMow Python WebAPI wrapper](https://github.com/ChrisHaPunkt/stihl-imow-webapi), this integration talks to the [STIHL iMow cloud API](https://app.imow.stihl.com/#) and brings your mower into Home Assistant:
 
-In Home Assistant, this enables me to provide the following:
-
-* Display current state, statistics and settings in Home Assistant,
-* Support for **multiple mowers** on the same STIHL account,
-* Upstream localisation: display state messages in your configured language,
-* Localised entity names and configuration UI in 10 languages,
-* Switch settings like automatic mode, child lock or GPS protection on or off,
-* Initiate an action to a mower via the `stihl_imow.intent` action (edge mowing, return to dock, start mowing from point, start mowing),
-* Automatic re-authentication and reconfiguration from the UI,
-* Diagnostics download (with credentials redacted) for troubleshooting.
+- 🔋 **Live status & sensors** — current state, battery, statistics and settings for every mower.
+- 🔀 **Multiple mowers** — full support for several mowers on the same STIHL account.
+- 🌍 **Localised** — state messages in your configured language, device tracker plus entity names and setup UI in **10 languages**.
+- 🎛️ **Controllable settings** — toggle automatic mode, child lock or GPS protection right from HA.
+- ▶️ **Actions** — trigger edge mowing, return to dock, or start mowing (from a point) via the `stihl_imow.intent` action.
+- 🔐 **Self-healing auth** — automatic re-authentication and reconfiguration from the UI.
+- 🩺 **Diagnostics** — downloadable troubleshooting data with credentials redacted.
 
 ## Installation
 
@@ -58,14 +48,14 @@ In Home Assistant, this enables me to provide the following:
 <details>
 <summary>Add the repository to HACS manually (if the button doesn't work)</summary>
 
-Go to `HACS 🠊 ⋮ (3-dots) 🠊 Custom repositories` and add:
+Go to `HACS → ⋮ (3-dots) → Custom repositories` and add:
 
 | Field | Value |
 | --- | --- |
 | Repository | `https://github.com/ChrisHaPunkt/ha-stihl-imow` |
 | Type | `Integration` |
 
-Then open `HACS 🠊 search for 'STIHL'`, download the integration, and **restart Home Assistant**.
+Then open `HACS → search for 'STIHL'`, download the integration, and **restart Home Assistant**.
 
 </details>
 
@@ -91,7 +81,7 @@ Then open `HACS 🠊 search for 'STIHL'`, download the integration, and **restar
 <details>
 <summary>Start the configuration manually</summary>
 
-Go to `Settings 🠊 Devices & Services 🠊 + ADD INTEGRATION`, search for **STIHL iMow**, and follow the on-screen steps.
+Go to `Settings → Devices & Services → + ADD INTEGRATION`, search for **STIHL iMow**, and follow the on-screen steps.
 
 </details>
 
@@ -151,20 +141,73 @@ Start mowing from a defined start point for 60 minutes:
 ```
 
 ## Troubleshooting
-- **"Invalid authentication" or a re-authentication prompt:** your STIHL password changed or the token expired. Use the re-authentication prompt, or `Settings 🠊 Devices & Services 🠊 STIHL iMow 🠊 Reconfigure`, to enter your current password.
-- **Integration won't add / "Failed to connect":** verify your credentials work at https://app.imow.stihl.com. If they only work at https://myimow.stihl.com, your mower is Generation 5 and is not supported.
-- **Timeouts in the log:** the upstream STIHL server occasionally responds slowly; the integration retries and keeps working. Occasional timeout log lines are harmless.
-- **A sensor is missing:** some sensors are disabled by default (e.g. *Mowing area (feet)*, *Time zone*, *Last GPS position*). Enable them from the entity settings. Read-only diagnostic sensors are grouped under the device's *Diagnostic* section and settings switches under *Configuration*.
-- **Report a problem:** download diagnostics from `Settings 🠊 Devices & Services 🠊 STIHL iMow 🠊 (three-dot menu) 🠊 Download diagnostics` (credentials are redacted) and attach it to a GitHub issue.
 
-### Screenshots
-#### Integration
-![grafik](https://user-images.githubusercontent.com/4389395/124358848-71bad300-dc22-11eb-9095-567a069db925.png)
-#### Overview
-![grafik](https://user-images.githubusercontent.com/4389395/124358816-4f28ba00-dc22-11eb-81d1-6e72f9a4b16d.png)
-#### Service
-![grafik](https://user-images.githubusercontent.com/4389395/124358851-74b5c380-dc22-11eb-9435-3248b84e84f6.png)
+Pick the symptom that matches your issue:
+
+<details>
+<summary>🔑 <strong>"Invalid authentication" or a re-authentication prompt</strong></summary>
+
+Your STIHL password changed or the token expired. Re-enter your current password via the re-authentication prompt, or through `Settings → Devices & Services → STIHL iMow → Reconfigure`.
+
+</details>
+
+<details>
+<summary>🔌 <strong>Integration won't add / "Failed to connect"</strong></summary>
+
+Verify your credentials work at [app.imow.stihl.com](https://app.imow.stihl.com). If they only work at [myimow.stihl.com](https://myimow.stihl.com), your mower is **Generation 5** and is not supported.
+
+</details>
+
+<details>
+<summary>⏱️ <strong>Timeouts in the log</strong></summary>
+
+The upstream STIHL server occasionally responds slowly; the integration retries and keeps working. Occasional timeout log lines are **harmless**.
+
+</details>
+
+<details>
+<summary>🔍 <strong>A sensor is missing</strong></summary>
+
+Some sensors are disabled by default (e.g. *Mowing area (feet)*, *Time zone*, *Last GPS position*) — enable them from the entity settings. Read-only diagnostic sensors are grouped under the device's *Diagnostic* section, and settings switches under *Configuration*.
+
+</details>
+
+> [!TIP]
+> **Still stuck?** Download diagnostics from `Settings → Devices & Services → STIHL iMow → ⋮ (3-dots) → Download diagnostics` (credentials are redacted) and attach it to a [new GitHub issue](https://github.com/ChrisHaPunkt/ha-stihl-imow/issues/new).
+
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center" valign="top" width="33%">
+      <a href="https://user-images.githubusercontent.com/4389395/124358848-71bad300-dc22-11eb-9095-567a069db925.png">
+        <img src="https://user-images.githubusercontent.com/4389395/124358848-71bad300-dc22-11eb-9095-567a069db925.png" width="260" alt="Integration" />
+      </a>
+      <br /><sub><b>Integration</b></sub>
+    </td>
+    <td align="center" valign="top" width="33%">
+      <a href="https://user-images.githubusercontent.com/4389395/124358816-4f28ba00-dc22-11eb-81d1-6e72f9a4b16d.png">
+        <img src="https://user-images.githubusercontent.com/4389395/124358816-4f28ba00-dc22-11eb-81d1-6e72f9a4b16d.png" width="260" alt="Overview" />
+      </a>
+      <br /><sub><b>Overview</b></sub>
+    </td>
+    <td align="center" valign="top" width="33%">
+      <a href="https://user-images.githubusercontent.com/4389395/124358851-74b5c380-dc22-11eb-9435-3248b84e84f6.png">
+        <img src="https://user-images.githubusercontent.com/4389395/124358851-74b5c380-dc22-11eb-9435-3248b84e84f6.png" width="260" alt="Action" />
+      </a>
+      <br /><sub><b>Action</b></sub>
+    </td>
+  </tr>
+</table>
 
 ## Support
-If you want to buy me a coffee, feel free — use the [Buy Me A Coffee](https://www.buymeacoffee.com/chrishapunkt) badge at the top of this page. :)
+
+This integration is developed and maintained in my free time. If it's useful to you, here are a few ways to give something back — **all of them help, none of them are required:**
+
+- ⭐ **Star this repository** — it costs nothing and helps others discover the integration.
+- 🐛 **Report bugs or ideas** via [GitHub issues](https://github.com/ChrisHaPunkt/ha-stihl-imow/issues) (diagnostics attached help a lot).
+- 🔧 **Contribute** — pull requests for fixes, translations or docs are very welcome.
+- ☕ **[Buy me a coffee](https://www.buymeacoffee.com/chrishapunkt)** if you'd like to say thanks (also linked as a badge at the top).
+
+Thank you for using STIHL iMow for Home Assistant! 💚
 
