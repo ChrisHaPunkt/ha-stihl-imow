@@ -40,29 +40,63 @@ In Home Assistant, this enables me to provide the following:
 
 ## Installation
 
-### 1.a Using the Home Assistant Community Store ( [HACS](https://hacs.xyz/) )
-If you're using HACS, add this Github-Repo url as a custom repo:
-`HACS 🠊 custom repositories 🠊 Type: 'Integration' 🠊 URL:`
-```
-https://github.com/ChrisHaPunkt/ha-stihl-imow.git
-```
-Afterwards go to your `HACS 🠊 Integrations 🠊 '+ EXPLORE & ADD REPOSITORIES' 🠊 search for 'STIHL'`,
-if you're not presented with a `New repository` banner, to install the component to your server.
+> [!TIP]
+> **Fastest path:** install via HACS with the one-click button, restart Home Assistant, then configure with the second button. Each step is explained below.
 
-### 1.b Without HACS
-Otherwise install the component manually by putting the files from `/custom_components/stihl_imow/` in your folder `<config directory>/custom_components/stihl_imow/`
+### Step 1 — Install the integration
 
-### 2. Restart your Home Assistant
-You have to restart Home Assistant to make you server recognize the new integration.
+#### Option A · HACS (recommended)
 
-## Configuration
-After installing, you have to configure the new component in your Home Assistant. This is done via the UI.
+1. Make sure [HACS](https://hacs.xyz/) is installed.
+2. Add this repository to HACS with one click:
 
-To do so, add the STIHL iMow Integration in your Servers `Configuration 🠊 Integrations 🠊 '+ ADD INTEGRATION'`.
+   [![Open your Home Assistant instance and add this repository to HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=ChrisHaPunkt&repository=ha-stihl-imow&category=integration)
 
-Within the configuration flow provide your `https://app.imow.stihl.com/#` credentials to let Home Assistant access the upstream API and configure your preferred language for the state messages.
+3. On the opened HACS page, use the **⋮ (3-dots)** menu → **Download**.
+4. **Restart Home Assistant.**
 
-The integration polls the STIHL cloud every 30 seconds. Following Home Assistant's guidance for cloud services, the polling interval is fixed and not user-configurable.
+<details>
+<summary>Add the repository to HACS manually (if the button doesn't work)</summary>
+
+Go to `HACS 🠊 ⋮ (3-dots) 🠊 Custom repositories` and add:
+
+| Field | Value |
+| --- | --- |
+| Repository | `https://github.com/ChrisHaPunkt/ha-stihl-imow` |
+| Type | `Integration` |
+
+Then open `HACS 🠊 search for 'STIHL'`, download the integration, and **restart Home Assistant**.
+
+</details>
+
+#### Option B · Manual install (without HACS)
+
+<details>
+<summary>Show manual installation steps</summary>
+
+1. Download the contents of `custom_components/stihl_imow/` from this repository.
+2. Copy them into `<config directory>/custom_components/stihl_imow/` on your Home Assistant instance.
+3. **Restart Home Assistant.**
+
+</details>
+
+### Step 2 — Configure the integration
+
+1. Start the setup with one click:
+
+   [![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=stihl_imow)
+
+2. Enter your [`https://app.imow.stihl.com`](https://app.imow.stihl.com) credentials and pick your preferred language for the state messages.
+
+<details>
+<summary>Start the configuration manually</summary>
+
+Go to `Settings 🠊 Devices & Services 🠊 + ADD INTEGRATION`, search for **STIHL iMow**, and follow the on-screen steps.
+
+</details>
+
+> [!NOTE]
+> The integration polls the STIHL cloud every 30 seconds. Following Home Assistant's guidance for cloud services, the polling interval is fixed and not user-configurable.
 
 ## Data updates
 The integration polls the STIHL cloud API about every 30 seconds and refreshes every entity of every mower from a single fetch per mower. STIHL is a cloud service, so there is no local or push update; the 30-second interval balances freshness against the upstream server's rate limits.
