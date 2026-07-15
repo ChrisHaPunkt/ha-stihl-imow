@@ -1,8 +1,14 @@
 
 # Home Assistant STIHL iMow
-[![CI](https://github.com/ChrisHaPunkt/ha-stihl-imow/actions/workflows/validate_via_cron.yaml/badge.svg?branch=main)](https://github.com/ChrisHaPunkt/ha-stihl-imow/actions/workflows/validate_via_cron.yaml)
-[![CI](https://github.com/ChrisHaPunkt/ha-stihl-imow/actions/workflows/release.yaml/badge.svg)](https://github.com/ChrisHaPunkt/ha-stihl-imow/actions/workflows/.yaml)
-[![CI](https://github.com/ChrisHaPunkt/ha-stihl-imow/actions/workflows/pushpull.yaml/badge.svg)](https://github.com/ChrisHaPunkt/ha-stihl-imow/actions/workflows/pushpull.yaml)
+[![CI validate](https://img.shields.io/github/actions/workflow/status/ChrisHaPunkt/ha-stihl-imow/validate_via_cron.yaml?style=for-the-badge&logo=github&logoColor=ccc&label=validate)](https://github.com/ChrisHaPunkt/ha-stihl-imow/actions/workflows/validate_via_cron.yaml)
+[![CI release](https://img.shields.io/github/actions/workflow/status/ChrisHaPunkt/ha-stihl-imow/release.yaml?style=for-the-badge&logo=github&logoColor=ccc&label=release)](https://github.com/ChrisHaPunkt/ha-stihl-imow/actions/workflows/release.yaml)
+[![CI push/pull](https://img.shields.io/github/actions/workflow/status/ChrisHaPunkt/ha-stihl-imow/pushpull.yaml?style=for-the-badge&logo=github&logoColor=ccc&branch=main&label=push%2Fpull)](https://github.com/ChrisHaPunkt/ha-stihl-imow/actions/workflows/pushpull.yaml)
+[![latest release](https://img.shields.io/github/v/release/ChrisHaPunkt/ha-stihl-imow?style=for-the-badge&logo=github&logoColor=ccc&label=latest)](https://github.com/ChrisHaPunkt/ha-stihl-imow/releases/latest)
+[![release date](https://img.shields.io/github/release-date/ChrisHaPunkt/ha-stihl-imow?style=for-the-badge&logo=github&logoColor=ccc&label=released)](https://github.com/ChrisHaPunkt/ha-stihl-imow/releases/latest)
+[![hainstall][hainstallbadge]][hainstall]
+
+[hainstall]: https://my.home-assistant.io/redirect/config_flow_start/?domain=stihl_imow
+[hainstallbadge]: https://img.shields.io/badge/dynamic/json?style=for-the-badge&logo=home-assistant&logoColor=ccc&label=usage&suffix=%20installs&cacheSeconds=15600&url=https://analytics.home-assistant.io/custom_integrations.json&query=$.stihl_imow.total
 
 
 # Limitations
