@@ -6,6 +6,7 @@
 [![latest release](https://img.shields.io/github/v/release/ChrisHaPunkt/ha-stihl-imow?style=for-the-badge&logo=github&logoColor=ccc&label=latest)](https://github.com/ChrisHaPunkt/ha-stihl-imow/releases/latest)
 [![release date](https://img.shields.io/github/release-date/ChrisHaPunkt/ha-stihl-imow?style=for-the-badge&logo=github&logoColor=ccc&label=released)](https://github.com/ChrisHaPunkt/ha-stihl-imow/releases/latest)
 [![hainstall][hainstallbadge]][hainstall]
+[![Buy Me A Coffee](https://img.shields.io/badge/buy%20me%20a-coffee-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=000)](https://www.buymeacoffee.com/chrishapunkt)
 
 [hainstall]: https://my.home-assistant.io/redirect/config_flow_start/?domain=stihl_imow
 [hainstallbadge]: https://img.shields.io/badge/dynamic/json?style=for-the-badge&logo=home-assistant&logoColor=ccc&label=usage&suffix=%20installs&cacheSeconds=15600&url=https://analytics.home-assistant.io/custom_integrations.json&query=$.stihl_imow.total
@@ -131,7 +132,5 @@ Start mowing from a defined start point for 60 minutes:
 ![grafik](https://user-images.githubusercontent.com/4389395/124358851-74b5c380-dc22-11eb-9435-3248b84e84f6.png)
 
 ## Support
-If you want to buy me a coffee, feel free: :)
-[!["Buy Me A Coffee"](
-https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=&slug=chrishapunkt&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff)](https://www.buymeacoffee.com/chrishapunkt)
+If you want to buy me a coffee, feel free — use the [Buy Me A Coffee](https://www.buymeacoffee.com/chrishapunkt) badge at the top of this page. :)
 
